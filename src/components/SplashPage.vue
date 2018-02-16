@@ -9,7 +9,7 @@
       <tr>
         <td width="33%">Name: </td>
         <td width="33%"><input v-model="serverList[0].name"></td>
-        <td rowspan = 2>  <button class='hasError'> X </button> </td>
+        <td rowspan = 2>  <button :class='{hasError: !isOnline}' :disable='!isOnline'> {{ isOnline ? 'Go' : 'X' }} </button> </td>
       </tr>
       <tr>
         <td width="33%">URL: </td>
@@ -28,11 +28,13 @@ export default {
   data () {
     return {
       msg: 'Welcome to Iseult.js',
-      // imageSrc: 'http://127.0.0.1:8000/api/imgs/?n=1
       serverList: [
         {id: 0, name: 'Server1', path: ''}
       ]
     }
+  },
+  computed: {
+    isOnline: function () { return false }
   }
 }
 
@@ -69,18 +71,20 @@ button {
     background-color: #4CAF50; /* Green */
     border: none;
     color: white;
-    padding: 15px 32px;
+    width: 75px;
+    height: 50px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
 }
 .hasError {
-    background-color: #FF0000; /* Green */
+    background-color: #FF0000; /* red */
     border: none;
     opacity: 0.6;
     color: white;
-    padding: 15px 32px;
+    width: 75px;
+    height: 50px;
     text-align: center;
     text-decoration: none;
     display: inline-block;

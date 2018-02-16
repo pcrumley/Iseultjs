@@ -9,7 +9,6 @@
 export default {
   name: 'App'
 }
-console.log(this)
 </script>
 
 <style>
