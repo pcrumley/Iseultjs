@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import SplashPage from '@/components/SplashPage'
 import sidebar from '@/components/sidebar'
 import sidebarToggle from '@/components/sidebarToggle'
-import Image from '@/components/Image'
+import ImageCanvas from '@/components/ImageCanvas'
 Vue.use(Router)
 
 export default new Router({
@@ -15,8 +15,8 @@ export default new Router({
     },
     {
       path: '/image',
-      name: 'image',
-      component: Image
+      name: 'imageCanvas',
+      component: ImageCanvas
     },
     {
       path: '/',
