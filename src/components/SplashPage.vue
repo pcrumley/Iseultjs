@@ -1,5 +1,6 @@
 <template>
   <div class="splash">
+    <img src="../assets/logo.png">
     <h1>{{ msg }}</h1>
     <p>A visualizer for particle-in-cell data created with Vue.js & D3. <br> Written by
        Patrick Crumley (patrick.crumley@gmail.com).
@@ -30,12 +31,43 @@ export default {
       msg: 'Welcome to Iseult.js',
       serverList: [
         {id: 0, name: 'Server1', path: ''}
-      ]
+      ],
+      isOnline: false
+    }
+  }
+  /*
+  watch: {
+    // whenever question changes, this function will run
+    serverList: function (newServer, oldSever) {
+      this.isOnline  = false
+      this.pingServer()
     }
   },
-  computed: {
-    isOnline: function () { return false }
+  methods: {
+    // _.debounce is a function provided by lodash to limit how
+    // often a particularly expensive operation can be run.
+    // In this case, we want to limit how often we access
+    // yesno.wtf/api, waiting until the user has completely
+    // finished typing before making the ajax request. To learn
+    // more about the _.debounce function (and its cousin
+    // _.throttle), visit: https://lodash.com/docs#debounce
+    getAnswer: _.debounce(
+      function () {
+        var vm = this
+        axios.get(vm.serverList[0].name + '/api/handshake')
+          .then(function (response) {
+            vm.isOnline = (response.data.name === 'IseultServer')
+          })
+          .catch(function (error) {
+            vm.isOnline = false + error
+          })
+      },
+      // This is the number of milliseconds we wait for the
+      // user to stop typing.
+      500
+    )
   }
+  */
 }
 
 </script>
