@@ -28,6 +28,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 canvas {
-    border: 2px solid black ;
+  position: absolute;
+    border: 2px solid black;
 }
 </style>

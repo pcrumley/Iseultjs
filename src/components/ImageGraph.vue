@@ -1,10 +1,21 @@
 <template>
   <div>
+
   <iseult-image-canvas :px="px" :py="py" :imgData="imgObj.pngData"></iseult-image-canvas>
+  <svg style="width:500px;height:500px">
+    <iseult-axis :orient="axisX.orient"
+                 :scaleType="axisX.scaleType"
+                 :range="axisX.range"
+                 :domain="axisX.domain"
+                 :height="px"
+                 :width="py">
+    </iseult-axis>
+
+  </svg>
   <p>Input the for flask server
     <input v-model="imgSrc">
   </p>
-  <p> {{ imgObj.xmin/2 }} </p>
+  <p> {{  imgObj.xmax - imgObj.xmin }} {{ imgObj.ymax - imgObj.ymin }} </p>
   </div>
 </template>
 
@@ -12,12 +23,14 @@
 import axios from 'axios'
 import _ from 'lodash'
 import ImageCanvas from './ImageCanvas.vue'
+import IseultAxis from './IseultAxis.vue'
 export default {
   name: 'ImageGraph',
   data () {
     return {
-      px: 400,
-      py: 400,
+      px: 400, // For the svg element containing an image graph & a colorbar
+      py: 400, // For the svg element containing an image graph & a colorbar
+
       imgSrc: 'http://127.0.0.1:5000/api/2dhist/imgs/?sim_type=tristan-mp&outdir=test_output/&n=1&prtl_type=ions&xval=x&yval=px&cnorm=log&xmin=150',
       imgObj: {
         'pngData': '',
@@ -28,11 +41,36 @@ export default {
         'vmin': '',
         'vmax': '',
         'cmap': ''
-      }
+      },
+      axisX: {
+        scaleType: 'scaleLinear',
+        range: [0, this.px],
+        domain: [0, 1],
+        orient: 'axisBottom'
+      },
+      axisY: {
+        scaleType: 'scaleLinear',
+        range: [0, this.py],
+        domain: [0, 1],
+        orient: 'axisLeft'
+      },
+      axisColorbar: {
+        scaleType: 'scaleLinear',
+        range: [0, 1],
+        domain: [0, 1],
+        orient: 'axisRight',
+        cmap: ''
+      },
+
+      xScale: '',
+      xAxis: '',
+      yScale: '',
+      vScale: ''
     }
   },
   components: {
-    'iseultImageCanvas': ImageCanvas
+    'iseultImageCanvas': ImageCanvas,
+    'iseultAxis': IseultAxis
   },
   watch: {
     imgSrc: function (newSrc, oldSrc) {
@@ -47,12 +85,9 @@ export default {
           .then(function (response) {
             vm.imgObj.pngData = response.data.imgString
             vm.imgObj.cmap = response.data.cmap
-            vm.imgObj.xmin = parseFloat(response.data.xmin)
-            vm.imgObj.xmax = parseFloat(response.data.xmax)
-            vm.imgObj.ymin = parseFloat(response.data.ymin)
-            vm.imgObj.ymax = parseFloat(response.data.ymax)
-            vm.imgObj.vmin = parseFloat(response.data.cmin)
-            vm.imgObj.vmax = parseFloat(response.data.cmax)
+            vm.axisX.domain = [response.data.xmin, response.data.xmax]
+            vm.axisY.domain = [response.data.ymin, response.data.ymax]
+            vm.axisColorbar.domain = [response.data.cmin, response.data.cmax]
           })
           .catch(function (error) {
             vm.imgString = ''
@@ -65,7 +100,7 @@ export default {
 }
 
 </script>
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-</style>
+
+  </style>
