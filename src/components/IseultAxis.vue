@@ -17,21 +17,29 @@ export default {
   ],
   computed: {
     axisTransform () {
-      var x = this.orient === 'axisRight' ? this.width : 0
-      var y = this.orient === 'axisBottom' ? this.height : 0
+      var x = this.orient === 'axisRight' ? this.width : 1
+      var y = this.orient === 'axisBottom' ? this.height + 1 : 0
       return 'translate(' + x + ',' + y + ')'
     },
     scale () {
       return d3[this.scaleType]()
         .range(this.range)
         .domain(this.domain)
-    },
-    mounted: function () {
+    }
+  },
+  methods: {
+    drawAxis () {
       d3.select(this.$el)
         .call(d3[this.orient](this.scale))
-      console.log('hi ')
-      return console.log('hi')
     }
+  },
+  watch: {
+    scale: function (newScale, oldScale) {
+      this.drawAxis()
+    }
+  },
+  mounted: function () {
+    this.drawAxis()
   }
 }
 </script>

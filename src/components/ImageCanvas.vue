@@ -29,6 +29,6 @@ export default {
 <style scoped>
 canvas {
   position: absolute;
-    border: 2px solid black;
+    border: 1px solid black;
 }
 </style>

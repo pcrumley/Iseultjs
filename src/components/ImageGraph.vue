@@ -15,7 +15,8 @@
   <p>Input the for flask server
     <input v-model="imgSrc">
   </p>
-  <p> {{  imgObj.xmax - imgObj.xmin }} {{ imgObj.ymax - imgObj.ymin }} </p>
+
+  <p> {{  axisX.range }} </p>
   </div>
 </template>
 
@@ -42,30 +43,38 @@ export default {
         'vmax': '',
         'cmap': ''
       },
-      axisX: {
-        scaleType: 'scaleLinear',
-        range: [0, this.px],
-        domain: [0, 1],
-        orient: 'axisBottom'
-      },
-      axisY: {
-        scaleType: 'scaleLinear',
-        range: [0, this.py],
-        domain: [0, 1],
-        orient: 'axisLeft'
-      },
-      axisColorbar: {
-        scaleType: 'scaleLinear',
-        range: [0, 1],
-        domain: [0, 1],
-        orient: 'axisRight',
-        cmap: ''
-      },
 
       xScale: '',
       xAxis: '',
       yScale: '',
       vScale: ''
+    }
+  },
+  computed: {
+    axisX () {
+      return {
+        scaleType: 'scaleLinear',
+        range: [0, this.px],
+        domain: [0, 1],
+        orient: 'axisBottom'
+      }
+    },
+    axisY () {
+      return {
+        scaleType: 'scaleLinear',
+        range: [0, this.py],
+        domain: [0, 1],
+        orient: 'axisLeft'
+      }
+    },
+    axisColorbar () {
+      return {
+        scaleType: 'scaleLinear',
+        range: [0, 1],
+        domain: [0, 1],
+        orient: 'axisRight',
+        cmap: ''
+      }
     }
   },
   components: {
