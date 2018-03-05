@@ -1,31 +1,38 @@
 <template>
   <!--<div> -->
   <div>
-  <div class="relative">
-  <svg style="width:500px;height:500px">
+  <div class="relative" :style="{ width:width+'px', height:height+'px' }">
+  <svg :style="{ width:width+'px', height:height+'px' }">
 
     <iseult-axis :orient="axisX.orient"
                  :scaleType="axisX.scaleType"
                  :range="axisX.range"
                  :domain="axisX.domain"
-                 :height="imgX"
-                 :width="imgY">
+                 :height="imgY"
+                 :width="imgX"
+                 :margin="margin">
     </iseult-axis>
     <iseult-axis :orient="axisY.orient"
                  :scaleType="axisY.scaleType"
                  :range="axisY.range"
                  :domain="axisY.domain"
-                 :height="imgX"
-                 :width="imgY">
+                 :height="imgY"
+                 :width="imgX"
+                 :margin="margin">
     </iseult-axis>
   </svg>
-  <iseult-image-canvas :imgX="imgX" :imgY="imgY" :top="10" :left="50" :imgData="imgObj.pngData"></iseult-image-canvas>
+
+  <iseult-image-canvas :imgX="imgX" :imgY="imgY" :top="margin.top + 'px'" :left="margin.left+'px'" :imgData="imgObj.pngData"></iseult-image-canvas>
+  <span class="axisLabel">
+  <katex mathstr='p_x'/>
+  </span>
+
   </div>
+
   <p>Input the for flask server
     <input v-model="imgSrc">
   </p>
   <p> {{  axisX.range }} </p>
-  <katex :mathstr="xLabel"> </katex>
   </div>
 </template>
 
@@ -34,14 +41,20 @@ import axios from 'axios'
 import _ from 'lodash'
 import ImageCanvas from './ImageCanvas.vue'
 import iseultAxis from './IseultAxis.vue'
-import latexText from './LatexText.vue'
+import katex from './Katex.vue'
 export default {
   name: 'ImageGraph',
   data () {
     return {
-      imgX: 400, // For the svg element containing an image graph & a colorbar
-      imgY: 400, // For the svg element containing an image graph & a colorbar
-      xLabel: 'p',
+      width: 900,
+      height: 500,
+      margin: {
+        top: 20,
+        right: 10,
+        bottom: 50,
+        left: 70
+      },
+      xLabel: 'x \\space \\space [c/\\omega_{pe}]',
       imgSrc: 'http://127.0.0.1:5000/api/2dhist/imgs/?sim_type=tristan-mp&outdir=test_output/&n=1&prtl_type=ions&xval=x&yval=px&cnorm=log&xmin=150',
       imgObj: {
         'pngData': '',
@@ -61,6 +74,14 @@ export default {
     }
   },
   computed: {
+    imgX () {
+      // return this.width - this.right-this.left
+      return this.width - this.margin.right - this.margin.left
+    },
+    imgY () {
+      // return this.width - this.right-this.left
+      return this.height - this.margin.top - this.margin.bottom
+    },
     axisX () {
       return {
         scaleType: 'scaleLinear',
@@ -72,7 +93,7 @@ export default {
     axisY () {
       return {
         scaleType: 'scaleLinear',
-        range: [0, this.imgY],
+        range: [this.imgY, 0],
         domain: [0, 1],
         orient: 'axisLeft'
       }
@@ -90,7 +111,7 @@ export default {
   components: {
     'iseultImageCanvas': ImageCanvas,
     iseultAxis,
-    'katex': latexText
+    katex
   },
   watch: {
     imgSrc: function (newSrc, oldSrc) {
@@ -123,13 +144,13 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 div.relative {
-    position: relative;
-    width: 500px;
-    height: 500px;
-    border: 3px solid #73AD21;
+  position: relative;
+  border: 3px solid #73AD21;
     margin: auto;
 }
-span.katex-html {
-  display: block;
+span.axisLabel {
+  position: absolute;
+  top: 450px;
+  font-size: 20px;
 }
 </style>

@@ -13,12 +13,14 @@ export default {
     'range',
     'domain',
     'height',
-    'width'
+    'width',
+    'margin'
   ],
   computed: {
     axisTransform () {
-      var x = this.orient === 'axisRight' ? this.width : 50
-      var y = this.orient === 'axisBottom' ? this.height + 11 : 11
+      var x = this.orient === 'axisRight' ? this.width : this.margin.left
+      var y = this.orient === 'axisBottom' ? this.height + this.margin.top : this.margin.top
+
       return 'translate(' + x + ',' + y + ')'
     },
     scale () {
@@ -43,3 +45,9 @@ export default {
   }
 }
 </script>
+<style scoped>
+g {
+  font: 14px Avenir;
+  shape-rendering: crispEdges;
+}
+</style>

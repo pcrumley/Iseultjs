@@ -1,6 +1,5 @@
 <template>
-  <canvas :transform="imgTransform"
-          :width="imgX"
+  <canvas :width="imgX"
           :height="imgY"
           :style="{ left: left, top: top }"
                     v-insert-image="imgData">
@@ -12,12 +11,6 @@ export default {
   name: 'ImageCanvas',
   props: ['imgX', 'imgY', 'imgData', 'top', 'left'],
   computed: {
-    imgTransform () {
-      // var x = this.orient === 'axisRight' ? this.width : 100
-      // var y = this.orient === 'axisBottom' ? this.height + 1 : 0
-      // return 'translate(' + x + ',' + y + ')'
-      return 'translate(0,0)'
-    }
   },
   directives: {
     insertImage: function (canvasElement, binding) {
@@ -43,8 +36,6 @@ export default {
 canvas {
   border: 0px solid black;
   position: absolute;
-  top:10px;
-  left:50px;
 }
 
 </style>
