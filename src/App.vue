@@ -20,4 +20,7 @@ export default {
   --accent-color: #FFCB08;
   margin-top: 60px;
 }
+span.katex-html {
+  display: none;
+}
 </style>

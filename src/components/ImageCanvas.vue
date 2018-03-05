@@ -1,11 +1,24 @@
 <template>
-  <canvas :width="px" :height="py" v-insert-image="imgData"></canvas>
+  <canvas :transform="imgTransform"
+          :width="imgX"
+          :height="imgY"
+          :style="{ left: left, top: top }"
+                    v-insert-image="imgData">
+  </canvas>
 </template>
 
 <script>
 export default {
   name: 'ImageCanvas',
-  props: ['px', 'py', 'imgData'],
+  props: ['imgX', 'imgY', 'imgData', 'top', 'left'],
+  computed: {
+    imgTransform () {
+      // var x = this.orient === 'axisRight' ? this.width : 100
+      // var y = this.orient === 'axisBottom' ? this.height + 1 : 0
+      // return 'translate(' + x + ',' + y + ')'
+      return 'translate(0,0)'
+    }
+  },
   directives: {
     insertImage: function (canvasElement, binding) {
       // Get canvas context
@@ -28,7 +41,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 canvas {
+  border: 0px solid black;
   position: absolute;
-    border: 1px solid black;
+  top:10px;
+  left:50px;
 }
+
 </style>

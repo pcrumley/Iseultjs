@@ -17,8 +17,8 @@ export default {
   ],
   computed: {
     axisTransform () {
-      var x = this.orient === 'axisRight' ? this.width : 1
-      var y = this.orient === 'axisBottom' ? this.height + 1 : 0
+      var x = this.orient === 'axisRight' ? this.width : 50
+      var y = this.orient === 'axisBottom' ? this.height + 11 : 11
       return 'translate(' + x + ',' + y + ')'
     },
     scale () {
