@@ -60,8 +60,8 @@ export default {
   name: 'ImageGraph',
   data () {
     return {
-      width: 900,
-      height: 500,
+      width: 2400,
+      height: 600,
       margin: {
         top: 20,
         right: 60,

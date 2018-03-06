@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import katex from './Katex.vue'
+import katex from '@/components/Katex.vue'
 export default {
   name: 'AxisLabel',
   props: [
