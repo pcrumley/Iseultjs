@@ -1,4 +1,8 @@
 <template>
+  <!--
+  A SIMPLE VUE COMPONENT THAT ALLOWS RENDERING OF
+  LATEX COMMANDS
+  -->
   <span v-compile-latex="mathstr">
   </span>
 </template>
@@ -19,3 +23,9 @@ export default {
 
 }
 </script>
+
+<style scoped>
+span {
+  margin: 0px;
+}
+</style>

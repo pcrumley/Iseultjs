@@ -2,8 +2,11 @@
   <!--<div> -->
   <div>
   <div class="relative" :style="{ width:width+'px', height:height+'px' }">
+  <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
+       three labels -->
   <svg :style="{ width:width+'px', height:height+'px' }">
-
+    <!-- The svg is where we'll draw our vector elements using d3.js -->
+    <!-- The x-axis -->
     <iseult-axis :orient="axisX.orient"
                  :scaleType="axisX.scaleType"
                  :range="axisX.range"
@@ -12,6 +15,7 @@
                  :width="imgX"
                  :margin="margin">
     </iseult-axis>
+    <!-- The y-axis -->
     <iseult-axis :orient="axisY.orient"
                  :scaleType="axisY.scaleType"
                  :range="axisY.range"
@@ -20,19 +24,29 @@
                  :width="imgX"
                  :margin="margin">
     </iseult-axis>
+    <!-- The colorbar-axis -->
+    <iseult-axis :orient="axisColorbar.orient"
+                 :scaleType="axisColorbar.scaleType"
+                 :range="axisColorbar.range"
+                 :domain="axisColorbar.domain"
+                 :height="imgY"
+                 :width="imgX"
+                 :margin="margin">
+    </iseult-axis>
+
   </svg>
 
   <iseult-image-canvas :imgX="imgX" :imgY="imgY" :top="margin.top + 'px'" :left="margin.left+'px'" :imgData="imgObj.pngData"></iseult-image-canvas>
-  <span class="axisLabel">
-  <katex mathstr='p_x'/>
-  </span>
+  <iseult-image-canvas :imgX="cbarWidth" :imgY="imgY" :top="margin.top + 'px'" :left="cbarObj.left+'px'" :imgData="cbarPNG"></iseult-image-canvas>
 
+  <axis-label :orient="'labelLeft'" :text="'p_x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
+  <axis-label :orient="'labelBottom'" :text="'x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   </div>
 
   <p>Input the for flask server
-    <input v-model="imgSrc">
+    <input v-model="imgSrc  ">
   </p>
-  <p> {{  axisX.range }} </p>
+  <p> {{  cbarPNG }} </p>
   </div>
 </template>
 
@@ -41,7 +55,7 @@ import axios from 'axios'
 import _ from 'lodash'
 import ImageCanvas from './ImageCanvas.vue'
 import iseultAxis from './IseultAxis.vue'
-import katex from './Katex.vue'
+import axisLabel from './AxisLabel.vue'
 export default {
   name: 'ImageGraph',
   data () {
@@ -50,12 +64,15 @@ export default {
       height: 500,
       margin: {
         top: 20,
-        right: 10,
-        bottom: 50,
-        left: 70
+        right: 60,
+        bottom: 70,
+        left: 70,
+        hspace: 50
       },
       xLabel: 'x \\space \\space [c/\\omega_{pe}]',
       imgSrc: 'http://127.0.0.1:5000/api/2dhist/imgs/?sim_type=tristan-mp&outdir=test_output/&n=1&prtl_type=ions&xval=x&yval=px&cnorm=log&xmin=150',
+      cbarPNG: '',
+      cbarWidth: 20,
       imgObj: {
         'pngData': '',
         'xmin': '',
@@ -74,9 +91,19 @@ export default {
     }
   },
   computed: {
+    cbarObj () {
+      return {
+        width: 20,
+        height: this.imgY,
+        top: this.margin.top,
+        left: this.width - this.margin.right - 20,
+        url: 'http://localhost:5000/api/colorbar/' +
+             '?px=20&py=' + this.imgY
+      }
+    },
     imgX () {
       // return this.width - this.right-this.left
-      return this.width - this.margin.right - this.margin.left
+      return this.width - this.margin.right - this.margin.left - this.margin.hspace
     },
     imgY () {
       // return this.width - this.right-this.left
@@ -100,8 +127,8 @@ export default {
     },
     axisColorbar () {
       return {
-        scaleType: 'scaleLinear',
-        range: [0, 1],
+        scaleType: 'scaleLog',
+        range: [this.imgY, 0],
         domain: [0, 1],
         orient: 'axisRight',
         cmap: ''
@@ -111,7 +138,7 @@ export default {
   components: {
     'iseultImageCanvas': ImageCanvas,
     iseultAxis,
-    katex
+    axisLabel
   },
   watch: {
     imgSrc: function (newSrc, oldSrc) {
@@ -128,7 +155,8 @@ export default {
             vm.imgObj.cmap = response.data.cmap
             vm.axisX.domain = [response.data.xmin, response.data.xmax]
             vm.axisY.domain = [response.data.ymin, response.data.ymax]
-            vm.axisColorbar.domain = [response.data.cmin, response.data.cmax]
+            vm.axisColorbar.domain = [response.data.vmin, response.data.vmax]
+            vm.getColorBar()
           })
           .catch(function (error) {
             vm.imgString = ''
@@ -136,7 +164,18 @@ export default {
           })
       },
       500
-    )
+    ),
+    getColorBar () {
+      var vm = this
+      axios.get(vm.cbarObj.url)
+        .then(function (response) {
+          vm.cbarPNG = response.data.cbarString
+        })
+        .catch(function (error) {
+          vm.imgString = ''
+          console.log(error)
+        })
+    }
   }
 }
 </script>
@@ -144,13 +183,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 div.relative {
-  position: relative;
-  border: 3px solid #73AD21;
-    margin: auto;
-}
-span.axisLabel {
-  position: absolute;
-  top: 450px;
-  font-size: 20px;
+    position: relative;
+  margin: auto;
 }
 </style>

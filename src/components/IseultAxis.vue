@@ -18,7 +18,8 @@ export default {
   ],
   computed: {
     axisTransform () {
-      var x = this.orient === 'axisRight' ? this.width : this.margin.left
+      console.log(this.height)
+      var x = this.orient === 'axisRight' ? this.width + this.margin.left + this.margin.hspace : this.margin.left
       var y = this.orient === 'axisBottom' ? this.height + this.margin.top : this.margin.top
 
       return 'translate(' + x + ',' + y + ')'
