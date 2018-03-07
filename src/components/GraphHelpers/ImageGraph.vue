@@ -1,6 +1,5 @@
 <template>
   <!--<div> -->
-  <div>
   <div class="relative" :style="{ width:width+'px', height:height+'px' }">
   <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
        three labels -->
@@ -42,12 +41,6 @@
   <axis-label :orient="'labelLeft'" :text="'p_x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="'x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   </div>
-
-  <p>Input the for flask server
-    <input v-model="imgText  ">
-  </p>
-  <p> {{  cbarPNG }} </p>
-  </div>
 </template>
 
 <script>
@@ -58,10 +51,10 @@ import iseultAxis from './IseultAxis.vue'
 import axisLabel from './AxisLabel.vue'
 export default {
   name: 'ImageGraph',
-  props: ['histOpts'],
+  props: ['histOpts',
+          'myRefresh'],
   data () {
     return {
-      imgText:'',
       margin: {
         top: 20,
         right: 60,
@@ -98,10 +91,10 @@ export default {
       return imgstr
     },
     width () {
-      return window.innerWidth
+      return 400
     },
     height () {
-      return 800
+      return 400
     },
     cbarObj () {
       return {
@@ -110,7 +103,7 @@ export default {
         top: this.margin.top,
         left: this.width - this.margin.right - 20,
         url: 'http://localhost:5000/api/colorbar/' +
-             '?px=20&py=' + this.imgY
+             '?px=20&py=' + this.imgY +'&cmap=' + this.histOpts['cmap']
       }
     },
     imgX () {
@@ -153,7 +146,7 @@ export default {
     axisLabel
   },
   watch: {
-    imgText: function (newSrc, oldSrc) {
+    myRefresh: function (newSrc, oldSrc) {
       this.getImg()
     }
   },
@@ -175,7 +168,7 @@ export default {
             console.log(error)
           })
       },
-      500
+      1
     ),
     getColorBar () {
       var vm = this

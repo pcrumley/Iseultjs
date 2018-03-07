@@ -1,7 +1,17 @@
 <template>
   <div>
-    <iseult-image-graph :histOpts="histOptions"/>
+    <iseult-image-graph :histOpts="histOptions" :myRefresh="refreshPlot"/>
+  <hr>
+  <select id="cmap"
+          v-model="histOptions.cmap">
+    <option v-for="item in cmapOpts"> {{ item }} </option>
+  </select>
+  <p>
+  {{ histOptions }}
+  </p>
+  <button @click="refreshPlot+=1">Refresh</button>
   </div>
+
 </template>
 
 <script>
@@ -10,8 +20,9 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      cbarOpts: ['viridis'],
+      cmapOpts: ['viridis'],
       prtlObj: {},
+      refreshPlot: 0,
       histOptions: {
         // outdir:
         // sim_type
@@ -55,11 +66,11 @@ export default {
       var vm = this
       axios.get('http://127.0.0.1:5000/api/cmaps/')
         .then(function (response) {
-          vm.cbarOpts = response.data
-          console.log(vm.cbarOpts)
+          vm.cmapOpts = response.data
+          console.log(vm.cmapOpts)
         })
         .catch(function (error) {
-          vm.cbarOpts=['viridis']
+          vm.cmapOpts=['viridis']
         })
       axios.get('http://127.0.0.1:5000/api/prtl_quants/?sim_type=tristan-mp')
         .then(function (response) {
@@ -79,30 +90,4 @@ export default {
 </script>
 
 <style>
-.el-row {
-  margin-bottom: 20px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-.el-col {
-  border-radius: 4px;
-}
-.bg-purple-dark {
-  background: #99a9bf;
-}
-.bg-purple {
-  background: #d3dce6;
-}
-.bg-purple-light {
-  background: #e5e9f2;
-}
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
-}
-.row-bg {
-  padding: 10px 0;
-  background-color: #f9fafc;
-}
 </style>
