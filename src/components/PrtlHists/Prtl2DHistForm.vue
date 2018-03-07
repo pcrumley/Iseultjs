@@ -6,6 +6,11 @@
           v-model="histOptions.cmap">
     <option v-for="item in cmapOpts"> {{ item }} </option>
   </select>
+  <select id="xval"
+          v-model="histOptions.xval">
+    <option v-for="item in prtlObj[histOptions['prtl_type']].quantities"> {{ item }} </option>
+  </select>
+
   <p>
   {{ histOptions }}
   </p>
@@ -67,7 +72,6 @@ export default {
       axios.get('http://127.0.0.1:5000/api/cmaps/')
         .then(function (response) {
           vm.cmapOpts = response.data
-          console.log(vm.cmapOpts)
         })
         .catch(function (error) {
           vm.cmapOpts=['viridis']
