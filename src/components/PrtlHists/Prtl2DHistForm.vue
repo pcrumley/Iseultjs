@@ -1,32 +1,76 @@
 <template>
   <div>
-    <iseult-image-graph/>
+    <iseult-image-graph :histOpts="histOptions"/>
   </div>
 </template>
 
 <script>
 import ImageGraph from '@/components/GraphHelpers/ImageGraph'
+import axios from 'axios'
 export default {
   data () {
     return {
-      userData: {
-        email: '',
-        password: '',
-        age: 27
-      },
-      message: 'A new Text',
-      sendMail: [],
-      gender: 'Male',
-      selectedPriority: 'High',
-      priorities: ['High', 'Medium', 'Low'],
-      dataSwitch: true,
-      isSubmitted: false
+      cbarOpts: ['viridis'],
+      prtlObj: {},
+      histOptions: {
+        // outdir:
+        // sim_type
+        // n
+        prtl_type: 'ions',
+        yval: 'px',
+        xval: 'x',
+        weights: '',
+        boolstr: '',
+        ybins: 200,
+        xbins: 200,
+        yvalmin: '',
+        yvalmax: '',
+        xvalmin: '',
+        xvalmax: '',
+        normhist: true,
+        cmap: 'viridis',
+        cnorm: 'log',
+        pow_zero: 0,
+        pow_gamma: 1.0,
+        vmin: '',
+        vmax:'',
+        clip: false,
+        xmin: '',
+        xmax: '',
+        ymin: '',
+        ymax: '',
+        aspect: 'auto',
+        mask_zeros: true,
+        interpolation: 'bicubic'
+      }
     }
   },
   methods: {
     submitted () {
       this.isSubmitted = true
     }
+  },
+  mounted:
+    function () {
+      var vm = this
+      axios.get('http://127.0.0.1:5000/api/cmaps/')
+        .then(function (response) {
+          vm.cbarOpts = response.data
+          console.log(vm.cbarOpts)
+        })
+        .catch(function (error) {
+          vm.cbarOpts=['viridis']
+        })
+      axios.get('http://127.0.0.1:5000/api/prtl_quants/?sim_type=tristan-mp')
+        .then(function (response) {
+          vm.prtlObj = response.data
+          for (var key in vm.prtlObj){
+            console.log(key)
+          }
+        })
+        .catch(function (error) {
+          vm.cbarOpts = ['viridis']
+        })
   },
   components: {
     iseultImageGraph: ImageGraph,

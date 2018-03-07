@@ -44,7 +44,7 @@
   </div>
 
   <p>Input the for flask server
-    <input v-model="imgSrc  ">
+    <input v-model="imgText  ">
   </p>
   <p> {{  cbarPNG }} </p>
   </div>
@@ -58,10 +58,10 @@ import iseultAxis from './IseultAxis.vue'
 import axisLabel from './AxisLabel.vue'
 export default {
   name: 'ImageGraph',
+  props: ['histOpts'],
   data () {
     return {
-      width: 2400,
-      height: 600,
+      imgText:'',
       margin: {
         top: 20,
         right: 60,
@@ -70,7 +70,6 @@ export default {
         hspace: 50
       },
       xLabel: 'x \\space \\space [c/\\omega_{pe}]',
-      imgSrc: 'http://127.0.0.1:5000/api/2dhist/imgs/?sim_type=tristan-mp&outdir=test_output/&n=1&prtl_type=ions&xval=x&yval=px&cnorm=log&xmin=150',
       cbarPNG: '',
       cbarWidth: 20,
       imgObj: {
@@ -91,6 +90,19 @@ export default {
     }
   },
   computed: {
+    imgSrc () {
+      var imgstr = 'http://localhost:5000/api/2dhist/imgs/?'
+      for (var key in this.histOpts) {
+        imgstr += key + '=' + this.histOpts[key] + '&'
+      }
+      return imgstr
+    },
+    width () {
+      return window.innerWidth
+    },
+    height () {
+      return 800
+    },
     cbarObj () {
       return {
         width: 20,
@@ -141,7 +153,7 @@ export default {
     axisLabel
   },
   watch: {
-    imgSrc: function (newSrc, oldSrc) {
+    imgText: function (newSrc, oldSrc) {
       this.getImg()
     }
   },
@@ -149,7 +161,7 @@ export default {
     getImg: _.debounce(
       function () {
         var vm = this
-        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY)
+        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY +'&outdir=./test_output' +'&n=3')
           .then(function (response) {
             vm.imgObj.pngData = response.data.imgString
             vm.imgObj.cmap = response.data.cmap
