@@ -1,26 +1,50 @@
 <template>
   <div>
     <iseult-image-graph :histOpts="histOptions" :myRefresh="refreshPlot" />
-  <hr>
-  <select id="cmap"
-          v-model="histOptions.cmap">
-    <option v-for="item in cmapOpts" :key="item"> {{ item }} </option>
-  </select>
-  <select id="xval"
+    <hr>
+    <div class="field is-grouped is-grouped-multiline">
+      <div class="field">
+        <label class="label">Colormap</label>
+        <div class="select control">
+          <select id="cmap"
+                  v-model="histOptions.cmap">>
+            <option v-for="item in cmapOpts" :key="item"> {{ item }} </option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">x-value</label>
+        <div class="select control">
+          <select id="xval"
           v-model="histOptions.xval">
-    <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
-  </select>
-  <select id="yval"
-          v-model="histOptions.yval">
-    <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
-  </select>
-  <select id="prtl_type"
-          v-model="histOptions.prtl_type">
-    <option v-for="(val, key) in prtlObj" :key="key"> {{ key }} </option>
-  </select>
-  <button @click="refreshPlot+=1">Refresh</button>
-  </div>
+            <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">y-value</label>
+        <div class="select control">
+          <select id="yval"
+                    v-model="histOptions.yval">
+              <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">particle</label>
+        <div class="select control">
+          <select id="prtl_type"
+                    v-model="histOptions.prtl_type">
+              <option v-for="(item, key) in prtlObj" :key="key"> {{ key }} </option>
+          </select>
+        </div>
+      </div>
 
+    </div>
+    <div class="control">
+      <button class="button is-primary"  @click="refreshPlot+=1">Refresh</button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -97,4 +121,5 @@ export default {
 </script>
 
 <style>
+
 </style>

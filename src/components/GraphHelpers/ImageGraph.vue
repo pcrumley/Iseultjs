@@ -3,7 +3,7 @@
   <div class="relative" :style="{ width:width+'px', height:height+'px' }">
   <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
        three labels -->
-  <svg :style="{ width:width+'px', height:height+'px' }">
+  <svg :style="{ width:width+'px', height:height+'px'}">
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
     <iseult-axis :orient="axisX.orient"
