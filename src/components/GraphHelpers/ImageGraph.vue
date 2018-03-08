@@ -51,8 +51,7 @@ import iseultAxis from './IseultAxis.vue'
 import axisLabel from './AxisLabel.vue'
 export default {
   name: 'ImageGraph',
-  props: ['histOpts',
-          'myRefresh'],
+  props: ['histOpts', 'myRefresh'],
   data () {
     return {
       margin: {
@@ -91,7 +90,7 @@ export default {
       return imgstr
     },
     width () {
-      return 400
+      return 800
     },
     height () {
       return 400
@@ -103,7 +102,7 @@ export default {
         top: this.margin.top,
         left: this.width - this.margin.right - 20,
         url: 'http://localhost:5000/api/colorbar/' +
-             '?px=20&py=' + this.imgY +'&cmap=' + this.histOpts['cmap']
+             '?px=20&py=' + this.imgY + '&cmap=' + this.histOpts['cmap']
       }
     },
     imgX () {
@@ -154,7 +153,7 @@ export default {
     getImg: _.debounce(
       function () {
         var vm = this
-        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY +'&outdir=./test_output' +'&n=3')
+        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY + '&outdir=./test_output' + '&n=3')
           .then(function (response) {
             vm.imgObj.pngData = response.data.imgString
             vm.imgObj.cmap = response.data.cmap

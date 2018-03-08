@@ -1,19 +1,23 @@
 <template>
   <div>
-    <iseult-image-graph :histOpts="histOptions" :myRefresh="refreshPlot"/>
+    <iseult-image-graph :histOpts="histOptions" :myRefresh="refreshPlot" />
   <hr>
   <select id="cmap"
           v-model="histOptions.cmap">
-    <option v-for="item in cmapOpts"> {{ item }} </option>
+    <option v-for="item in cmapOpts" :key="item"> {{ item }} </option>
   </select>
   <select id="xval"
           v-model="histOptions.xval">
-    <option v-for="item in prtlObj[histOptions['prtl_type']].quantities"> {{ item }} </option>
+    <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
   </select>
-
-  <p>
-  {{ histOptions }}
-  </p>
+  <select id="yval"
+          v-model="histOptions.yval">
+    <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
+  </select>
+  <select id="prtl_type"
+          v-model="histOptions.prtl_type">
+    <option v-for="(val, key) in prtlObj" :key="key"> {{ key }} </option>
+  </select>
   <button @click="refreshPlot+=1">Refresh</button>
   </div>
 
@@ -49,7 +53,7 @@ export default {
         pow_zero: 0,
         pow_gamma: 1.0,
         vmin: '',
-        vmax:'',
+        vmax: '',
         clip: false,
         xmin: '',
         xmax: '',
@@ -74,21 +78,20 @@ export default {
           vm.cmapOpts = response.data
         })
         .catch(function (error) {
-          vm.cmapOpts=['viridis']
+          console.log(error)
+          vm.cmapOpts = ['viridis']
         })
       axios.get('http://127.0.0.1:5000/api/prtl_quants/?sim_type=tristan-mp')
         .then(function (response) {
           vm.prtlObj = response.data
-          for (var key in vm.prtlObj){
-            console.log(key)
-          }
         })
         .catch(function (error) {
+          console.log(error)
           vm.cbarOpts = ['viridis']
         })
-  },
+    },
   components: {
-    iseultImageGraph: ImageGraph,
+    iseultImageGraph: ImageGraph
   }
 }
 </script>
