@@ -40,6 +40,7 @@
 
   <axis-label :orient="'labelLeft'" :text="'p_x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="'x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
+  <axis-label :orient="'labelRight'" :text="'\\log{f_i(p)}'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   </div>
 </template>
 
@@ -61,7 +62,6 @@ export default {
         left: 70,
         hspace: 50
       },
-      xLabel: 'x \\space \\space [c/\\omega_{pe}]',
       cbarPNG: '',
       cbarWidth: 20,
       imgObj: {

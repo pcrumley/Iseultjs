@@ -33,6 +33,13 @@ export default {
           top: '0px',
           left: '-20px'
         }
+      } else if (this.orient === 'labelRight') {
+        return {
+          height: this.figHeight - this.figMargin.bottom - this.figMargin.top + 'px',
+          width: this.figMargin.right + 'px',
+          top: '0px',
+          left: 25 + this.figWidth - this.figMargin.right + 'px'
+        }
       }
     }
   },
