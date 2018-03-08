@@ -44,6 +44,7 @@
     <div class="control">
       <button class="button is-primary"  @click="refreshPlot+=1">Refresh</button>
     </div>
+
   </div>
 </template>
 
@@ -54,7 +55,7 @@ export default {
   data () {
     return {
       cmapOpts: ['viridis'],
-      prtlObj: {},
+      prtlObj: {ions: {quantities: ['x']}},
       refreshPlot: 0,
       histOptions: {
         // outdir:
@@ -97,7 +98,7 @@ export default {
   mounted:
     function () {
       var vm = this
-      axios.get('http://127.0.0.1:5000/api/cmaps/')
+      axios.get('http://localhost:5000/api/cmaps/')
         .then(function (response) {
           vm.cmapOpts = response.data
         })
@@ -105,7 +106,7 @@ export default {
           console.log(error)
           vm.cmapOpts = ['viridis']
         })
-      axios.get('http://127.0.0.1:5000/api/prtl_quants/?sim_type=tristan-mp')
+      axios.get('http://localhost:5000/api/prtl_quants/?sim_type=tristan-mp')
         .then(function (response) {
           vm.prtlObj = response.data
         })
@@ -120,6 +121,6 @@ export default {
 }
 </script>
 
-<style>
+<style src="bulma/css/bulma.css">
 
 </style>
