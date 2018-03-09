@@ -54,13 +54,9 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      cmapOpts: ['viridis'],
       prtlObj: {ions: {quantities: ['x']}},
       refreshPlot: 0,
       histOptions: {
-        // outdir:
-        // sim_type
-        // n
         prtl_type: 'ions',
         yval: 'px',
         xval: 'x',
@@ -95,17 +91,15 @@ export default {
       this.isSubmitted = true
     }
   },
+  computed: {
+    cmapOpts () {
+      return this.$store.state.cmaps
+    }
+  },
   mounted:
     function () {
+      this.$store.dispatch('loadCmaps')
       var vm = this
-      axios.get('http://localhost:5000/api/cmaps/')
-        .then(function (response) {
-          vm.cmapOpts = response.data
-        })
-        .catch(function (error) {
-          console.log(error)
-          vm.cmapOpts = ['viridis']
-        })
       axios.get('http://localhost:5000/api/prtl_quants/?sim_type=tristan-mp')
         .then(function (response) {
           vm.prtlObj = response.data

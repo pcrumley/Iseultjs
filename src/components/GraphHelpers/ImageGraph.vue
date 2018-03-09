@@ -83,7 +83,7 @@ export default {
   },
   computed: {
     imgSrc () {
-      var imgstr = 'http://localhost:5000/api/2dhist/imgs/?'
+      var imgstr = this.$store.state.server + '/api/2dhist/imgs/?'
       for (var key in this.histOpts) {
         imgstr += key + '=' + this.histOpts[key] + '&'
       }
@@ -101,7 +101,7 @@ export default {
         height: this.imgY,
         top: this.margin.top,
         left: this.width - this.margin.right - 20,
-        url: 'http://localhost:5000/api/colorbar/' +
+        url: this.$store.state.server + '/api/colorbar/' +
              '?px=20&py=' + this.imgY + '&cmap=' + this.histOpts['cmap']
       }
     },
@@ -153,7 +153,8 @@ export default {
     getImg: _.debounce(
       function () {
         var vm = this
-        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY + '&outdir=./test_output' + '&n=3')
+        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY +
+                  '&outdir=' + this.$store.state.outdir + '&n=' + this.$store.state.n)
           .then(function (response) {
             vm.imgObj.pngData = response.data.imgString
             vm.imgObj.cmap = response.data.cmap
