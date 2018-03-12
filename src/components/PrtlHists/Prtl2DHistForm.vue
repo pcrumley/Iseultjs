@@ -17,7 +17,7 @@
         <div class="select control">
           <select id="xval"
           v-model="histOptions.xval">
-            <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
+            <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
           </select>
         </div>
       </div>
@@ -26,7 +26,7 @@
         <div class="select control">
           <select id="yval"
                     v-model="histOptions.yval">
-              <option v-for="item in prtlObj[histOptions['prtl_type']].quantities" :key="item"> {{ item }} </option>
+              <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
           </select>
         </div>
       </div>
@@ -35,7 +35,7 @@
         <div class="select control">
           <select id="prtl_type"
                     v-model="histOptions.prtl_type">
-              <option v-for="(item, key) in prtlObj" :key="key"> {{ key }} </option>
+              <option v-for="(item, key) in mySim.data.prtls" :key="key"> {{ key }} </option>
           </select>
         </div>
       </div>
@@ -43,6 +43,12 @@
     </div>
     <div class="control">
       <button class="button is-primary"  @click="refreshPlot+=1">Refresh</button>
+      <button class="button is-primary"  @click="addSim({ simID: 0,
+          name: 'TestData',
+          serverID: 0,
+          serverURL: 'http://localhost:5000',
+          simType: 'tristan-mp',
+          outdir: './test_output'})">AddSim</button>
     </div>
 
   </div>
@@ -50,12 +56,13 @@
 
 <script>
 import ImageGraph from '@/components/GraphHelpers/ImageGraph'
-import axios from 'axios'
+import { mapGetters, mapActions } from 'vuex'
+import * as types from '@/store/types'
 export default {
   data () {
     return {
-      prtlObj: {ions: {quantities: ['x']}},
       refreshPlot: 0,
+      simID: 0,
       histOptions: {
         prtl_type: 'ions',
         yval: 'px',
@@ -87,28 +94,40 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      addSim: types.AJAX_SIMULATION
+    }),
     submitted () {
       this.isSubmitted = true
     }
   },
   computed: {
+    ...mapGetters({
+      simObj: types.GET_SIMULATIONS
+    }),
+    mySim () {
+      if (this.simObj.length === 0) {
+        return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x']}}}}
+      } else {
+        return this.simObj.find(el => el.info.simID === this.simID)
+      }
+    },
     cmapOpts () {
-      return this.$store.state.cmaps
+      console.log(this.mySim)
+      return this.mySim.data.cmaps
+    },
+    prtlQuants () {
+      return this.mySim.data.prtls['ions'].quantities
     }
   },
-  mounted:
-    function () {
-      this.$store.dispatch('loadCmaps')
-      var vm = this
-      axios.get('http://localhost:5000/api/prtl_quants/?sim_type=tristan-mp')
-        .then(function (response) {
-          vm.prtlObj = response.data
-        })
-        .catch(function (error) {
-          console.log(error)
-          vm.cbarOpts = ['viridis']
-        })
-    },
+  /* mounted:
+    this.$store.state.dispatch(types.AJAX_SIMULATION,
+      { simID: 0,
+        name: 'TestData',
+        serverID: 0,
+        serverURL: 'http://localhost:5000',
+        simType: 'tristan-mp',
+        outdir: './test_output'}), */
   components: {
     iseultImageGraph: ImageGraph
   }

@@ -1,6 +1,6 @@
 <template>
   <!--<div> -->
-  <div class="relative" :style="{ width:width+'px', height:height+'px' }">
+  <div class="container" :style="{ width:width+'px', height:height+'px' }">
   <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
        three labels -->
   <svg :style="{ width:width+'px', height:height+'px'}">
@@ -187,8 +187,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-div.relative {
-    position: relative;
+div.container {
+  position: relative;
   margin: auto;
 }
 </style>
