@@ -1,9 +1,11 @@
 import * as types from '../types'
+import * as simTypes from '../simTypes'
 import axios from 'axios'
-// initial state. This holds an array of simulation objects, that can be attached to a graph,
-// so they have access to the simulation data
+// This module holds the state of the main graph layout.
+// The state contains an array of simulation objects
+console.log(Object.keys(simTypes.TWO_D_PRTL_HIST))
 const state = {
-  simArray: []
+  simArray: [simTypes.TWO_D_PRTL_HIST]
 }
 
 // getters
@@ -11,6 +13,12 @@ const getters = {
   [types.GET_SIMULATIONS]: (state) => {
     return state.simArray
   }
+  /* if (state.simArray.length > 0) {
+    return state.simArray[0]
+  } else {
+    return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x'], axisLabel: ['x']}}}}
+  }
+} */
 }
 
 // actions
@@ -19,7 +27,7 @@ const actions = {
     // Add some AJAX here that would open the sim from the server & give us
     // some info about what sim... until then
     // load the simulation data
-    axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + payload.outdir)
+    axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType)
       .then(function (response) {
         var simObj = { info: {}, data: {} }
         Object.assign(simObj.info, payload)
@@ -35,11 +43,8 @@ const actions = {
 // mutations
 const mutations = {
   [types.PUSH_SIMULATION]: (state, payload) => {
-    // a bit of a hack to avoid the fact that javascript arrays are weird.
-    // first we push an empty object to the array, then we find the only empty
-    // object in the array and copy our payload there.
     state.simArray.push({})
-    Object.assign(state.simArray.find(el => Object.keys(el).length === 0), payload)
+    Object.assign(state.simArray[0], payload)
   }
 }
 

@@ -95,7 +95,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      addSim: types.AJAX_SIMULATION
+      addSim: types.OPEN_SIMULATION
     }),
     submitted () {
       this.isSubmitted = true
@@ -113,7 +113,6 @@ export default {
       }
     },
     cmapOpts () {
-      console.log(this.mySim)
       return this.mySim.data.cmaps
     },
     prtlQuants () {

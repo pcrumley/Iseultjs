@@ -52,7 +52,7 @@ import iseultAxis from './IseultAxis.vue'
 import axisLabel from './AxisLabel.vue'
 export default {
   name: 'ImageGraph',
-  props: ['histOpts', 'myRefresh'],
+  props: ['xLabel', 'yLabel', 'cbarLabel', 'cbarScale'],
   data () {
     return {
       margin: {
