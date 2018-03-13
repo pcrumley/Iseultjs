@@ -76,7 +76,6 @@ export default {
       },
 
       xScale: '',
-      xAxis: '',
       yScale: '',
       vScale: ''
     }
@@ -97,7 +96,7 @@ export default {
     },
     cbarObj () {
       return {
-        width: 20,
+        width: this.cbarWidth,
         height: this.imgY,
         top: this.margin.top,
         left: this.width - this.margin.right - 20,

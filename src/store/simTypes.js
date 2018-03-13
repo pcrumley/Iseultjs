@@ -1,6 +1,7 @@
-// This holds the available options of a 2d particle histogram
+// This is the default state of 2d particle histogram
 export const TWO_D_PRTL_HIST = {
-  graphType: 'twoDPrtlHist',
+  // chartID: 0 Chart ID should be dynamically assigned at runtime
+  chartType: 'twoDPrtlHist',
   dataOptions: {
     prtl_type: 'ions',
     yval: 'px',
@@ -29,6 +30,8 @@ export const TWO_D_PRTL_HIST = {
     mask_zeros: true,
     interpolation: 'bicubic'},
   renderOptions: {
+    tot_width: 800,
+    tot_height: 400,
     margin: {
       top: 20,
       right: 60,
@@ -36,22 +39,6 @@ export const TWO_D_PRTL_HIST = {
       left: 70,
       hspace: 50
     },
-    cbarPNG: '',
     cbarWidth: 20,
-    imgObj: {
-      'pngData': '',
-      'xmin': '',
-      'xmax': '',
-      'ymin': '',
-      'ymax': '',
-      'vmin': '',
-      'vmax': '',
-      'cmap': ''
-    },
-
-    xScale: '',
-    xAxis: '',
-    yScale: '',
-    vScale: ''
   }
 }

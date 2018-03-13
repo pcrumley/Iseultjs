@@ -119,14 +119,6 @@ export default {
       return this.mySim.data.prtls['ions'].quantities
     }
   },
-  /* mounted:
-    this.$store.state.dispatch(types.AJAX_SIMULATION,
-      { simID: 0,
-        name: 'TestData',
-        serverID: 0,
-        serverURL: 'http://localhost:5000',
-        simType: 'tristan-mp',
-        outdir: './test_output'}), */
   components: {
     iseultImageGraph: ImageGraph
   }
