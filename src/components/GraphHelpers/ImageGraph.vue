@@ -36,7 +36,7 @@
   </svg>
 
   <iseult-image-canvas :imgX="imgX" :imgY="imgY" :top="margin.top + 'px'" :left="margin.left+'px'" :imgData="imgObj.pngData"></iseult-image-canvas>
-  <iseult-image-canvas :imgX="cbarWidth" :imgY="imgY" :top="margin.top + 'px'" :left="cbarObj.left+'px'" :imgData="cbarPNG"></iseult-image-canvas>
+  <iseult-image-canvas :imgX="cbarWidth" :imgY="imgY" :top="margin.top + 'px'" :left="cbarLeft+'px'" :imgData="cbarPNG"></iseult-image-canvas>
 
   <axis-label :orient="'labelLeft'" :text="'p_x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="'x'" :figWidth="width" :figHeight="height" :figMargin="margin"/>
@@ -52,57 +52,24 @@ import iseultAxis from './IseultAxis.vue'
 import axisLabel from './AxisLabel.vue'
 export default {
   name: 'ImageGraph',
-  props: ['xLabel', 'yLabel', 'cbarLabel', 'cbarScale'],
-  data () {
-    return {
-      margin: {
-        top: 20,
-        right: 60,
-        bottom: 70,
-        left: 70,
-        hspace: 50
-      },
-      cbarPNG: '',
-      cbarWidth: 20,
-      imgObj: {
-        'pngData': '',
-        'xmin': '',
-        'xmax': '',
-        'ymin': '',
-        'ymax': '',
-        'vmin': '',
-        'vmax': '',
-        'cmap': ''
-      },
-
-      xScale: '',
-      yScale: '',
-      vScale: ''
-    }
-  },
+  props: [
+    'width',
+    'height',
+    'xLabel',
+    'xScale',
+    'xDomain',
+    'yLabel',
+    'yScale',
+    'yDomain',
+    'cbarLabel',
+    'cbarWidth',
+    'cbarPNG',
+    'cbarScale',
+    'cbarDomain',
+    'margin'],
   computed: {
-    imgSrc () {
-      var imgstr = this.$store.state.server + '/api/2dhist/imgs/?'
-      for (var key in this.histOpts) {
-        imgstr += key + '=' + this.histOpts[key] + '&'
-      }
-      return imgstr
-    },
-    width () {
-      return 800
-    },
-    height () {
-      return 400
-    },
-    cbarObj () {
-      return {
-        width: this.cbarWidth,
-        height: this.imgY,
-        top: this.margin.top,
-        left: this.width - this.margin.right - 20,
-        url: this.$store.state.server + '/api/colorbar/' +
-             '?px=20&py=' + this.imgY + '&cmap=' + this.histOpts['cmap']
-      }
+    cbarLeft () {
+      return this.width - this.margin.right - this.cbarWidth
     },
     imgX () {
       // return this.width - this.right-this.left

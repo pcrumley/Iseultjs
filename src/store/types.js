@@ -1,7 +1,6 @@
 // Getters
-export const GET_SIMULATIONS = 'simulations/GET_SIMULATIONS'
-export const GET_GRAPH_STATE_ARR = 'mainView/GET_GRAPH_STATE_ARR'
-// Setters
+export const GET_SIM_MAP = 'simulations/GET_SIM_MAP'
+export const GET_GRAPH_STATE_MAP = 'mainView/GET_GRAPH_STATE_MAP'
 
 // Mutations
 export const PUSH_SIMULATION = 'simulations/PUSH_SIMULATION'

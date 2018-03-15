@@ -3,7 +3,8 @@ import Router from 'vue-router'
 import SplashPage from '@/components/SplashPage'
 import sidebar from '@/components/sidebar'
 import sidebarToggle from '@/components/sidebarToggle'
-import Prtl2DHist from '@/components/PrtlHists/Prtl2DHistForm'
+// import Prtl2DHist from '@/components/PrtlHists/Prtl2DHistForm'
+import Chart from '@/components/Chart'
 Vue.use(Router)
 
 export default new Router({
@@ -15,8 +16,8 @@ export default new Router({
     },
     {
       path: '/image',
-      name: 'Prtl2DHist',
-      component: Prtl2DHist
+      name: 'Chart',
+      component: Chart
     },
     {
       path: '/',

@@ -1,50 +1,122 @@
 <template>
-  <iseult-image-graph :histOpts="histOptions" :myRefresh="refreshPlot" />
+  <!--
+  <iseult-image-graph
+    :width="width"
+    :height="height"
+    :xLabel="xLabel"
+    :xScale="'scaleLinear'"
+    :xDomain="xDomain"
+    :yLabel="yLabel"
+    :yScale="'scaleLinear'"
+    :yDomain="yDomain"
+    :cbarLabel="cbarLabel"
+    :cbarWidth="cbarWidth"
+    :cbarPNG="cbarPNG"
+    :cbarScale="cbarScale"
+    :cbarDomaim="cbarDomain"
+    :margin="margin"/>
+  -->
+  <div>
+    <h2> hey, I'm chart #  {{ chartID }} </h2>
+    <p> here's my viewState<p> </p> {{ myViewState }}
+    <p> here's mySim: </p><p> {{ mySim }} </p>
+    <p> here's where my chart data lives: </p><p> {{imgURL}} </p>
+    <p> here's where my cbar lives: </p><p> {{cbarURL}} </p>
+
+  </div>
 </template>
 
 <script>
 import ImageGraph from '@/components/GraphHelpers/ImageGraph'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import * as types from '@/store/types'
+import axios from 'axios'
+import _ from 'lodash'
+
 export default {
-  // data () {
-  //  return {
-  //  }
-  // },
-  methods: {
-    ...mapActions({
-      addSim: types.OPEN_SIMULATION
-    }),
-    submitted () {
-      this.isSubmitted = true
-    }
-  },
+  name: 'TwoDimPrtlHist',
+  props: [
+    'chartID'
+  ],
   computed: {
     ...mapGetters({
-      simObj: types.GET_GRAPH_STATE
+      simMap: types.GET_SIM_MAP,
+      graphMap: types.GET_GRAPH_STATE_MAP
     }),
     mySim () {
-      if (this.simObj.length === 0) {
-        return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x']}}}}
+      if (this.simMap.has(this.myViewState.sims[0])) {
+        return this.simMap.get(this.myViewState.sims[0])
       } else {
-        return this.simObj.find(el => el.info.simID === this.simID)
+        // just a placeholder
+        return {}
       }
     },
-    cmapOpts () {
-      return this.mySim.data.cmaps
+    myViewState () {
+      if (this.graphMap.has(this.chartID)) {
+        return this.graphMap.get(this.chartID)
+      } else {
+        return {}
+      }
     },
-    prtlQuants () {
-      return this.mySim.data.prtls['ions'].quantities
+    imgX () {
+      // return this.width - this.right-this.left
+      return this.myViewState.renderOptions.tot_width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace
+    },
+    imgY () {
+      return this.myViewState.renderOptions.tot_height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
+    },
+    cbarURL () {
+      return this.mySim.info.serverURL + '/api/colorbar/' +
+        '?px=' + this.myViewState.renderOptions.cbarWidth +
+        '&py=' + this.imgY +
+        '&cmap=' + this.myViewState.dataOptions['cmap']
+    },
+    imgURL () {
+      var imgstr = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
+        'px=' + this.imgX + '&py=' + this.imgY +
+        '&sim_type=' + this.mySim.info.simType +
+        '&outdir=' + this.mySim.info.outdir +
+        '&n=' + this.mySim.i + '&'
+      var histOpts = this.myViewState.dataOptions
+      for (var key in histOpts) {
+        imgstr += key + '=' + histOpts[key] + '&'
+      }
+      return imgstr
     }
   },
-  /* mounted:
-    this.$store.state.dispatch(types.AJAX_SIMULATION,
-      { simID: 0,
-        name: 'TestData',
-        serverID: 0,
-        serverURL: 'http://localhost:5000',
-        simType: 'tristan-mp',
-        outdir: './test_output'}), */
+  methods: {
+    getImg: _.debounce(
+      function () {
+        var vm = this
+        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY +
+                  '&outdir=' + this.$store.state.outdir + '&n=' + this.$store.state.n)
+          .then(function (response) {
+            vm.imgObj.pngData = response.data.imgString
+            vm.imgObj.cmap = response.data.cmap
+            vm.axisX.domain = [response.data.xmin, response.data.xmax]
+            vm.axisY.domain = [response.data.ymin, response.data.ymax]
+            vm.axisColorbar.domain = [response.data.vmin, response.data.vmax]
+            vm.getColorBar()
+          })
+          .catch(function (error) {
+            vm.imgString = ''
+            console.log(error)
+          })
+      },
+      1
+    ),
+    getColorBar () {
+      var vm = this
+      axios.get(vm.cbarObj.url)
+        .then(function (response) {
+          vm.cbarPNG = response.data.cbarString
+        })
+        .catch(function (error) {
+          vm.imgString = ''
+          console.log(error)
+        })
+    }
+  },
   components: {
     iseultImageGraph: ImageGraph
   }

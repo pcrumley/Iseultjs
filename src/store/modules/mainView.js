@@ -1,16 +1,101 @@
 import * as types from '../types'
-import * as simTypes from '../simTypes'
 // import axios from 'axios'
 // This module holds the state of the main graph layout.
 // The state contains an array of simulation objects
 const state = {
-  graphArray: []
+  twoD_PRTL_HIST: {
+    chartType: 'twoDPrtlHist',
+    dataOptions: {
+      prtl_type: 'ions',
+      yval: 'px',
+      xval: 'x',
+      weights: '',
+      boolstr: '',
+      ybins: 200,
+      xbins: 200,
+      yvalmin: '',
+      yvalmax: '',
+      xvalmin: '',
+      xvalmax: '',
+      normhist: true,
+      cmap: 'viridis',
+      cnorm: 'log',
+      pow_zero: 0,
+      pow_gamma: 1.0,
+      vmin: '',
+      vmax: '',
+      clip: false,
+      xmin: '',
+      xmax: '',
+      ymin: '',
+      ymax: '',
+      aspect: 'auto',
+      mask_zeros: true,
+      interpolation: 'bicubic'},
+    renderOptions: {
+      tot_width: 800,
+      tot_height: 400,
+      margin: {
+        top: 20,
+        right: 60,
+        bottom: 70,
+        left: 70,
+        hspace: 50
+      },
+      cbarWidth: 20
+    }
+  },
+  nextGraphID: 0,
+  // graphViewStateMap: new Map() WHEN WE DYNAMICALLY CHANGE state
+  graphViewStateMap: new Map([[0, {
+    sims: [0],
+    chartType: 'twoDPrtlHist',
+    dataOptions: {
+      prtl_type: 'ions',
+      yval: 'px',
+      xval: 'x',
+      weights: '',
+      boolstr: '',
+      ybins: 200,
+      xbins: 200,
+      yvalmin: '',
+      yvalmax: '',
+      xvalmin: '',
+      xvalmax: '',
+      normhist: true,
+      cmap: 'viridis',
+      cnorm: 'log',
+      pow_zero: 0,
+      pow_gamma: 1.0,
+      vmin: '',
+      vmax: '',
+      clip: false,
+      xmin: '',
+      xmax: '',
+      ymin: '',
+      ymax: '',
+      aspect: 'auto',
+      mask_zeros: true,
+      interpolation: 'bicubic'},
+    renderOptions: {
+      tot_width: 800,
+      tot_height: 400,
+      margin: {
+        top: 20,
+        right: 60,
+        bottom: 70,
+        left: 70,
+        hspace: 50
+      },
+      cbarWidth: 20
+    }
+  }]])
 }
 
 // getters
 const getters = {
-  [types.GET_GRAPH_STATE_ARR]: (state) => {
-    return state.simArray
+  [types.GET_GRAPH_STATE_MAP]: (state) => {
+    return state.graphViewStateMap
   }
 }
 
@@ -29,13 +114,14 @@ const mutations = {
     // a bit of a hack to avoid the fact that javascript arrays are weird.
     // first we push an empty object to the array, then we find the only empty
     // object in the array and copy our payload there.
-    state.simArray.push({ chartID: payload.chartID })
-    var newChart = state.simArray.find(el => el.chartID === payload.chartID)
+    state.graphViewStateMap.set(payload.chartID, {})
     if (payload.chartType === 'twoDPrtlHist') {
-      Object.assign(newChart, simTypes.TWO_D_PRTL_HIST)
+      Object.assign(state.graphViewStateMap.get(payload.chartID), state.twoD_PRTL_HIST)
       // Set the chartID
       if (payload.simID != null) {
-        newChart.sims = [ payload.simID ]
+        state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+      } else {
+        state.graphViewStateMap.get(payload.chartID).sims = []
       }
     }
   }
