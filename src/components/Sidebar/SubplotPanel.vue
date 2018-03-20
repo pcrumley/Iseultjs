@@ -2,7 +2,7 @@
   <!--
   THE VUE COMPONENT THAT MANAGES EACH CHART
   -->
-    <div>
+    <div class="mx-auto text-center">
       <!--<server v-for="(item, key) in chartArr" :key="key" :serverID="item[0]">
       </server> -->
       SUBPLOT PANEL NOT YET IMPLEMENTED

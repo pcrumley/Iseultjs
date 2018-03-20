@@ -26,19 +26,13 @@
       </form>
 
       <div class="mx-auto text-right">
+        <router-link :to="{name: 'Help'}">
         <button type="button"
-          class="btn btn-primary btn-lg disabled">
+          class="btn btn-primary btn-lg">
           Help
         </button>
-        <!--<a class="btn btn-lg"
-          :class="{'btn-danger': !isOnline,
-                    'btn-success': isOnline,
-                     disabled: !isOnline}"
-           href="#/charts"
-           role="button"
-           @click="addServer">
-           {{ btnMsg }}
-        </a>-->
+        </router-link>
+
         <router-link :to="{name: 'Charts'}">
         <button type="button"
           class="btn btn-lg"

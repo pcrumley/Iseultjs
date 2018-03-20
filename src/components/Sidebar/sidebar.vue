@@ -20,7 +20,12 @@
           :class = "{'btn-primary': curView === 2, 'btn-outline-secondary': curView !== 2}"
           @click="curView=2">Subplots</button>
       </li>
+      <li>
+        <router-link :to="{name: 'Help'}">
+        <a class="nav-link">Help</a>
+        </router-link>
 
+      </li>
     </ul>
     <hr class="mx-4">
     <component :is="components[curView]" />
@@ -61,7 +66,11 @@ export default {
     }
   },
   mounted: function () {
-    this.$store.dispatch('toggleSidebar')
+    const dX = this.open ? 0 : -this.$el.offsetWidth
+    TweenMax.to(this.$el, 0.6, {
+      x: dX,
+      ease: Power4.easeOut
+    })
   },
   components: {
     servers,
