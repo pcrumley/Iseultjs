@@ -3,7 +3,7 @@ import * as types from '../types'
 // initial state
 // shape:[ {id, quantity}]
 const state = {
-  sidebarOpen: true
+  sidebarOpen: false
 }
 
 // getters

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import simulations from './modules/simulations'
 import mainView from './modules/mainView'
+import ui from './modules/ui'
 Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
@@ -15,7 +16,8 @@ export default new Vuex.Store({
   },
   modules: {
     simulations,
-    mainView
+    mainView,
+    ui
   },
   strict: debug
 })

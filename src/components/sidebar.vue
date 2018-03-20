@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.sidebar">
+  <div :class="$style.sidebar" v-if="open">
     Hi!
   </div>
 </template>
@@ -8,25 +8,29 @@
 import {TweenMax, Power4} from 'gsap'
 export default {
   name: 'sidebar',
+  /*
   mounted () {
     TweenMax.set(this.$el, {
-      x: this.$el.offsetWidth
+      x: -this.$el.offsetWidth
     })
   },
+  */
   computed: {
     open () {
-      console.log(this.$store.state.ui.sidebarOpen)
       return this.$store.state.ui.sidebarOpen
     }
   },
   watch: {
     open: function (open) {
-      const dX = open ? 0 : this.$el.offsetWidth
+      const dX = open ? 0 : -this.$el.offsetWidth
       TweenMax.to(this.$el, 0.6, {
         x: dX,
         ease: Power4.easeOut
       })
     }
+  },
+  mounted: function () {
+    this.$store.dispatch('toggleSidebar')
   }
 }
 </script>
@@ -34,9 +38,9 @@ export default {
 <style module>
   .sidebar{
     position: fixed;
-    right: 0;
+    left: 0;
     top: 0;
-    width: 300px;
+    width: 500px;
     height: 100vh;
     max-width: 90vw;
     background-color: var(--accent-color);

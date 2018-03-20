@@ -4,7 +4,7 @@ import SplashPage from '@/components/SplashPage'
 import sidebar from '@/components/sidebar'
 import sidebarToggle from '@/components/sidebarToggle'
 // import Prtl2DHist from '@/components/PrtlHists/Prtl2DHistForm'
-import Chart from '@/components/Chart'
+import Charts from '@/components/Charts'
 Vue.use(Router)
 
 export default new Router({
@@ -15,9 +15,9 @@ export default new Router({
       component: SplashPage
     },
     {
-      path: '/image',
-      name: 'Chart',
-      component: Chart
+      path: '/charts',
+      name: 'Charts',
+      component: Charts
     },
     {
       path: '/',

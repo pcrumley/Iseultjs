@@ -3,8 +3,12 @@
   THE VUE COMPONENT THAT MANAGES EACH CHART
   -->
   <div>
+  <div>
     <component v-for="(item, key) in chartArr" :key="key" :is="item[1]" :chartID="item[0]">
     </component>
+  </div>
+  <sidebar/>
+  <sidebar-toggle/>
   </div>
 </template>
 
@@ -12,6 +16,9 @@
 import TwoDimPrtlHist from '@/components/PrtlHists/Prtl2DHist'
 import * as types from '@/store/types'
 import { mapGetters } from 'vuex'
+import Sidebar from '@/components/sidebar.vue'
+import SidebarToggle from '@/components/sidebarToggle.vue'
+
 export default {
   computed: {
     ...mapGetters({
@@ -26,7 +33,9 @@ export default {
     }
   },
   components: {
-    twoDPrtlHist: TwoDimPrtlHist
+    twoDPrtlHist: TwoDimPrtlHist,
+    Sidebar,
+    SidebarToggle
   }
 }
 </script>

@@ -1,45 +1,73 @@
 <template>
-  <div class="splash">
-    <img src="../assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <p>A visualizer for particle-in-cell data created with Vue.js & D3. <br> Written by
-       Patrick Crumley (patrick.crumley@gmail.com).
-       </p>
-    <h2> Please connect to an Iseult Server* </h2>
-    <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" width="400">
-      <tr>
-        <td width="33%">Name: </td>
-        <td width="33%"><input v-model="serverList[0].name"></td>
-        <td rowspan = 2>  <button :class='{hasError: !isOnline}' :disable='!isOnline'> {{ isOnline ? 'Go' : 'X' }} </button> </td>
-      </tr>
-      <tr>
-        <td width="33%">URL: </td>
-        <td width="33%"><input v-model="serverList[0].path"></td>
-      </tr>
-    </table>
+  <div class="container">
 
-    <p>*Requires an IseultServer instance that has access to the data of your simulation.*</p>
+    <div class="jumbotron">
+      <div class="row">
+    <div class="col-md-5">
+        <img src="../assets/logo.png" class="img-fluid">
+        </div>
+    <div class="col-md-7">
+      <h1 class="display-4">Welcome to Iseult.js</h1>
+      <p class="lead">A visualizer for particle-in-cell data created with Vue.js & D3. <br> by
+         Patrick Crumley (patrick.crumley@gmail.com).</p>
+      <hr class="my-4">
+      <div class="mx-auto my-4 text-center">
+        <h2>Please connect to an <a href="https://github.com/pcrumley/IseultServer"> Iseult Server </a></h2>
+      </div>
+      <form>
+        <div class="form-group">
+          <label for="formGroupServerName">Server Name</label>
+          <input type="text" class="form-control" id="formGroupServerName" placeholder="My Computer" v-model="serverName">
+        </div>
+        <div class="form-group">
+          <label for="formGroupServerURL">Server URL</label>
+          <input type="text" class="form-control" :class="{'has-failure': !isOnline, 'has-success': isOnline}" id="formGroupServerURL" placeholder="localhost:5000" v-model="serverURL">
+        </div>
+      </form>
 
+      <div class="mx-auto text-right"><button type="button" class="btn btn-primary btn-lg disabled">Help</button>
+        <a class="btn btn-lg" :class="{'btn-danger': !isOnline, 'btn-success': isOnline, disabled: !isOnline}" href="#/charts" role="button">{{ btnMsg }}</a>
+
+      </div>
+      </div>
+    </div>
   </div>
+</div>
 </template>
 
 <script>
+import axios from 'axios'
+import _ from 'lodash'
+
 export default {
   name: 'SplashPage',
   data () {
     return {
-      msg: 'Welcome to Iseult.js',
-      serverList: [
-        {id: 0, name: 'Server1', path: ''}
-      ],
+      serverURL: 'localhost:5000',
+      serverName: 'My Computer',
       isOnline: false
     }
-  }
-  /*
+  },
+  computed: {
+    cleanedServerURL () {
+      if (this.serverURL.substring(0, 7) === 'http://') {
+        return this.serverURL
+      } else {
+        return 'http://' + this.serverURL
+      }
+    },
+    btnMsg () {
+      if (this.isOnline) {
+        return 'Connect'
+      } else {
+        return 'No server found'
+      }
+    }
+  },
   watch: {
     // whenever question changes, this function will run
-    serverList: function (newServer, oldSever) {
-      this.isOnline  = false
+    serverURL: function (newServer, oldServer) {
+      this.isOnline = false
       this.pingServer()
     }
   },
@@ -51,76 +79,50 @@ export default {
     // finished typing before making the ajax request. To learn
     // more about the _.debounce function (and its cousin
     // _.throttle), visit: https://lodash.com/docs#debounce
-    getAnswer: _.debounce(
+    pingServer: _.debounce(
       function () {
         var vm = this
-        axios.get(vm.serverList[0].name + '/api/handshake')
+        axios.get(vm.cleanedServerURL + '/api/handshake')
           .then(function (response) {
+            console.log(response.data)
             vm.isOnline = (response.data.name === 'IseultServer')
           })
           .catch(function (error) {
-            vm.isOnline = false + error
+            vm.isOnline = false
+            console.log(error)
           })
       },
       // This is the number of milliseconds we wait for the
       // user to stop typing.
       500
     )
+  },
+  mounted () {
+    this.pingServer()
   }
-  */
 }
 
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
+label {
+  text-align: left;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+.jumbotron {
+  background-color: #FFFFFF;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
-a {
-  color: #42b983;
+.has-failure {
+  border: 2px solid red;
 }
-table {
-  margin-left: auto;
-  margin-right: auto;
-}
-td {
-  padding-left: 6px;
-  padding-right: 6px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  text-align: right;
-}
-button {
-    background-color: #4CAF50; /* Green */
-    border: none;
-    color: white;
-    width: 75px;
-    height: 50px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-}
-.hasError {
-    background-color: #FF0000; /* red */
-    border: none;
-    opacity: 0.6;
-    color: white;
-    width: 75px;
-    height: 50px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
+.has-success {
+  border: 2px solid green;
 }
 
 </style>

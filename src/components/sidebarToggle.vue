@@ -27,7 +27,7 @@ export default {
   .button{
     position: fixed;
     bottom: 1rem;
-    right: 1rem;
+    left: 1rem;
     padding: 0;
     height: 50px;
     width: 50px;
@@ -58,7 +58,7 @@ export default {
   .active{
     transform: rotate(45deg);
   }
-  /*
+
   .active svg{
     fill: var(--primary-color);
   }
@@ -66,5 +66,5 @@ export default {
   .active:focus{
     border-color: var(--primary-color);
   }
-  */
+
 </style>

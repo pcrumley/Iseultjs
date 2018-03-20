@@ -125,6 +125,6 @@ export default {
 }
 </script>
 
-<style src="bulma/css/bulma.css">
+<style scoped src="bulma/css/bulma.css">
 
 </style>

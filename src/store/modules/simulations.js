@@ -76,7 +76,7 @@ const state = {
             '\\mathrm{proc_e}',
             '\\mathrm{ind_e}'
           ],
-          'quantities': [
+          quantities: [
             'x',
             'y',
             'z',
@@ -86,7 +86,8 @@ const state = {
             'gamma',
             'proc',
             'index'
-          ]
+          ],
+          histLabel: 'f_e(p)'
         },
         ions: {
           axisLabels: [
@@ -110,7 +111,8 @@ const state = {
             'gamma',
             'proc',
             'index'
-          ]
+          ],
+          histLabel: 'f_e(p)'
         }
       }
     }

@@ -22,6 +22,7 @@
     <p> here's mySim: </p><p> {{ mySim }} </p>
     <p> here's where my chart data lives: </p><p> {{imgURL}} </p>
     <p> here's where my cbar lives: </p><p> {{cbarURL}} </p>
+    <p> here's where my cbar lives: </p><p> {{cbarLabel}} </p>
 
   </div>
 </template>
@@ -35,6 +36,15 @@ import _ from 'lodash'
 
 export default {
   name: 'TwoDimPrtlHist',
+  data () {
+    return {
+      xScale: 'scaleLinear',
+      xDomain: [0, 1],
+      yScale: 'scaleLinear',
+      yDomain: [0, 1],
+      cbarDomain: [0, 1]
+    }
+  },
   props: [
     'chartID'
   ],
@@ -43,6 +53,9 @@ export default {
       simMap: types.GET_SIM_MAP,
       graphMap: types.GET_GRAPH_STATE_MAP
     }),
+    cbarLabel () {
+      return this.mySim.data.prtls[this.myViewState.dataOptions.prtl_type].histLabel
+    },
     mySim () {
       if (this.simMap.has(this.myViewState.sims[0])) {
         return this.simMap.get(this.myViewState.sims[0])
@@ -65,6 +78,9 @@ export default {
     imgY () {
       return this.myViewState.renderOptions.tot_height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
     },
+    n () {
+      return this.mySim.data.fileArray[this.mySim.i]
+    },
     cbarURL () {
       return this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
@@ -76,7 +92,7 @@ export default {
         'px=' + this.imgX + '&py=' + this.imgY +
         '&sim_type=' + this.mySim.info.simType +
         '&outdir=' + this.mySim.info.outdir +
-        '&n=' + this.mySim.i + '&'
+        '&n=' + this.n + '&'
       var histOpts = this.myViewState.dataOptions
       for (var key in histOpts) {
         imgstr += key + '=' + histOpts[key] + '&'
@@ -123,6 +139,6 @@ export default {
 }
 </script>
 
-<style src="bulma/css/bulma.css">
+<style scoped src="bulma/css/bulma.css">
 
 </style>
