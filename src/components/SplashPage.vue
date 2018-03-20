@@ -7,7 +7,7 @@
         <img src="../assets/logo.png" class="img-fluid">
         </div>
     <div class="col-md-7">
-      <h1 class="display-4">Welcome to Iseult.js</h1>
+      <h1 class="display-1">Iseult.js</h1>
       <p class="lead">A visualizer for particle-in-cell data created with Vue.js & D3. <br> by
          Patrick Crumley (patrick.crumley@gmail.com).</p>
       <hr class="my-4">

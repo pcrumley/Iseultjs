@@ -4,7 +4,7 @@
   -->
   <div>
   <div>
-    <component v-for="(item, key) in chartArr" :key="key" :is="item[1]" :chartID="item[0]">
+    <component v-for="(item, key) in chartArr" :key="key" :serverID="item[0]">
     </component>
   </div>
   <sidebar/>
@@ -22,12 +22,12 @@ import SidebarToggle from '@/components/Sidebar/sidebarToggle.vue'
 export default {
   computed: {
     ...mapGetters({
-      graphMap: types.GET_GRAPH_STATE_MAP
+      graphMap: types.GET_SERVER_MAP
     }),
-    chartArr () {
+    serverArr () {
       var tmpArr = []
-      for (var [key, value] of this.graphMap.entries()) {
-        tmpArr.push([key, value.chartType])
+      for (var key in this.serverArr.entries()) {
+        tmpArr.push([key])
       }
       return tmpArr
     }

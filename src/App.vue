@@ -16,7 +16,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  --accent-color: #FFCB08;
+  --accent-color: #DCD6E0;
+  --secondary-color: #DCD6E0;
   margin-top: 60px;
 }
 span.katex-html {
