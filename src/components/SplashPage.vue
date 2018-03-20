@@ -25,9 +25,30 @@
         </div>
       </form>
 
-      <div class="mx-auto text-right"><button type="button" class="btn btn-primary btn-lg disabled">Help</button>
-        <a class="btn btn-lg" :class="{'btn-danger': !isOnline, 'btn-success': isOnline, disabled: !isOnline}" href="#/charts" role="button">{{ btnMsg }}</a>
-
+      <div class="mx-auto text-right">
+        <button type="button"
+          class="btn btn-primary btn-lg disabled">
+          Help
+        </button>
+        <!--<a class="btn btn-lg"
+          :class="{'btn-danger': !isOnline,
+                    'btn-success': isOnline,
+                     disabled: !isOnline}"
+           href="#/charts"
+           role="button"
+           @click="addServer">
+           {{ btnMsg }}
+        </a>-->
+        <router-link :to="{name: 'Charts'}">
+        <button type="button"
+          class="btn btn-lg"
+          :class="{'btn-danger': !isOnline,
+                   'btn-success': isOnline,
+                      disabled: !isOnline}"
+          @click="addServer({name: serverName, url: serverURL})">
+          {{ btnMsg }}
+          </button>
+        </router-link>
       </div>
       </div>
     </div>
@@ -38,6 +59,8 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
+import * as types from '@/store/types'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'SplashPage',
@@ -72,6 +95,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      addServer: types.ADD_SERVER
+    }),
     // _.debounce is a function provided by lodash to limit how
     // often a particularly expensive operation can be run.
     // In this case, we want to limit how often we access
@@ -84,7 +110,6 @@ export default {
         var vm = this
         axios.get(vm.cleanedServerURL + '/api/handshake')
           .then(function (response) {
-            console.log(response.data)
             vm.isOnline = (response.data.name === 'IseultServer')
           })
           .catch(function (error) {

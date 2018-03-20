@@ -1,11 +1,14 @@
 <template>
   <div :class="$style.sidebar" v-if="open">
-    Hi!
+    {{ serverMap }}
   </div>
 </template>
 
 <script>
 import {TweenMax, Power4} from 'gsap'
+import * as types from '@/store/types'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'sidebar',
   /*
@@ -16,6 +19,9 @@ export default {
   },
   */
   computed: {
+    ...mapGetters({
+      serverMap: types.GET_SERVER_MAP
+    }),
     open () {
       return this.$store.state.ui.sidebarOpen
     }
