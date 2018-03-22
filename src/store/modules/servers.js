@@ -3,7 +3,8 @@ import * as types from '../types'
 const state = {
   // A map that contains all of the server information
   nextServerID: 0, // a way to keep the servers uniquely identifiable.
-  serverMap: new Map([])
+  serverMap: new Map([]),
+  serverArr: []
 }
 
 // getters
@@ -13,6 +14,9 @@ const getters = {
   },
   [types.GET_NEXT_SERVER_ID]: (state) => {
     return state.nextServerID
+  },
+  [types.GET_SERVER_ARR]: (state) => {
+    return state.serverArr
   }
 }
 
@@ -24,8 +28,8 @@ const actions = {
     commit(types.PUSH_SERVER, payload)
   },
   [types.DEL_SERVER]: ({ commit, state }, payload) => {
-    // Payload must include server name, url
-    commit(types.POP_SERVER, {id: payload.serverID})
+    // Payload must include server id
+    commit(types.POP_SERVER, payload)
   }
 
 }
@@ -34,12 +38,13 @@ const actions = {
 const mutations = {
   [types.PUSH_SERVER]: (state, payload) => {
     // push the payload into the map
-    console.log(payload)
     state.serverMap.set(state.nextServerID, payload)
+    state.serverArr.push(state.nextServerID)
     state.nextServerID += 1
   },
   [types.POP_SERVER]: (state, payload) => {
     state.serverMap.delete(payload.id)
+    state.serverArr.splice(state.serverArr.findIndex((el) => { return el === payload.id }), 1)
   }
 }
 

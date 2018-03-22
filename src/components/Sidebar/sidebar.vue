@@ -1,6 +1,6 @@
 <template>
 
-  <div :class="$style.sidebar" v-if="open">
+  <div class="border-right" :class="$style.sidebar" v-if="open">
     <ul class="nav nav-pills justify-content-center my-3">
       <li class="nav-item">
         <button type="button"
@@ -88,6 +88,6 @@ export default {
     width: 500px;
     height: 100vh;
     max-width: 90vw;
-    background-color: var(--secondary-color);
+      background-color: var(--secondary-color);
   }
 </style>

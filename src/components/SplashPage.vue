@@ -33,13 +33,13 @@
         </button>
         </router-link>
 
-        <router-link :to="{name: 'Charts'}">
+        <router-link :to="{name: 'Charts'}" :event="!isOnline ? '' : 'click'">
         <button type="button"
           class="btn btn-lg"
           :class="{'btn-danger': !isOnline,
                    'btn-success': isOnline,
                       disabled: !isOnline}"
-          @click="addServer({name: serverName, url: serverURL})">
+          @click="wrappedAddServer()">
           {{ btnMsg }}
           </button>
         </router-link>
@@ -99,6 +99,11 @@ export default {
     // finished typing before making the ajax request. To learn
     // more about the _.debounce function (and its cousin
     // _.throttle), visit: https://lodash.com/docs#debounce
+    wrappedAddServer () {
+      if (this.isOnline) {
+        this.addServer({name: this.serverName, url: this.serverURL})
+      }
+    },
     pingServer: _.debounce(
       function () {
         var vm = this
