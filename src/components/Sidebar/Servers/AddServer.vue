@@ -49,6 +49,7 @@ export default {
       active: false,
       serverURL: 'localhost:5000',
       serverName: 'TigressData',
+      simTypes: [],
       isOnline: false
     }
   },
@@ -83,7 +84,7 @@ export default {
     wrappedAddServer () {
       if (this.isOnline) {
         this.active = false
-        this.addServer({name: this.serverName, url: this.serverURL})
+        this.addServer({name: this.serverName, url: this.serverURL, simTypes: this.simTypes})
       }
     },
     pingServer: _.debounce(
@@ -92,6 +93,9 @@ export default {
         axios.get(vm.cleanedServerURL + '/api/handshake')
           .then(function (response) {
             vm.isOnline = (response.data.name === 'IseultServer')
+            if (vm.isOnline) {
+              vm.simTypes = response.data.sim_types
+            }
           })
           .catch(function (error) {
             vm.isOnline = false

@@ -12,9 +12,6 @@ const getters = {
   [types.GET_SERVER_MAP]: (state) => {
     return state.serverMap
   },
-  [types.GET_NEXT_SERVER_ID]: (state) => {
-    return state.nextServerID
-  },
   [types.GET_SERVER_ARR]: (state) => {
     return state.serverArr
   }

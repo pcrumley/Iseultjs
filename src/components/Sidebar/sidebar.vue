@@ -36,8 +36,8 @@
 import {TweenMax, Power4} from 'gsap'
 import * as types from '@/store/types'
 import { mapGetters } from 'vuex'
-import servers from '@/components/Sidebar/ServerPanel'
-import simulations from '@/components/Sidebar/SimulationPanel'
+import servers from '@/components/Sidebar/Servers/ServerPanel'
+import simulations from '@/components/Sidebar/Sims/SimulationPanel'
 import subplots from '@/components/Sidebar/SubplotPanel'
 
 export default {

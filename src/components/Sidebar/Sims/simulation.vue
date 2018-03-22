@@ -4,12 +4,12 @@
   -->
   <div class="card my-2 ">
   <div class="card-header text-left clickable" @click="active = !active">
-    <span>{{ myServer.name }}</span>
+    <span>{{ mySim.info.name }}@{{ mySim.info.serverName }}</span>
     <div class="float-right" ><font-awesome-icon :icon="icon" /></div>
   </div>
   <div class="card-body" v-if="active" >
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
-    <p class="card-text text-left">URL: {{ myServer.url }}</p>
+    <p class="card-text text-left">{{mySim}}</p>
     <button class="btn btn-danger float-right" @click="removeServer({id: serverID})">Remove</button>
   </div>
 </div>
@@ -17,7 +17,7 @@
 
 <script>
 import * as types from '@/store/types'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faMinus from '@fortawesome/fontawesome-free-solid/faMinus'
@@ -28,18 +28,19 @@ export default {
       active: false
     }
   },
-  props: ['serverID'],
-  methods: {
+  props: ['simID'],
+  /* methods: {
     ...mapActions({
       removeServer: types.DEL_SERVER
     })
   },
+  */
   computed: {
     ...mapGetters({
-      serverMap: types.GET_SERVER_MAP
+      simMap: types.GET_SIM_MAP
     }),
-    myServer () {
-      return this.serverMap.get(this.serverID)
+    mySim () {
+      return this.simMap.get(this.simID)
     },
     icon () {
       if (this.active) {
@@ -59,6 +60,6 @@ export default {
 <style scoped>
 .clickable {cursor: pointer;}
 div.card-header:hover {
-  background-color: #DCDCDC;
+  background-color: #E8E8E8;
 }
 </style>

@@ -21,7 +21,10 @@
         </div>
         <div class="form-group">
           <label for="formGroupServerURL">Server URL</label>
-          <input type="text" class="form-control" :class="{'has-failure': !isOnline, 'has-success': isOnline}" id="formGroupServerURL" placeholder="localhost:5000" v-model="serverURL">
+          <input type="text" class="form-control"
+            :class="{'has-failure': !isOnline,
+                     'has-success': isOnline}"
+            id="formGroupServerURL" placeholder="localhost:5000" v-model="serverURL">
         </div>
       </form>
 
@@ -62,6 +65,7 @@ export default {
     return {
       serverURL: 'localhost:5000',
       serverName: 'My Computer',
+      simTypes: [],
       isOnline: false
     }
   },
@@ -101,7 +105,7 @@ export default {
     // _.throttle), visit: https://lodash.com/docs#debounce
     wrappedAddServer () {
       if (this.isOnline) {
-        this.addServer({name: this.serverName, url: this.serverURL})
+        this.addServer({name: this.serverName, url: this.serverURL, simTypes: this.simTypes})
       }
     },
     pingServer: _.debounce(
@@ -110,6 +114,9 @@ export default {
         axios.get(vm.cleanedServerURL + '/api/handshake')
           .then(function (response) {
             vm.isOnline = (response.data.name === 'IseultServer')
+            if (vm.isOnline) {
+              vm.simTypes = response.data.sim_types
+            }
           })
           .catch(function (error) {
             vm.isOnline = false

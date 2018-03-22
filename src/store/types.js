@@ -1,10 +1,10 @@
 // Getters
 export const GET_SIM_MAP = 'simulations/GET_SIM_MAP'
+export const GET_SIM_ARR = 'servers/GET_SIM_ARR'
 export const GET_GRAPH_STATE_MAP = 'mainView/GET_GRAPH_STATE_MAP'
 export const DEFAULT_TWOD_PRTL_HIST = 'defaultGraphs/TWO_D_PRTL_HIST'
 export const GET_SERVER_MAP = 'servers/GET_SERVER_MAP'
 export const GET_SERVER_ARR = 'servers/GET_SERVER_ARR'
-export const GET_NEXT_SERVER_ID = 'servers/GET_NEXT_SERVER_ID'
 
 // Mutations
 export const PUSH_SIMULATION = 'simulations/PUSH_SIMULATION'

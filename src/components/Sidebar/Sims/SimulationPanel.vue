@@ -3,28 +3,27 @@
   THE VUE COMPONENT THAT MANAGES EACH CHART
   -->
   <div class="mx-4 text-center">
-    <server v-for="(item, key) in serverArr" :key="key" :serverID="item">
-    </server>
-    <add-server/>
+    <pic-sim v-for="(item, key) in simArr" :key="key" :simID="item">
+    </pic-sim>
+
   </div>
 
 </template>
 
 <script>
-import server from '@/components/Sidebar/server'
-import AddServer from '@/components/Sidebar/AddServer'
+import simulation from '@/components/Sidebar/Sims/simulation'
+import AddServer from '@/components/Sidebar/Servers/AddServer'
 import * as types from '@/store/types'
 import { mapGetters } from 'vuex'
 
 export default {
   computed: {
     ...mapGetters({
-      serverMap: types.GET_SERVER_MAP,
-      serverArr: types.GET_SERVER_ARR
+      simArr: types.GET_SIM_ARR
     })
   },
   components: {
-    server,
+    picSim: simulation,
     AddServer
   }
 }

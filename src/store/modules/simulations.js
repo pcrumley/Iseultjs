@@ -26,14 +26,16 @@ import axios from 'axios'
 //   outdir: './test_output' The directory of the output files on the server}
 
 const state = {
-  // nextSimID: 0,
+  nextSimID: 0,
   // simMap: new Map() // we keep an ID here to keep the keys unique
   // EVENTUALLY WE WILL LOAD THIS STATE FROM A SERVER, BUT WE KEEP IT THIS WAY
   // FOR TESTING PURPOSES
+  simArr: [0],
   simMap: new Map([[0, { i: 2,
     info: { simID: 0,
       name: 'TestData',
       serverID: 0,
+      serverName: 'My Computer',
       serverURL: 'http://localhost:5000',
       simType: 'tristan-mp',
       outdir: './test_output'
@@ -123,7 +125,11 @@ const state = {
 const getters = {
   [types.GET_SIM_MAP]: (state) => {
     return state.simMap
+  },
+  [types.GET_SIM_ARR]: (state) => {
+    return state.simArr
   }
+
 }
 
 // actions
@@ -150,6 +156,8 @@ const mutations = {
   [types.PUSH_SIMULATION]: (state, payload) => {
     // push the payload into the map
     state.simMap.set(payload.info.simID, Object.assign({}, payload))
+    state.simArr.push(state.nextSimID)
+    state.nextSimID += 1
   }
 }
 
