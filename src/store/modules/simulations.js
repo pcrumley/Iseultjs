@@ -26,17 +26,15 @@ import axios from 'axios'
 //   outdir: './test_output' The directory of the output files on the server}
 
 const state = {
-  nextSimID: 0,
+  nextSimID: 1,
   // simMap: new Map() // we keep an ID here to keep the keys unique
   // EVENTUALLY WE WILL LOAD THIS STATE FROM A SERVER, BUT WE KEEP IT THIS WAY
   // FOR TESTING PURPOSES
   simArr: [0],
   simMap: new Map([[0, { i: 2,
-    info: { simID: 0,
-      name: 'TestData',
+    info: {name: 'TestData',
       serverID: 0,
       serverName: 'My Computer',
-      serverURL: 'http://localhost:5000',
       simType: 'tristan-mp',
       outdir: './test_output'
     },
@@ -138,7 +136,7 @@ const actions = {
     // Add some AJAX here that would open the sim from the server & give us
     // some info about what sim... until then
     // load the simulation data
-    axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + payload.outdir)
+    axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + '\'' + payload.outdir + '\'')
       .then(function (response) {
         var simObj = { info: {}, data: {} }
         Object.assign(simObj.info, payload)
@@ -155,8 +153,9 @@ const actions = {
 const mutations = {
   [types.PUSH_SIMULATION]: (state, payload) => {
     // push the payload into the map
-    state.simMap.set(payload.info.simID, Object.assign({}, payload))
+    state.simMap.set(state.nextSimID, Object.assign({}, payload))
     state.simArr.push(state.nextSimID)
+    console.log(state.simArr)
     state.nextSimID += 1
   }
 }

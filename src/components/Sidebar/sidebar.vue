@@ -89,6 +89,6 @@ export default {
     height: 100vh;
     overflow-y:auto;
     max-width: 90vw;
-      background-color: var(--secondary-color);
+    background-color: var(--secondary-color);
   }
 </style>

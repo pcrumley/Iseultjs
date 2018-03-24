@@ -7,6 +7,11 @@
   </div>
   <div class="card-body text-left" >
     <form>
+      <div class="form-group ">
+        <label for="formGroupServerName">Simulation Name</label>
+        <input type="text" class="form-control" id="formGroupServerName" placeholder="My Sim" v-model="simName">
+      </div>
+
       <div class="form-group">
         <label for="exampleFormControlSelect1"> Choose server </label>
         <select class="form-control" id="exampleFormControlSelect1" v-model="serverLoc">
@@ -55,7 +60,7 @@
 
       <button type="button"
         class="btn btn-lg btn-success"
-        :class="{'disabled': !isOnline}">
+        @click="wrappeAddSimulation()">
         Add
         </button>
       </div>
@@ -81,13 +86,11 @@ export default {
       serverLoc: 0,
       simTypeID: 0,
       clickedDir: -1,
+      simName: '',
       isOnline: false,
       parentDir: '',
       curDir: '',
-      dirList: [ 'Dapibus ac facilisis',
-        'Morbi leo risus',
-        'Porta ac consectetur ac',
-        'Vestibulum at eros']
+      dirList: []
     }
   },
   computed: {
@@ -97,6 +100,13 @@ export default {
     }),
     openFolderIcon () {
       return faFolderOpen
+    },
+    cleanedServerURL () {
+      if (this.serverURL.substring(0, 7) === 'http://') {
+        return this.serverURL
+      } else {
+        return 'http://' + this.serverURL
+      }
     },
     lvlUpIcon () {
       return faLevelUp
@@ -120,13 +130,6 @@ export default {
     availSimTypes () {
       return this.serverMap.get(this.serverID).simTypes
     },
-    cleanedServerURL () {
-      if (this.serverURL.substring(0, 7) === 'http://') {
-        return this.serverURL
-      } else {
-        return 'http://' + this.serverURL
-      }
-    },
     btnMsg () {
       if (this.isOnline) {
         return 'Connect'
@@ -137,9 +140,6 @@ export default {
   },
   watch: {
     // whenever question changes, this function will run
-    serverURL: function (newServer, oldServer) {
-      this.isOnline = false
-    },
     serverID: function (newID, oldID) {
       this.curDir = this.serverMap.get(newID).serverDir
     },
@@ -151,8 +151,19 @@ export default {
   },
   methods: {
     ...mapActions({
-      addServer: types.ADD_SERVER
+      addSimulation: types.OPEN_SIMULATION
     }),
+    wrappeAddSimulation: function () {
+      console.log(this.simName)
+      this.addSimulation({
+        serverID: this.serverID,
+        serverURL: this.cleanedServerURL,
+        serverName: this.serverNames[this.serverLoc],
+        simType: this.simType,
+        outdir: this.curDir,
+        name: this.simName
+      })
+    },
     pingServer:
       function () {
         var vm = this
