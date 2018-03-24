@@ -66,7 +66,8 @@ export default {
       serverURL: 'localhost:5000',
       serverName: 'My Computer',
       simTypes: [],
-      isOnline: false
+      isOnline: false,
+      serverDir: '/'
     }
   },
   computed: {
@@ -105,7 +106,12 @@ export default {
     // _.throttle), visit: https://lodash.com/docs#debounce
     wrappedAddServer () {
       if (this.isOnline) {
-        this.addServer({name: this.serverName, url: this.serverURL, simTypes: this.simTypes})
+        this.addServer({
+          name: this.serverName,
+          url: this.serverURL,
+          simTypes: this.simTypes,
+          serverDir: this.serverDir
+        })
       }
     },
     pingServer: _.debounce(
@@ -116,6 +122,7 @@ export default {
             vm.isOnline = (response.data.name === 'IseultServer')
             if (vm.isOnline) {
               vm.simTypes = response.data.sim_types
+              vm.serverDir = response.data.server_dir
             }
           })
           .catch(function (error) {

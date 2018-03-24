@@ -10,8 +10,10 @@
   <div class="card-body" v-if="active" >
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
     <p class="card-text text-left">URL: {{ myServer.url }}</p>
-    <p class="card-text text-left">Available Sim Types: <span v-for="(item, key) in myServer.simTypes" :key=key>{{ item }}, </span> </p>
-
+    <p class="card-text text-left">Available Sim Types:
+      <span v-for="(item, key) in myServer.simTypes" :key=key > {{ item }} </span>
+    </p>
+    <p class="card-text text-left">Base Directory: {{ myServer.serverDir }}</p>
     <button class="btn btn-danger float-right" @click="removeServer({id: serverID})">Remove</button>
   </div>
 </div>

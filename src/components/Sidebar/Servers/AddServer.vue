@@ -50,7 +50,8 @@ export default {
       serverURL: 'localhost:5000',
       serverName: 'TigressData',
       simTypes: [],
-      isOnline: false
+      isOnline: false,
+      serverDir: '/'
     }
   },
   computed: {
@@ -84,7 +85,12 @@ export default {
     wrappedAddServer () {
       if (this.isOnline) {
         this.active = false
-        this.addServer({name: this.serverName, url: this.serverURL, simTypes: this.simTypes})
+        this.addServer({
+          name: this.serverName,
+          url: this.serverURL,
+          simTypes: this.simTypes,
+          serverDir: this.serverDir
+        })
       }
     },
     pingServer: _.debounce(
@@ -95,6 +101,7 @@ export default {
             vm.isOnline = (response.data.name === 'IseultServer')
             if (vm.isOnline) {
               vm.simTypes = response.data.sim_types
+              vm.serverDir = response.data.server_dir
             }
           })
           .catch(function (error) {
@@ -118,15 +125,6 @@ export default {
 <style scoped>
 label {
   text-align: left;
-}
-.jumbotron {
-  background-color: #FFFFFF;
-}
-.center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
 }
 .has-failure {
   border: 2px solid red;
