@@ -10,14 +10,14 @@
   <div class="card-body" v-if="active" >
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
     <p class="card-text text-left">{{mySim}}</p>
-    <button class="btn btn-danger float-right" @click="removeServer({id: serverID})">Remove</button>
+    <button class="btn btn-danger float-right" @click="removeSim({id: simID})">Remove</button>
   </div>
 </div>
 </template>
 
 <script>
 import * as types from '@/store/types'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faMinus from '@fortawesome/fontawesome-free-solid/faMinus'
@@ -29,12 +29,11 @@ export default {
     }
   },
   props: ['simID'],
-  /* methods: {
+  methods: {
     ...mapActions({
-      removeServer: types.DEL_SERVER
+      removeSim: types.DEL_SIMULATION
     })
   },
-  */
   computed: {
     ...mapGetters({
       simMap: types.GET_SIM_MAP

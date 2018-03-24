@@ -146,6 +146,10 @@ const actions = {
       .catch(function (error) {
         console.log(error)
       })
+  },
+  [types.DEL_SIMULATION]: ({ commit, state }, payload) => {
+    // Payload must include server id
+    commit(types.POP_SIMULATION, payload)
   }
 }
 
@@ -155,9 +159,13 @@ const mutations = {
     // push the payload into the map
     state.simMap.set(state.nextSimID, Object.assign({}, payload))
     state.simArr.push(state.nextSimID)
-    console.log(state.simArr)
     state.nextSimID += 1
+  },
+  [types.POP_SIMULATION]: (state, payload) => {
+    state.simMap.delete(payload.id)
+    state.simArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
   }
+
 }
 
 export default {
