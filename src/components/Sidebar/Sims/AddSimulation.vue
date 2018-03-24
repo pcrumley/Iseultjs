@@ -87,7 +87,6 @@ export default {
       simTypeID: 0,
       clickedDir: -1,
       simName: '',
-      isOnline: false,
       parentDir: '',
       curDir: '',
       dirList: []
@@ -154,7 +153,7 @@ export default {
       addSimulation: types.OPEN_SIMULATION
     }),
     wrappeAddSimulation: function () {
-      console.log(this.simName)
+      this.active = false
       this.addSimulation({
         serverID: this.serverID,
         serverURL: this.cleanedServerURL,
