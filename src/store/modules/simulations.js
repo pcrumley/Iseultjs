@@ -26,97 +26,12 @@ import axios from 'axios'
 //   outdir: './test_output' The directory of the output files on the server}
 
 const state = {
-  nextSimID: 1,
+  nextSimID: 0,
   // simMap: new Map() // we keep an ID here to keep the keys unique
   // EVENTUALLY WE WILL LOAD THIS STATE FROM A SERVER, BUT WE KEEP IT THIS WAY
   // FOR TESTING PURPOSES
-  simArr: [0],
-  simMap: new Map([[0, { i: 2,
-    info: {name: 'TestData',
-      serverID: 0,
-      serverName: 'My Computer',
-      simType: 'tristan-mp',
-      outdir: './test_output'
-    },
-    data: {
-      cmaps: [
-        'Spectral',
-        'rainbow',
-        'RdYlGn',
-        'coolwarm',
-        'temperature',
-        'gnuplot',
-        'PuOr',
-        'Blue-Black-Red',
-        'viridis',
-        'Blue-Black-Yellow',
-        'RdBu',
-        'hot',
-        'PiYG',
-        'magma',
-        'PRGn',
-        'BuYlRd',
-        'gnuplot2',
-        'inferno',
-        'plasma',
-        'Blue/Green/Yellow/Red',
-        'winter'
-      ],
-      fileArray: [1, 2, 3],
-      prtls: {
-        electrons: {
-          axisLabels: [
-            'x\\ [c/\\omega_{pe}]',
-            'y\\ [c/\\omega_{pe}]',
-            'z\\ [c/\\omega_{pe}]',
-            '\\gamma_e\\beta_{x,e}',
-            '\\gamma_e\\beta_{y,e}',
-            '\\gamma_e\\beta_{z,e}',
-            '\\gamma_e',
-            '\\mathrm{proc_e}',
-            '\\mathrm{ind_e}'
-          ],
-          quantities: [
-            'x',
-            'y',
-            'z',
-            'px',
-            'py',
-            'pz',
-            'gamma',
-            'proc',
-            'index'
-          ],
-          histLabel: 'f_e(p)'
-        },
-        ions: {
-          axisLabels: [
-            'x\\ [c/\\omega_{pe}]',
-            'y\\ [c/\\omega_{pe}]',
-            'z\\ [c/\\omega_{pe}]',
-            '\\gamma_i\\beta_{i,x}',
-            '\\gamma_i\\beta_{i,y}',
-            '\\gamma_i\\beta_{i,z}',
-            '\\gamma_i',
-            '\\mathrm{proc_i}',
-            '\\mathrm{ind_i}'
-          ],
-          quantities: [
-            'x',
-            'y',
-            'z',
-            'px',
-            'py',
-            'pz',
-            'gamma',
-            'proc',
-            'index'
-          ],
-          histLabel: 'f_e(p)'
-        }
-      }
-    }
-  }]])
+  simArr: [],
+  simMap: new Map([])
 }
 
 // getters
@@ -136,7 +51,7 @@ const actions = {
     // Add some AJAX here that would open the sim from the server & give us
     // some info about what sim... until then
     // load the simulation data
-    axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + '\'' + payload.outdir + '\'')
+    axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + payload.outdir)
       .then(function (response) {
         var simObj = { info: {}, data: {} }
         Object.assign(simObj.info, payload)
@@ -158,6 +73,7 @@ const mutations = {
   [types.PUSH_SIMULATION]: (state, payload) => {
     // push the payload into the map
     state.simMap.set(state.nextSimID, Object.assign({}, payload))
+    state.simMap.get(state.nextSimID).i = state.simMap.get(state.nextSimID).data.fileArray.length - 1
     state.simArr.push(state.nextSimID)
     state.nextSimID += 1
   },

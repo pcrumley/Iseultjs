@@ -1,20 +1,16 @@
 <template>
   <!--
-  THE VUE COMPONENT THAT MANAGES EACH SERVER STATE
+  THE VUE COMPONENT THAT MANAGES EACH SUBPLOT
   -->
   <div class="card my-2 ">
   <div class="card-header text-left clickable" @click="active = !active">
-    <span>{{ myServer.name }}</span>
+    <span>Subplot {{ chartID }}</span>
     <div class="float-right" ><font-awesome-icon :icon="icon" /></div>
   </div>
   <div class="card-body" v-if="active" >
+    {{myChart}}
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
-    <p class="card-text text-left">URL: {{ myServer.url }}</p>
-    <p class="card-text text-left">Available Sim Types:
-      <span v-for="(item, key) in myServer.simTypes" :key=key > {{ item }} </span>
-    </p>
-    <p class="card-text text-left">Base Directory: {{ myServer.serverDir }}</p>
-    <button class="btn btn-danger float-right" @click="removeServer({id: serverID})">Remove</button>
+    <!--<button class="btn btn-danger float-right" @click="removeServer({id: serverID})">Remove</button>-->
   </div>
 </div>
 </template>
@@ -32,7 +28,7 @@ export default {
       active: false
     }
   },
-  props: ['serverID'],
+  props: ['chartID'],
   methods: {
     ...mapActions({
       removeServer: types.DEL_SERVER
@@ -40,10 +36,10 @@ export default {
   },
   computed: {
     ...mapGetters({
-      serverMap: types.GET_SERVER_MAP
+      chartMap: types.GET_GRAPH_STATE_MAP
     }),
-    myServer () {
-      return this.serverMap.get(this.serverID)
+    myChart () {
+      return this.chartMap.get(this.chartID)
     },
     icon () {
       if (this.active) {

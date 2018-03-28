@@ -3,7 +3,8 @@ import * as types from '../types'
 // This module holds the state of the main graph layout.
 // The state contains an array of simulation objects
 const state = {
-  nextGraphID: 0,
+  nextChartID: 1,
+  chartArr: [0],
   // graphViewStateMap: new Map() WHEN WE DYNAMICALLY CHANGE state
   graphViewStateMap: new Map([[0, {
     sims: [0],
@@ -54,21 +55,29 @@ const state = {
 const getters = {
   [types.GET_GRAPH_STATE_MAP]: (state) => {
     return state.graphViewStateMap
+  },
+  [types.GET_CHART_ARR]: (state) => {
+    return state.chartArr
   }
 }
 
 // actions
 const actions = {
-  [types.OPEN_NEW_GRAPH]: ({ commit, state }, payload) => {
+  [types.OPEN_GRAPH]: ({ commit, state }, payload) => {
     // We don't have to do any async operations here, just
     // pass on the payload
-    commit(types.PUSH_NEW_GRAPH, payload)
+    commit(types.PUSH_GRAPH, payload)
+  },
+  [types.DEL_GRAPH]: ({ commit, state }, payload) => {
+    // Payload must include server id
+    commit(types.POP_GRAPH, payload)
   }
+
 }
 
 // mutations
 const mutations = {
-  [types.PUSH_NEW_GRAPH]: (state, payload) => {
+  [types.PUSH_GRAPH]: (state, payload) => {
     // a bit of a hack to avoid the fact that javascript arrays are weird.
     // first we push an empty object to the array, then we find the only empty
     // object in the array and copy our payload there.
@@ -82,7 +91,14 @@ const mutations = {
         state.graphViewStateMap.get(payload.chartID).sims = []
       }
     }
+    state.chartArr.push(state.nextChartID)
+    state.nextChartID += 1
+  },
+  [types.POP_GRAPH]: (state, payload) => {
+    state.graphViewStateMap.delete(payload.id)
+    state.chartArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
   }
+
 }
 
 export default {

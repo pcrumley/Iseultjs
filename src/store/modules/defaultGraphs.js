@@ -3,6 +3,7 @@ import * as types from '../types'
 // This module holds the state of the main graph layout.
 // The state contains an array of simulation objects
 const state = {
+  availChartTypes: ['2D Histograms'], // THIS SHOULD BE SENT BY SERVER PROBABLY... NEED TO THINK ABOUT IT.
   twoD_PRTL_HIST: {
     chartType: 'twoDPrtlHist',
     dataOptions: {
@@ -51,6 +52,9 @@ const state = {
 const getters = {
   [types.DEFAULT_TWOD_PRTL_HIST]: (state) => {
     return state.twoD_PRTL_HIST
+  },
+  [types.AVAIL_CHART_TYPES]: (state) => {
+    return state.availChartTypes
   }
 }
 

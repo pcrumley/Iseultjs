@@ -1,46 +1,61 @@
 <template>
   <div>
-    <iseult-image-graph :histOpts="histOptions" :myRefresh="refreshPlot" />
-    <hr>
-    <div class="field is-grouped is-grouped-multiline">
-      <div class="field">
-        <label class="label">Colormap</label>
-        <div class="select control">
-          <select id="cmap"
-                  v-model="histOptions.cmap">>
-            <option v-for="item in cmapOpts" :key="item"> {{ item }} </option>
-          </select>
-        </div>
+    <form>
+      <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="chooseColorMap"> Simulation: </label>
+        <select class="form-control" id="chooseSubplotType" v-model="simID">
+          <option v-for="(item, key) in simArr" :key="item" :value="item">
+            {{ simNames[key] }}
+          </option>
+        </select>
       </div>
-      <div class="field">
-        <label class="label">x-value</label>
-        <div class="select control">
-          <select id="xval"
-          v-model="histOptions.xval">
-            <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
-          </select>
-        </div>
+      <div class="form-group col-md-6">
+        <label for="chooseColorMap">Colormap</label>
+        <select class="form-control" id="chooseCmap"
+                v-model="histOptions.cmap">
+          <option v-for="item in cmapOpts" :key="item">
+            {{ item }}
+          </option>
+        </select>
       </div>
-      <div class="field">
-        <label class="label">y-value</label>
-        <div class="select control">
-          <select id="yval"
-                    v-model="histOptions.yval">
-              <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
-          </select>
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">particle</label>
-        <div class="select control">
-          <select id="prtl_type"
-                    v-model="histOptions.prtl_type">
-              <option v-for="(item, key) in mySim.data.prtls" :key="key"> {{ key }} </option>
-          </select>
-        </div>
-      </div>
-
     </div>
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="choosePrtl"> Particle </label>
+        <select class="form-control" id="particle"
+          v-model="histOptions.prtl_type">
+          <option v-for="item in prtlTypes" :key="item"> {{ item }} </option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="chooseX"> x-value </label>
+        <select class="form-control" id="xval"
+          v-model="histOptions.xval">
+          <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="chooseY"> y-value </label>
+        <select class="form-control" id="yval"
+          v-model="histOptions.yval">
+          <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-4 offset-md-4">
+        <label for="xbins"> xBins </label>
+        <input type="number" step="1" class="form-control" id="xBins"
+          v-model.number="histOptions.xbins">
+      </div>
+      <div class="form-group col-md-4">
+        <label for="chooseX"> yBins </label>
+        <input type="number" step="1" class="form-control"
+          id="xval" v-model.number="histOptions.ybins">
+      </div>
+    </div>
+    </form>
     <div class="control">
       <button class="button is-primary"  @click="refreshPlot+=1">Refresh</button>
       <button class="button is-primary"  @click="addSim({ simID: 0,
@@ -50,12 +65,10 @@
           simType: 'tristan-mp',
           outdir: './test_output'})">AddSim</button>
     </div>
-
   </div>
 </template>
 
 <script>
-import ImageGraph from '@/components/GraphHelpers/ImageGraph'
 import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/store/types'
 export default {
@@ -103,28 +116,36 @@ export default {
   },
   computed: {
     ...mapGetters({
-      simObj: types.GET_SIMULATIONS
+      simMap: types.GET_SIM_MAP,
+      simArr: types.GET_SIM_ARR
     }),
     mySim () {
-      if (this.simObj.length === 0) {
+      try {
+        return this.simMap.get(this.simID)
+      } catch (typeError) {
         return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x']}}}}
-      } else {
-        return this.simObj.find(el => el.info.simID === this.simID)
       }
+    },
+    simNames () {
+      var tmpArr = []
+      this.simArr.forEach((el) =>
+        tmpArr.push(this.simMap.get(el).info.name)
+      )
+      return tmpArr
     },
     cmapOpts () {
       return this.mySim.data.cmaps
     },
+    prtlTypes () {
+      return Object.keys(this.mySim.data.prtls)
+    },
     prtlQuants () {
       return this.mySim.data.prtls['ions'].quantities
     }
-  },
-  components: {
-    iseultImageGraph: ImageGraph
   }
 }
 </script>
 
-<style scoped src="bulma/css/bulma.css">
+<style>
 
 </style>

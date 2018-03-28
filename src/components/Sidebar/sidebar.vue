@@ -38,7 +38,7 @@ import * as types from '@/store/types'
 import { mapGetters } from 'vuex'
 import servers from '@/components/Sidebar/Servers/ServerPanel'
 import simulations from '@/components/Sidebar/Sims/SimulationPanel'
-import subplots from '@/components/Sidebar/SubplotPanel'
+import subplots from '@/components/Sidebar/SubPlots/SubplotPanel'
 
 export default {
   name: 'sidebar',

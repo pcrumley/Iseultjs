@@ -3,28 +3,28 @@
   THE SIDEBAR PANEL THAT LAYS OUT THE SERVER COMPONENTS
   -->
   <div class="mx-4 text-center">
-    <server v-for="(item, key) in serverArr" :key="key" :serverID="item">
-    </server>
-    <add-server/>
+    <subplot v-for="(item, key) in chartArr" :key="key" :chartID="item">
+    </subplot>
+    <add-subplot/>
   </div>
 
 </template>
 
 <script>
-import server from '@/components/Sidebar/Servers/server'
-import AddServer from '@/components/Sidebar/Servers/AddServer'
+import subplot from '@/components/Sidebar/SubPlots/Subplot'
+import AddSubplot from '@/components/Sidebar/SubPlots/AddSubplot'
 import * as types from '@/store/types'
 import { mapGetters } from 'vuex'
 
 export default {
   computed: {
     ...mapGetters({
-      serverArr: types.GET_SERVER_ARR
+      chartArr: types.GET_CHART_ARR
     })
   },
   components: {
-    server,
-    AddServer
+    subplot,
+    AddSubplot
   }
 }
 </script>

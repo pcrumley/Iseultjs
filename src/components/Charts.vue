@@ -4,8 +4,11 @@
   -->
   <div>
   <div>
-    <component v-for="(item, key) in chartArr" :key="key" :is="item[1]" :chartID="item[0]">
+    GRAPHS HERE--- FIX!
+    <!--
+    <component v-for="(item, key) in chartArr" :key="key" :is="" :chartID="item[0]">
     </component>
+    -->
   </div>
   <sidebar/>
   <sidebar-toggle/>
@@ -22,15 +25,9 @@ import SidebarToggle from '@/components/Sidebar/sidebarToggle.vue'
 export default {
   computed: {
     ...mapGetters({
-      graphMap: types.GET_GRAPH_STATE_MAP
-    }),
-    chartArr () {
-      var tmpArr = []
-      for (var [key, value] of this.graphMap.entries()) {
-        tmpArr.push([key, value.chartType])
-      }
-      return tmpArr
-    }
+      graphMap: types.GET_GRAPH_STATE_MAP,
+      chartArr: types.GET_CHART_ARR
+    })
   },
   components: {
     twoDPrtlHist: TwoDimPrtlHist,

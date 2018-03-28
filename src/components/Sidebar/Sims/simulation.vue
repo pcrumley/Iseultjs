@@ -1,6 +1,6 @@
 <template>
   <!--
-  THE VUE COMPONENT THAT MANAGES EACH CHART
+  THE VUE COMPONENT THAT MANAGES THE SIMULATION STATE
   -->
   <div class="card my-2 ">
   <div class="card-header text-left clickable" @click="active = !active">

@@ -7,14 +7,16 @@
   </div>
   <div class="card-body text-left" >
     <form>
-      <div class="form-group ">
+      <div class="form-row">
+        <div class="form-group col-md-4">
         <label for="formGroupServerName">Server Name</label>
         <input type="text" class="form-control" id="formGroupServerName" placeholder="My Computer" v-model="serverName">
       </div>
-      <div class="form-group">
+        <div class="form-group col-md-8">
         <label for="formGroupServerURL">Server URL</label>
         <input type="text" class="form-control" :class="{'has-failure': !isOnline, 'has-success': isOnline}" id="formGroupServerURL" placeholder="localhost:5000" v-model="serverURL">
       </div>
+    </div>
     </form>
 
       <div class="mx-auto text-right">

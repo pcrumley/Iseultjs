@@ -11,22 +11,23 @@
         <label for="formGroupServerName">Simulation Name</label>
         <input type="text" class="form-control" id="formGroupServerName" placeholder="My Sim" v-model="simName">
       </div>
-
-      <div class="form-group">
-        <label for="exampleFormControlSelect1"> Choose server </label>
-        <select class="form-control" id="exampleFormControlSelect1" v-model="serverLoc">
-          <option v-for="(item, key) in serverArr" :key="item" :value="key">
-            {{ serverNames[key] }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="exampleFormControlSelect1"> Sim Type </label>
-        <select class="form-control" id="exampleFormControlSelect1" v-model="simTypeID">
-          <option v-for="(item, key) in availSimTypes" :key="key" :value="key">
-            {{ item }}
-          </option>
-        </select>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="SelectServer"> Choose server </label>
+          <select class="form-control" id="SelectServer" v-model="serverLoc">
+            <option v-for="(item, key) in serverArr" :key="item" :value="key">
+              {{ serverNames[key] }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="exampleFormControlSelect1"> Sim Type </label>
+          <select class="form-control" id="exampleFormControlSelect1" v-model="simTypeID">
+            <option v-for="(item, key) in availSimTypes" :key="key" :value="key">
+              {{ item }}
+            </option>
+          </select>
+        </div>
       </div>
       <div class="form-group">
         <label for="exampleFormControlSelect1"> Output Directory </label>
@@ -60,7 +61,7 @@
 
       <button type="button"
         class="btn btn-lg btn-success"
-        @click="wrappeAddSimulation()">
+        @click="wrappedAddSimulation()">
         Add
         </button>
       </div>
@@ -152,7 +153,7 @@ export default {
     ...mapActions({
       addSimulation: types.OPEN_SIMULATION
     }),
-    wrappeAddSimulation: function () {
+    wrappedAddSimulation: function () {
       this.active = false
       this.addSimulation({
         serverID: this.serverID,
