@@ -86,7 +86,7 @@ export default {
     left: 0;
     top: 0;
     width: 500px;
-    height: 100vh;
+    height: calc(100vh - 70px);
     overflow-y:auto;
     max-width: 90vw;
     background-color: var(--secondary-color);

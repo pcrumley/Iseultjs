@@ -26,11 +26,9 @@ export default {
 <style module>
   .button{
     position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-    padding: 0;
-    height: 50px;
-    width: 50px;
+    padding: 10px;
+    height: 70px;
+    width: y0px;
     border: 3px solid transparent;
     border-radius: 50%;
     background-color: transparent;

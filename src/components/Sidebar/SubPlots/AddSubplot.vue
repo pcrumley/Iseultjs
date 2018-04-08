@@ -7,9 +7,9 @@
   </div>
   <div class="card-body text-left" >
     <form>
-      <div class="form-group">
-        <label for="chooseSubplotType"> Choose Chart Type: </label>
-        <select class="form-control" id="chooseSubplotType" v-model="subplotType">
+      <div class="form-row form-group">
+        <label for="chooseSubplotType" class='col-form-label col-sm-5'> Choose Chart Type: </label>
+        <select class="form-control col-sm-5" id="chooseSubplotType" v-model="subplotType">
           <option v-for="(item, key) in chartTypeArr" :key="item" :value="key">
             {{ chartTypeArr[key] }}
           </option>

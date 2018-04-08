@@ -11,7 +11,7 @@
     -->
   </div>
   <sidebar/>
-  <sidebar-toggle/>
+  <chart-footer/>
   </div>
 </template>
 
@@ -20,8 +20,7 @@ import TwoDimPrtlHist from '@/components/PrtlHists/Prtl2DHist'
 import * as types from '@/store/types'
 import { mapGetters } from 'vuex'
 import Sidebar from '@/components/Sidebar/sidebar.vue'
-import SidebarToggle from '@/components/Sidebar/sidebarToggle.vue'
-
+import ChartFooter from '@/components/Footer/ChartFooter.vue'
 export default {
   computed: {
     ...mapGetters({
@@ -32,7 +31,7 @@ export default {
   components: {
     twoDPrtlHist: TwoDimPrtlHist,
     Sidebar,
-    SidebarToggle
+    ChartFooter
   }
 }
 </script>

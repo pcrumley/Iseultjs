@@ -8,7 +8,7 @@
     <div class="float-right" ><font-awesome-icon :icon="icon" /></div>
   </div>
   <div class="card-body" v-if="active" >
-    {{myChart}}
+    {{ myChart }}
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
     <!--<button class="btn btn-danger float-right" @click="removeServer({id: serverID})">Remove</button>-->
   </div>
