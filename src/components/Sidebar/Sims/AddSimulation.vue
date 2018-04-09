@@ -89,7 +89,7 @@ export default {
       clickedDir: -1,
       simName: '',
       parentDir: '',
-      curDir: '',
+      curDir: '/',
       dirList: []
     }
   },

@@ -1,47 +1,20 @@
 <template>
 <div id="footer">
   <sidebar-toggle/>
-  <span class="align-middle" id="MyNavBar" >
-    <font-awesome-icon class="clickable" :icon="homeIcon" />
-    <font-awesome-icon class="clickable" :icon="undoIcon" />
-    <font-awesome-icon class="clickable" :icon="redoIcon" />
-    <font-awesome-icon class="clickable" :icon="arrowsIcon" />
-    <font-awesome-icon class="clickable" :icon="searchIcon" />
-  </span>
-
+  <iseult-nav-bar/>
+  <sim-nav-bar/>
 </div>
 </template>
 
 <script>
 import SidebarToggle from '@/components/Footer/sidebarToggle.vue'
-import faHome from '@fortawesome/fontawesome-free-solid/faHome'
-import faUndo from '@fortawesome/fontawesome-free-solid/faUndoAlt'
-import faRedo from '@fortawesome/fontawesome-free-solid/faRedoAlt'
-import faArrows from '@fortawesome/fontawesome-free-solid/faArrowsAlt'
-import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
-import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
-
+import NavBar from '@/components/Footer/NavBar.vue'
+import SimNavBar from '@/components/Footer/SimNavBar.vue'
 export default {
-  computed: {
-    homeIcon () {
-      return faHome
-    },
-    undoIcon () {
-      return faUndo
-    },
-    redoIcon () {
-      return faRedo
-    },
-    arrowsIcon () {
-      return faArrows
-    },
-    searchIcon () {
-      return faSearch
-    }
-  },
   components: {
     SidebarToggle,
-    FontAwesomeIcon
+    SimNavBar,
+    IseultNavBar: NavBar
   }
 }
 </script>
@@ -51,12 +24,15 @@ export default {
   opacity:0.1;
   user-select: none;
 }
+#toggleSpacer{
+  width:70px;
+}
 #footer {
   position: fixed;
   bottom: 0;
   width: 100%;
   height: 70px;
-  background: white smoke;
+  background: whiteSmoke  ;
   line-height: 2;
   text-align: center;
   font-size: 30px;
