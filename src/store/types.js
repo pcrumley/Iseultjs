@@ -17,6 +17,7 @@ export const POP_GRAPH = 'mainView/POP_GRAPH'
 export const TOGGLE_SIDEBAR = 'sidebar/TOGGLE_SIDEBAR'
 export const PUSH_SERVER = 'servers/PUSH_SERVER'
 export const POP_SERVER = 'servers/POP_SERVER'
+export const MUTATE_TSTEP = 'sims/MUTATE_TSTEP'
 
 // Actions
 export const OPEN_SIMULATION = 'simulations/OPEN_SIMULATION'
@@ -25,3 +26,4 @@ export const OPEN_GRAPH = 'mainView/OPEN_GRAPH'
 export const DEL_GRAPH = 'mainView/DEL_GRAPH'
 export const ADD_SERVER = 'servers/ADD_SERVER'
 export const DEL_SERVER = 'servers/DEL_SERVER'
+export const CHANGE_SIM_TSTEP = 'sims/CHANGE_SIM_TSTEP'

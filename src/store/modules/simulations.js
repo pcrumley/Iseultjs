@@ -65,6 +65,10 @@ const actions = {
   [types.DEL_SIMULATION]: ({ commit, state }, payload) => {
     // Payload must include server id
     commit(types.POP_SIMULATION, payload)
+  },
+  [types.CHANGE_SIM_TSTEP]: ({ commit, state }, payload) => {
+    // Payload must include simID
+    commit(types.MUTATE_TSTEP, payload)
   }
 }
 
@@ -80,6 +84,9 @@ const mutations = {
   [types.POP_SIMULATION]: (state, payload) => {
     state.simMap.delete(payload.id)
     state.simArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
+  },
+  [types.MUTATE_TSTEP]: (state, payload) => {
+    state.simMap.get(payload.id).i = payload.ind
   }
 
 }

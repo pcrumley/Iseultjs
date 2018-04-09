@@ -8,14 +8,15 @@
     </option>
     </select>
   </form>
-  {{ simN }} {{ curInd }}
+  {{ simN }}
   <font-awesome-icon class="clickable" :icon="stepBackIcon" />
   <font-awesome-icon class="clickable" :icon="playIcon" />
   <font-awesome-icon class="clickable" :icon="stepForwardsIcon" />
   <input class="align-middle  "
     type="range"
-    min="10"
-    max="2000"
+    min="0"
+    :max="maxInd"
+    v-model.number="curInd"
   >
 </span>
 </template>
@@ -24,14 +25,15 @@ import faStepBackward from '@fortawesome/fontawesome-free-solid/faStepBackward'
 import faPlay from '@fortawesome/fontawesome-free-solid/faPlay'
 import faStepForward from '@fortawesome/fontawesome-free-solid/faStepForward'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/store/types'
 
 export default {
   data () {
     return {
       simID: 0,
-      simN: 0 // the value of N file of sim.
+      simN: 0, // the value of N file of sim.
+      curInd: 0
     }
   },
   computed: {
@@ -41,15 +43,15 @@ export default {
     }),
     mySim () {
       const tmpArr = this.simArr.filter(id => id === this.simID)
-      if (tmpArr.Length === 0) {
+      if (tmpArr.length === 0) {
         return {}
       } else {
         return this.simMap.get(tmpArr[0])
       }
     },
-    curInd () {
+    maxInd () {
       try {
-        return this.mySim.i
+        return this.mySim.data.fileArray.length - 1
       } catch (typeError) {
         return 0
       }
@@ -75,11 +77,17 @@ export default {
   watch: {
     curInd: function (newInd, oldInd) {
       try {
+        this.changeTStep({ id: this.simID, ind: newInd })
         this.simN = this.mySim.data.fileArray[newInd]
       } catch (e) {
         this.simN = 0
       }
     }
+  },
+  methods: {
+    ...mapActions({
+      changeTStep: types.CHANGE_SIM_TSTEP
+    })
   },
   components: {
     FontAwesomeIcon
