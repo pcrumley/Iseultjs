@@ -26,18 +26,22 @@ import axios from 'axios'
 //   outdir: './test_output' The directory of the output files on the server}
 
 const state = {
-  nextSimID: 0,
+  nextSimID: 1,
+  simUpdated: 0,
   // simMap: new Map() // we keep an ID here to keep the keys unique
   // EVENTUALLY WE WILL LOAD THIS STATE FROM A SERVER, BUT WE KEEP IT THIS WAY
   // FOR TESTING PURPOSES
   simArr: [],
-  simMap: new Map([])
+  simObj: {}
 }
 
 // getters
 const getters = {
+  [types.GET_SIM_UPDATED]: (state) => {
+    return state.simUpdated
+  },
   [types.GET_SIM_MAP]: (state) => {
-    return state.simMap
+    return state.simObj
   },
   [types.GET_SIM_ARR]: (state) => {
     return state.simArr
@@ -76,8 +80,8 @@ const actions = {
 const mutations = {
   [types.PUSH_SIMULATION]: (state, payload) => {
     // push the payload into the map
-    state.simMap.set(state.nextSimID, Object.assign({}, payload))
-    state.simMap.get(state.nextSimID).i = state.simMap.get(state.nextSimID).data.fileArray.length - 1
+    state.simObj[state.nextSimID] = Object.assign({}, payload)
+    state.simObj[state.nextSimID].i = state.simObj[state.nextSimID].data.fileArray.length - 1
     state.simArr.push(state.nextSimID)
     state.nextSimID += 1
   },
@@ -86,9 +90,13 @@ const mutations = {
     state.simArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
   },
   [types.MUTATE_TSTEP]: (state, payload) => {
-    state.simMap.get(payload.id).i = payload.ind
+    state.simObj[payload.id].i = payload.ind
+    if (Math.abs(state.simUpdated) === payload.id) {
+      state.simUpdated *= -1
+    } else {
+      state.simUpdated = payload.id
+    }
   }
-
 }
 
 export default {

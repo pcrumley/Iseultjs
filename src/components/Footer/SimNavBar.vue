@@ -8,7 +8,7 @@
     </option>
     </select>
   </form>
-  {{ simN }}
+  {{ simN }} {{ mySim.i }}
   <font-awesome-icon class="clickable" :icon="stepBackIcon" />
   <font-awesome-icon class="clickable" :icon="playIcon" />
   <font-awesome-icon class="clickable" :icon="stepForwardsIcon" />
@@ -31,22 +31,29 @@ import * as types from '@/store/types'
 export default {
   data () {
     return {
-      simID: 0,
-      simN: 0, // the value of N file of sim.
+      simID: 1,
       curInd: 0
     }
   },
   computed: {
     ...mapGetters({
-      simMap: types.GET_SIM_MAP,
-      simArr: types.GET_SIM_ARR
+      simObj: types.GET_SIM_MAP,
+      simArr: types.GET_SIM_ARR,
+      simUpdated: types.GET_SIM_UPDATED
     }),
     mySim () {
       const tmpArr = this.simArr.filter(id => id === this.simID)
       if (tmpArr.length === 0) {
         return {}
       } else {
-        return this.simMap.get(tmpArr[0])
+        return this.simObj[tmpArr[0]]
+      }
+    },
+    simN () {
+      try {
+        return this.mySim.data.fileArray[this.curInd]
+      } catch (e) {
+        return 0
       }
     },
     maxInd () {
@@ -59,11 +66,10 @@ export default {
     simNames () {
       var tmpArr = []
       this.simArr.forEach((el) =>
-        tmpArr.push(this.simMap.get(el).info.name)
+        tmpArr.push(this.simObj[el].info.name)
       )
       return tmpArr
     },
-
     stepBackIcon () {
       return faStepBackward
     },
@@ -75,13 +81,11 @@ export default {
     }
   },
   watch: {
+    mySim: function (newSim) {
+      this.curInd = newSim.i
+    },
     curInd: function (newInd, oldInd) {
-      try {
-        this.changeTStep({ id: this.simID, ind: newInd })
-        this.simN = this.mySim.data.fileArray[newInd]
-      } catch (e) {
-        this.simN = 0
-      }
+      this.changeTStep({id: this.simID, ind: this.newInd})
     }
   },
   methods: {

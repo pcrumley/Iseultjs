@@ -9,7 +9,7 @@
   </div>
   <div class="card-body" v-if="active" >
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
-    <p class="card-text text-left">{{mySim}}</p>
+    <p class="card-text text-left">{{mySim}} {{simUpdated}}</p>
     <button class="btn btn-danger float-right" @click="removeSim({id: simID})">Remove</button>
   </div>
 </div>
@@ -36,10 +36,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-      simMap: types.GET_SIM_MAP
+      simObj: types.GET_SIM_MAP,
+      simUpdated: types.GET_SIM_UPDATED
     }),
     mySim () {
-      return this.simMap.get(this.simID)
+      return this.simObj[this.simID]
     },
     icon () {
       if (this.active) {
