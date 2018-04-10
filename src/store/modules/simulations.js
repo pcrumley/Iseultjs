@@ -63,7 +63,7 @@ const actions = {
         var simObj = { info: {}, data: {}, i: 0 }
         Object.assign(simObj.info, payload)
         Object.assign(simObj.data, response.data)
-        simObj.i = simObj.data.fileArray.length - 1
+        Object.assign(simObj.i, simObj.data.fileArray.length - 1)
         commit(types.PUSH_SIMULATION, simObj)
       })
       .catch(function (error) {

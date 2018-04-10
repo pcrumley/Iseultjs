@@ -150,7 +150,7 @@ export default {
   data () {
     return {
       refreshPlot: 0,
-      simID: 0,
+      simID: 1,
       histOptions: {
         prtl_type: 'ions',
         yval: 'px',
@@ -191,12 +191,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      simObj: types.GET_SIM_MAP,
+      simMap: types.GET_SIM_MAP,
       simArr: types.GET_SIM_ARR
     }),
     mySim () {
       try {
-        return this.simObj[this.simID]
+        return this.simMap.get(this.simID)
       } catch (typeError) {
         return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x']}}}}
       }
@@ -204,7 +204,7 @@ export default {
     simNames () {
       var tmpArr = []
       this.simArr.forEach((el) =>
-        tmpArr.push(this.simObj[el].info.name)
+        tmpArr.push(this.simMap.get(el).info.name)
       )
       return tmpArr
     },

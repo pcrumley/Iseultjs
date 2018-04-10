@@ -8,7 +8,7 @@
     </option>
     </select>
   </form>
-  {{ simN }} {{ mySim.i }}
+  {{ simN }} {{mySim.i}}
   <font-awesome-icon class="clickable" :icon="stepBackIcon" />
   <font-awesome-icon class="clickable" :icon="playIcon" />
   <font-awesome-icon class="clickable" :icon="stepForwardsIcon" />
@@ -85,7 +85,7 @@ export default {
       this.curInd = newSim.i
     },
     curInd: function (newInd, oldInd) {
-      this.changeTStep({id: this.simID, ind: this.newInd})
+      this.changeTStep({id: this.simID, ind: newInd})
     }
   },
   methods: {
