@@ -27,12 +27,15 @@ import axios from 'axios'
 
 const state = {
   nextSimID: 1,
+  // We use simUpdated to tell us when properties of a sim are changed, basically
+  // an event bus. Right now we set simUpdated equal to the sim ID of the sim
+  // that changed, using the sign as a toggle.
   simUpdated: 0,
   // simMap: new Map() // we keep an ID here to keep the keys unique
   // EVENTUALLY WE WILL LOAD THIS STATE FROM A SERVER, BUT WE KEEP IT THIS WAY
   // FOR TESTING PURPOSES
   simArr: [],
-  simObj: {}
+  simMap: new Map([])
 }
 
 // getters
@@ -41,7 +44,7 @@ const getters = {
     return state.simUpdated
   },
   [types.GET_SIM_MAP]: (state) => {
-    return state.simObj
+    return state.simMap
   },
   [types.GET_SIM_ARR]: (state) => {
     return state.simArr
@@ -57,9 +60,10 @@ const actions = {
     // load the simulation data
     axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + payload.outdir)
       .then(function (response) {
-        var simObj = { info: {}, data: {} }
+        var simObj = { info: {}, data: {}, i: 0 }
         Object.assign(simObj.info, payload)
         Object.assign(simObj.data, response.data)
+        simObj.i = simObj.data.fileArray.length - 1
         commit(types.PUSH_SIMULATION, simObj)
       })
       .catch(function (error) {
@@ -80,8 +84,7 @@ const actions = {
 const mutations = {
   [types.PUSH_SIMULATION]: (state, payload) => {
     // push the payload into the map
-    state.simObj[state.nextSimID] = Object.assign({}, payload)
-    state.simObj[state.nextSimID].i = state.simObj[state.nextSimID].data.fileArray.length - 1
+    state.simMap.set(state.nextSimID, Object.assign({}, payload))
     state.simArr.push(state.nextSimID)
     state.nextSimID += 1
   },
@@ -90,7 +93,7 @@ const mutations = {
     state.simArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
   },
   [types.MUTATE_TSTEP]: (state, payload) => {
-    state.simObj[payload.id].i = payload.ind
+    state.simMap.get(payload.id).i = payload.ind
     if (Math.abs(state.simUpdated) === payload.id) {
       state.simUpdated *= -1
     } else {

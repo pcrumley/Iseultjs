@@ -36,11 +36,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-      simObj: types.GET_SIM_MAP,
+      simMap: types.GET_SIM_MAP,
       simUpdated: types.GET_SIM_UPDATED
     }),
     mySim () {
-      return this.simObj[this.simID]
+      return this.simMap.get(this.simID)
     },
     icon () {
       if (this.active) {

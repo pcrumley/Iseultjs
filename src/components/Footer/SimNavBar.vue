@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      simObj: types.GET_SIM_MAP,
+      simMap: types.GET_SIM_MAP,
       simArr: types.GET_SIM_ARR,
       simUpdated: types.GET_SIM_UPDATED
     }),
@@ -46,7 +46,7 @@ export default {
       if (tmpArr.length === 0) {
         return {}
       } else {
-        return this.simObj[tmpArr[0]]
+        return this.simMap.get(tmpArr[0])
       }
     },
     simN () {
@@ -66,7 +66,7 @@ export default {
     simNames () {
       var tmpArr = []
       this.simArr.forEach((el) =>
-        tmpArr.push(this.simObj[el].info.name)
+        tmpArr.push(this.simMap.get(el).info.name)
       )
       return tmpArr
     },
