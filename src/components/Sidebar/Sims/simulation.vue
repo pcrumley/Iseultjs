@@ -9,7 +9,7 @@
   </div>
   <div class="card-body" v-if="active" >
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
-    <p class="card-text text-left">{{mySim}} {{simUpdated}}</p>
+    <p class="card-text text-left">{{mySim}}</p>
     <button class="btn btn-danger float-right" @click="removeSim({id: simID})">Remove</button>
   </div>
 </div>

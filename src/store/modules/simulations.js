@@ -63,7 +63,7 @@ const actions = {
         var simObj = { info: {}, data: {}, i: 0 }
         Object.assign(simObj.info, payload)
         Object.assign(simObj.data, response.data)
-        Object.assign(simObj.i, simObj.data.fileArray.length - 1)
+        simObj.i = simObj.data.fileArray.length - 1
         commit(types.PUSH_SIMULATION, simObj)
       })
       .catch(function (error) {
@@ -86,11 +86,19 @@ const mutations = {
     // push the payload into the map
     state.simMap.set(state.nextSimID, Object.assign({}, payload))
     state.simArr.push(state.nextSimID)
+    // state.simUpdated = payload.id
+    state.simUpdated = state.nextSimID
     state.nextSimID += 1
   },
   [types.POP_SIMULATION]: (state, payload) => {
     state.simMap.delete(payload.id)
     state.simArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
+    /* if (Math.abs(state.simUpdated) === payload.id) {
+      state.simUpdated *= -1
+    } else {
+      state.simUpdated = payload.id
+    }
+    */
   },
   [types.MUTATE_TSTEP]: (state, payload) => {
     state.simMap.get(payload.id).i = payload.ind

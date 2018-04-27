@@ -192,13 +192,15 @@ export default {
   computed: {
     ...mapGetters({
       simMap: types.GET_SIM_MAP,
-      simArr: types.GET_SIM_ARR
+      simArr: types.GET_SIM_ARR,
+      simUpdated: types.GET_SIM_UPDATED
     }),
     mySim () {
-      try {
-        return this.simMap.get(this.simID)
-      } catch (typeError) {
+      const tmpArr = this.simArr.filter(id => id === this.simID)
+      if (tmpArr.length === 0) {
         return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x']}}}}
+      } else {
+        return this.simMap.get(tmpArr[0])
       }
     },
     simNames () {

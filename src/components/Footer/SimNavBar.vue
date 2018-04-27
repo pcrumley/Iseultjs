@@ -82,7 +82,9 @@ export default {
   },
   watch: {
     mySim: function (newSim) {
-      this.curInd = newSim.i
+      if ('i' in newSim) {
+        this.curInd = newSim.i
+      }
     },
     curInd: function (newInd, oldInd) {
       this.changeTStep({id: this.simID, ind: newInd})
