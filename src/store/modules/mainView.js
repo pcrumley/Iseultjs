@@ -4,10 +4,10 @@ import * as types from '../types'
 // The state contains an array of simulation objects
 const state = {
   nextChartID: 1,
-  chartArr: [0],
+  chartArr: [],
   // graphViewStateMap: new Map() WHEN WE DYNAMICALLY CHANGE state
-  graphViewStateMap: new Map([[0, {
-    sims: [0],
+  graphViewStateMap: new Map([[1, {
+    sims: [1],
     chartType: 'twoDPrtlHist',
     dataOptions: {
       prtl_type: 'ions',
@@ -58,6 +58,9 @@ const getters = {
   },
   [types.GET_CHART_ARR]: (state) => {
     return state.chartArr
+  },
+  [types.GET_NEXT_CHART_ID]: (state) => {
+    return state.nextChartID
   }
 }
 

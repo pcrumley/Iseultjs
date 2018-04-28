@@ -16,7 +16,7 @@
         </select>
       </div>
     </form>
-    <component :is="subplotOptsComponent">
+    <component :is="subplotOptsComponent" :chart-id="nextChartID">
     </component>
     <div class="mx-auto text-right">
       <button type="button"
@@ -51,10 +51,15 @@ export default {
   },
   computed: {
     ...mapGetters({
-      chartTypeArr: types.AVAIL_CHART_TYPES
+      chartTypeArr: types.AVAIL_CHART_TYPES,
+      nextChartID: types.GET_NEXT_CHART_ID
     }),
     subplotOptsComponent () {
-      return prtl2DHistForm
+      if (this.chartTypeArr[this.subplotType] === '2D Histograms') {
+        return prtl2DHistForm
+      } else {
+        return 0
+      }
     }
   },
   methods: {

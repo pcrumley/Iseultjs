@@ -10,6 +10,8 @@ export const AVAIL_CHART_TYPES = 'defaultGraphs/AVAIL_CHART_TYPES'
 export const GET_SERVER_MAP = 'servers/GET_SERVER_MAP'
 export const GET_SERVER_ARR = 'servers/GET_SERVER_ARR'
 
+export const GET_NEXT_CHART_ID = 'views/GET_NEXT_CHART_ID'
+
 // Mutations
 export const PUSH_SIMULATION = 'simulations/PUSH_SIMULATION'
 export const POP_SIMULATION = 'simulations/POP_SIMULATION'

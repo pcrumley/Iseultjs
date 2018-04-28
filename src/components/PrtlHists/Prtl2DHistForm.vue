@@ -3,8 +3,13 @@
   <form>
     <div class="form-row ">
     <div class="form-group col-md-4">
-      <label for="chooseColorMap"> Simulation: </label>
-      <select class="form-control  " id="chooseSubplotType" v-model="simID">
+      <label for="chooseSimulation">
+        Simulation:
+      </label>
+      <select class="form-control"
+        id="chooseSimulation"
+        v-model="simID"
+        @change="updatePlot">
         <option v-for="(item, key) in simArr" :key="item" :value="item">
           {{ simNames[key] }}
         </option>
@@ -13,7 +18,7 @@
     <div class="form-group col-md-4">
       <label for="chooseColorMap">Colormap</label>
       <select class="form-control" id="chooseCmap"
-              v-model="histOptions.cmap">
+              v-model="histOptions.cmap" @change="updatePlot">
         <option v-for="item in cmapOpts" :key="item">
           {{ item }}
         </option>
@@ -22,33 +27,44 @@
     <div class="form-group col-md-4">
       <label for="chooseInterpolation">Interpolation</label>
       <select class="form-control" id="chooseInterpolation"
-              v-model="histOptions.interpolation">
+              v-model="histOptions.interpolation" @change="updatePlot">
         <option> bicubic </option>
         <option> nearest </option>
       </select>
     </div>
   </div>
   <div class="form-group form-row">
-      <label for="choosePrtl" class="col-form-label col-sm-3"> Particle: </label>
-      <select class="form-control col-sm-3" id="particle"
-        v-model="histOptions.prtl_type">
+      <label for="choosePrtl" class="col-form-label col-sm-3">
+        Particle:
+      </label>
+      <select class="form-control col-sm-3"
+        id="particle"
+        v-model="histOptions.prtl_type"
+        @change="updatePlot">
         <option v-for="item in prtlTypes" :key="item"> {{ item }} </option>
       </select>
     </div>
     <div class="form-group form-row">
-      <label for="chooseX" class="col-form-label col-sm-1" > x: </label>
-      <select class="form-control  col-sm-2" id="xval"
-        v-model="histOptions.xval">
+      <label for="chooseX" class="col-form-label col-sm-1" >
+        x:
+      </label>
+      <select class="form-control col-sm-2"
+        id="xval"
+        v-model="histOptions.xval"
+        @change="updatePlot">
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
       <label for="chooseY" class="col-form-label col-sm-1 offset-sm-1"> y:</label>
-      <select class="form-control col-sm-2" id="yval"
-        v-model="histOptions.yval">
+      <select
+        class="form-control col-sm-2"
+        id="yval"
+        v-model="histOptions.yval"
+        @change="updatePlot">
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
       <label for="chooseWeights" class="col-form-label col-sm-2  offset-sm-1"> weights</label>
       <select class="form-control col-sm-2" id="weights"
-        v-model="histOptions.weights">
+        v-model="histOptions.weights" @change="updatePlot">
         <option> </option>
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
@@ -57,29 +73,29 @@
     <div class="form-group col-md-3">
       <label for="vMin"> vmin </label>
       <input class="form-control" id="vMin"
-        v-model.number="histOptions.vmin">
+        v-model.number="histOptions.vmin" @change="updatePlot">
     </div>
     <div class="form-group col-md-3">
       <label for="vMax"> vmax </label>
       <input class="form-control"
-        id="vMax" v-model.number="histOptions.vmax">
+        id="vMax" v-model.number="histOptions.vmax" @change="updatePlot">
     </div>
     <div class="form-group col-md-3">
       <label for="xbins"> xbins </label>
       <input type="number" step="1" class="form-control" id="xBins"
-        v-model.number="histOptions.xbins">
+        v-model.number="histOptions.xbins" @change="updatePlot">
     </div>
     <div class="form-group col-md-3">
       <label for="ybins"> ybins </label>
       <input type="number" step="1" class="form-control"
-        id="ybins" v-model.number="histOptions.ybins">
+        id="ybins" v-model.number="histOptions.ybins" @change="updatePlot">
     </div>
   </div>
   <div class="form-row ">
     <div class="form-group col-md-5">
       <label for="xbins"> Color Norm </label>
       <select class="form-control" id="cnorm"
-        v-model="histOptions.cnorm">
+        v-model="histOptions.cnorm" @change="updatePlot">
         <option> log </option>
         <option> linear </option>
         <option> pow </option>
@@ -89,51 +105,65 @@
     <div class="form-group col-md-3 offset-md-1" v-if="histOptions.cnorm === 'pow'">
         <label for="zero"> z0 </label>
         <input class="form-control"
-          id="pow_zero" v-model.number="histOptions.pow_zero">
+          id="pow_zero" v-model.number="histOptions.pow_zero" @change="updatePlot">
       </div>
       <div class="form-group col-md-3" v-if="histOptions.cnorm === 'pow'">
         <label for="gamma"> gamma </label>
         <input  class="form-control"
-          id="pow_gamma" v-model.number="histOptions.pow_gamma">
+          id="pow_gamma" v-model.number="histOptions.pow_gamma" @change="updatePlot">
     </div>
   </div>
   <div class="form-row ">
     <div class="form-group col-md-3">
       <label for="xmin"> xmin </label>
       <input class="form-control" id="xmin"
-        v-model.number="histOptions.xmin">
+        v-model.number="histOptions.xmin" @change="updatePlot">
     </div>
     <div class="form-group col-md-3">
       <label for="xmax"> xmax </label>
       <input class="form-control"
-        id="xmax" v-model.number="histOptions.xmax">
+        id="xmax" v-model.number="histOptions.xmax" @change="updatePlot">
     </div>
     <div class="form-group col-md-3">
       <label for="ymin"> ymin </label>
       <input class="form-control" id="xBins"
-        v-model.number="histOptions.ymin">
+        v-model.number="histOptions.ymin" @change="updatePlot">
     </div>
     <div class="form-group col-md-3">
       <label for="chooseX"> ymax </label>
       <input class="form-control"
-        id="ymin" v-model.number="histOptions.ymin">
+        id="ymin" v-model.number="histOptions.ymin" @change="updatePlot">
     </div>
   </div>
   <div class="form-row pb-3">
     <div class="form-check px-3">
-      <input class="form-check-input" type="checkbox" v-model="histOptions.normhist" id="NormCheck">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        v-model="histOptions.normhist"
+        id="NormCheck" @change="updatePlot">
       <label class="form-check-label" for="NormCheck">
         Normalize Hist
       </label>
     </div>
     <div class="form-check px-3">
-      <input class="form-check-input" type="checkbox" v-model="histOptions.mask_zeros" id="MaskCheck">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        v-model="histOptions.mask_zeros"
+        @change="updatePlot"
+        id="MaskCheck">
       <label class="form-check-label" for="MaskCheck">
         Mask Zeros
       </label>
     </div>
     <div class="form-check px-3">
-      <input class="form-check-input" type="checkbox" v-model="histOptions.clip" id="ClipValues">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        v-model="histOptions.clip"
+        @change="updatePlot"
+        id="ClipValues">
       <label class="form-check-label" for="ClipValues">
         Clip Values
       </label>
@@ -149,42 +179,17 @@ import * as types from '@/store/types'
 export default {
   data () {
     return {
-      refreshPlot: 0,
-      simID: 1,
-      histOptions: {
-        prtl_type: 'ions',
-        yval: 'px',
-        xval: 'x',
-        weights: '',
-        boolstr: '',
-        ybins: 200,
-        xbins: 200,
-        yvalmin: '',
-        yvalmax: '',
-        xvalmin: '',
-        xvalmax: '',
-        normhist: true,
-        cmap: 'viridis',
-        cnorm: 'log',
-        pow_zero: 0,
-        pow_gamma: 1.0,
-        vmin: '',
-        vmax: '',
-        clip: false,
-        xmin: '',
-        xmax: '',
-        ymin: '',
-        ymax: '',
-        aspect: 'auto',
-        mask_zeros: true,
-        interpolation: 'bicubic'
-      }
+      simID: 1
     }
   },
+  props: ['chartId'],
   methods: {
     ...mapActions({
       addSim: types.OPEN_SIMULATION
     }),
+    updatePlot () {
+      console.log('hi')
+    },
     submitted () {
       this.isSubmitted = true
     }
@@ -193,7 +198,8 @@ export default {
     ...mapGetters({
       simMap: types.GET_SIM_MAP,
       simArr: types.GET_SIM_ARR,
-      simUpdated: types.GET_SIM_UPDATED
+      simUpdated: types.GET_SIM_UPDATED,
+      chartMap: types.GET_GRAPH_STATE_MAP
     }),
     mySim () {
       const tmpArr = this.simArr.filter(id => id === this.simID)
@@ -202,6 +208,9 @@ export default {
       } else {
         return this.simMap.get(tmpArr[0])
       }
+    },
+    histOptions () {
+      return this.chartMap.get(this.chartId).dataOptions
     },
     simNames () {
       var tmpArr = []
