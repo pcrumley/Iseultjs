@@ -5,9 +5,7 @@ import * as types from '../types'
 const state = {
   nextChartID: 1,
   chartArr: [],
-  // graphViewStateMap: new Map() WHEN WE DYNAMICALLY CHANGE state
-  graphViewStateMap: new Map([[1, {
-    sims: [1],
+  twoD_PRTL_HIST: {
     chartType: 'twoDPrtlHist',
     dataOptions: {
       prtl_type: 'ions',
@@ -48,7 +46,8 @@ const state = {
       },
       cbarWidth: 20
     }
-  }]])
+  },
+  graphViewStateMap: new Map([])
 }
 
 // getters
@@ -69,6 +68,16 @@ const actions = {
   [types.OPEN_GRAPH]: ({ commit, state }, payload) => {
     // We don't have to do any async operations here, just
     // pass on the payload
+    const tmpObj = {
+      chartType: payload.chartType,
+      chartID: state.nextChartID,
+      simID: payload.simID
+    }
+    commit(types.PUSH_GRAPH, tmpObj)
+  },
+  [types.ADD_GRAPH]: ({ commit, state }, payload) => {
+    // We don't have to do any async operations here, just
+    // pass on the payload
     commit(types.PUSH_GRAPH, payload)
   },
   [types.DEL_GRAPH]: ({ commit, state }, payload) => {
@@ -84,18 +93,17 @@ const mutations = {
     // a bit of a hack to avoid the fact that javascript arrays are weird.
     // first we push an empty object to the array, then we find the only empty
     // object in the array and copy our payload there.
-    state.graphViewStateMap.set(payload.chartID, {})
-    if (payload.chartType === 'twoDPrtlHist') {
+
+    if (payload.chartID != null) {
+      state.graphViewStateMap.set(payload.chartID, {})
       Object.assign(state.graphViewStateMap.get(payload.chartID), state.twoD_PRTL_HIST)
       // Set the chartID
-      if (payload.simID != null) {
-        state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
-      } else {
-        state.graphViewStateMap.get(payload.chartID).sims = []
-      }
+      state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+    } else {
+      state.chartArr.push(state.nextChartID)
+      state.nextChartID += 1
     }
-    state.chartArr.push(state.nextChartID)
-    state.nextChartID += 1
+    console.log(state.graphViewStateMap.get(1))
   },
   [types.POP_GRAPH]: (state, payload) => {
     state.graphViewStateMap.delete(payload.id)

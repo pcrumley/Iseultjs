@@ -1,6 +1,6 @@
 <template>
   <div>
-  <button v-if="!active" button type="button" class="btn btn-success btn-lg btn-block" @click="active=true">Add new chart</button>
+  <button v-if="!active" button type="button" class="btn btn-success btn-lg btn-block" @click="openAddSubplotPanel">Add new chart</button>
   <div class="card my-2 " v-if="active">
   <div class="card-header text-left">
     Add new chart
@@ -26,8 +26,8 @@
         </button>
 
     <button type="button"
-      class="btn btn-lg btn-success">
-      <!--@click="wrappedAddServer()">-->
+      class="btn btn-lg btn-success"
+      @click="wrappedAddSubplot">
         Add
     </button>
   </div>
@@ -52,7 +52,8 @@ export default {
   computed: {
     ...mapGetters({
       chartTypeArr: types.AVAIL_CHART_TYPES,
-      nextChartID: types.GET_NEXT_CHART_ID
+      nextChartID: types.GET_NEXT_CHART_ID,
+      simArr: types.GET_SIM_ARR
     }),
     subplotOptsComponent () {
       if (this.chartTypeArr[this.subplotType] === '2D Histograms') {
@@ -64,8 +65,21 @@ export default {
   },
   methods: {
     ...mapActions({
-      addGraph: types.OPEN_GRAPH
-    })
+      addGraph: types.ADD_GRAPH,
+      openGraph: types.OPEN_GRAPH
+    }),
+    openAddSubplotPanel () {
+      this.openGraph({
+        chartType: '2D Histograms',
+        simID: this.simArr[0]})
+
+      this.active = true
+      // this.openGraph({chartType: this.chartTypeArr[this.subplotType]})
+    },
+    wrappedAddSubplot () {
+      this.active = false
+      this.addGraph({id: this.nextChartID})
+    }
   },
   components:
   {

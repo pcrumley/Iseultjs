@@ -26,6 +26,8 @@ export const MUTATE_TSTEP = 'sims/MUTATE_TSTEP'
 export const OPEN_SIMULATION = 'simulations/OPEN_SIMULATION'
 export const DEL_SIMULATION = 'simulations/DEL_SIMULATION'
 export const OPEN_GRAPH = 'mainView/OPEN_GRAPH'
+export const ADD_GRAPH = 'mainView/ADD_GRAPH'
+
 export const DEL_GRAPH = 'mainView/DEL_GRAPH'
 export const ADD_SERVER = 'servers/ADD_SERVER'
 export const DEL_SERVER = 'servers/DEL_SERVER'

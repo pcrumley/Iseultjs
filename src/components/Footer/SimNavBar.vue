@@ -12,11 +12,12 @@
   <font-awesome-icon class="clickable" :icon="stepBackIcon" />
   <font-awesome-icon class="clickable" :icon="playIcon" />
   <font-awesome-icon class="clickable" :icon="stepForwardsIcon" />
-  <input class="align-middle  "
+  <input class="align-middle"
     type="range"
     min="0"
     :max="maxInd"
     v-model.number="curInd"
+    @change="newTStep"
   >
 </span>
 </template>
@@ -85,15 +86,15 @@ export default {
       if ('i' in newSim) {
         this.curInd = newSim.i
       }
-    },
-    curInd: function (newInd, oldInd) {
-      this.changeTStep({id: this.simID, ind: newInd})
     }
   },
   methods: {
     ...mapActions({
       changeTStep: types.CHANGE_SIM_TSTEP
-    })
+    }),
+    newTStep () {
+      this.changeTStep({id: this.simID, ind: this.curInd})
+    }
   },
   components: {
     FontAwesomeIcon
