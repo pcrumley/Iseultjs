@@ -103,7 +103,6 @@ const mutations = {
       state.chartArr.push(state.nextChartID)
       state.nextChartID += 1
     }
-    console.log(state.graphViewStateMap.get(1))
   },
   [types.POP_GRAPH]: (state, payload) => {
     state.graphViewStateMap.delete(payload.id)
