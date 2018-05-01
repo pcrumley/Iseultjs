@@ -18,7 +18,7 @@
     <div class="form-group col-md-4">
       <label for="chooseColorMap">Colormap</label>
       <select class="form-control" id="chooseCmap"
-              v-model="histOptions.cmap" @change="updatePlot">
+              v-model="histOptions.cmap" @change="updatePlot('cmap')">
         <option v-for="item in cmapOpts" :key="item">
           {{ item }}
         </option>
@@ -27,7 +27,7 @@
     <div class="form-group col-md-4">
       <label for="chooseInterpolation">Interpolation</label>
       <select class="form-control" id="chooseInterpolation"
-              v-model="histOptions.interpolation" @change="updatePlot">
+              v-model="histOptions.interpolation" @change="updatePlot('interpolation')">
         <option> bicubic </option>
         <option> nearest </option>
       </select>
@@ -40,7 +40,7 @@
       <select class="form-control col-sm-3"
         id="particle"
         v-model="histOptions.prtl_type"
-        @change="updatePlot">
+        @change="updatePlot('prtl_type')">
         <option v-for="item in prtlTypes" :key="item"> {{ item }} </option>
       </select>
     </div>
@@ -51,7 +51,7 @@
       <select class="form-control col-sm-2"
         id="xval"
         v-model="histOptions.xval"
-        @change="updatePlot">
+        @change="updatePlot('xval')">
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
       <label for="chooseY" class="col-form-label col-sm-1 offset-sm-1"> y:</label>
@@ -59,12 +59,12 @@
         class="form-control col-sm-2"
         id="yval"
         v-model="histOptions.yval"
-        @change="updatePlot">
+        @change="updatePlot('yval')">
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
       <label for="chooseWeights" class="col-form-label col-sm-2  offset-sm-1"> weights</label>
       <select class="form-control col-sm-2" id="weights"
-        v-model="histOptions.weights" @change="updatePlot">
+        v-model="histOptions.weights" @change="updatePlot('weights')">
         <option> </option>
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
@@ -179,16 +179,24 @@ import * as types from '@/store/types'
 export default {
   data () {
     return {
-      simID: 1
+      simID: 1,
+      histOptions: {}
     }
   },
   props: ['chartId'],
   methods: {
     ...mapActions({
-      addSim: types.OPEN_SIMULATION
+      addSim: types.OPEN_SIMULATION,
+      toggleGraph: types.TOGGLE_UPDATE,
+      updateChartOptions: types.UPDATE_CHART
     }),
-    updatePlot () {
-      console.log('hi')
+    updatePlot (myKey) {
+      this.updateChartOptions({
+        key: myKey,
+        val: this.histOptions[myKey],
+        chartID: this.chartId
+      })
+      this.toggleGraph({id: this.chartId})
     },
     submitted () {
       this.isSubmitted = true
@@ -209,9 +217,6 @@ export default {
         return this.simMap.get(tmpArr[0])
       }
     },
-    histOptions () {
-      return this.chartMap.get(this.chartId).dataOptions
-    },
     simNames () {
       var tmpArr = []
       this.simArr.forEach((el) =>
@@ -228,6 +233,9 @@ export default {
     prtlQuants () {
       return this.mySim.data.prtls['ions'].quantities
     }
+  },
+  created: function () {
+    this.histOptions = JSON.parse(JSON.stringify(this.chartMap.get(this.chartId).dataOptions))
   }
 }
 </script>

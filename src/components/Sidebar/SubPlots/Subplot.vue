@@ -8,9 +8,9 @@
     <div class="float-right" ><font-awesome-icon :icon="icon" /></div>
   </div>
   <div class="card-body" v-if="active" >
-    {{ myChart }}
-    <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
-    <!--<button class="btn btn-danger float-right" @click="removeServer({id: serverID})">Remove</button>-->
+    <component :is="subplotOptsComponent" :chart-id="chartID">
+    </component>
+
   </div>
 </div>
 </template>
@@ -21,6 +21,7 @@ import { mapGetters, mapActions } from 'vuex'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faMinus from '@fortawesome/fontawesome-free-solid/faMinus'
+import prtl2DHistForm from '@/components/PrtLHists/Prtl2DHistForm'
 
 export default {
   data () {
@@ -38,6 +39,15 @@ export default {
     ...mapGetters({
       chartMap: types.GET_GRAPH_STATE_MAP
     }),
+
+    subplotOptsComponent () {
+      if (this.chartMap.get(this.chartID)['chartType'] === '2D Histograms') {
+        return prtl2DHistForm
+      } else {
+        return 0
+      }
+    },
+
     myChart () {
       return this.chartMap.get(this.chartID)
     },

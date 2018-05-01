@@ -19,7 +19,8 @@ import { mapGetters } from 'vuex'
 export default {
   computed: {
     ...mapGetters({
-      chartArr: types.GET_CHART_ARR
+      chartArr: types.GET_CHART_ARR,
+      chartMap: types.GET_GRAPH_STATE_MAP
     })
   },
   components: {

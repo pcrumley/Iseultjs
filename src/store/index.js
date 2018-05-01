@@ -7,7 +7,7 @@ import servers from '@/store/modules/servers'
 import defaultGraphs from '@/store/modules/defaultGraphs'
 Vue.use(Vuex)
 
-// const debug = process.env.NODE_ENV !== 'production'
+const debug = process.env.NODE_ENV !== 'production'
 
 export default new Vuex.Store({
 
@@ -22,6 +22,6 @@ export default new Vuex.Store({
     ui,
     defaultGraphs,
     servers
-  }
-  // strict: debug // Turning off strict mode
+  },
+  strict: debug // Turning off strict mode
 })

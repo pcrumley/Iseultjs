@@ -3,10 +3,11 @@ import * as types from '../types'
 // This module holds the state of the main graph layout.
 // The state contains an array of simulation objects
 const state = {
+  graphUpdated: 0,
   nextChartID: 1,
   chartArr: [],
   twoD_PRTL_HIST: {
-    chartType: 'twoDPrtlHist',
+    chartType: '2D Histograms',
     dataOptions: {
       prtl_type: 'ions',
       yval: 'px',
@@ -60,6 +61,9 @@ const getters = {
   },
   [types.GET_NEXT_CHART_ID]: (state) => {
     return state.nextChartID
+  },
+  [types.GET_2D]: (state) => {
+    return state.twoD_PRTL_HIST
   }
 }
 
@@ -83,20 +87,41 @@ const actions = {
   [types.DEL_GRAPH]: ({ commit, state }, payload) => {
     // Payload must include server id
     commit(types.POP_GRAPH, payload)
+  },
+  [types.UPDATE_CHART]: ({ commit, state }, payload) => {
+    commit(types.MUTATE_CHART_OPT, payload)
+  },
+  [types.TOGGLE_UPDATE]: ({ commit, state }, payload) => {
+    // since we mess with the state outside of vuex norms, we
+    // have to use this kludgy hack as a way to make the plots
+    // reactive.
+    commit(types.MARK_UPDATE, payload)
   }
-
 }
 
 // mutations
 const mutations = {
+  [types.MUTATE_CHART_OPT]: (state, payload) => {
+    console.log(payload)
+    state.graphViewStateMap.get(payload.chartID).dataOptions[payload.key] = payload.val
+  },
   [types.PUSH_GRAPH]: (state, payload) => {
     // a bit of a hack to avoid the fact that javascript arrays are weird.
     // first we push an empty object to the array, then we find the only empty
     // object in the array and copy our payload there.
 
     if (payload.chartID != null) {
-      state.graphViewStateMap.set(payload.chartID, {})
-      Object.assign(state.graphViewStateMap.get(payload.chartID), state.twoD_PRTL_HIST)
+      // let copy = {}
+      // let attributes = Object.keys(state.twoD_PRTL_HIST)
+      // attributes.forEach(attribute => {
+      //  let attributeValue = Object.getOwnPropertyDescriptor(state.twoD_PRTL_HIST, attribute)
+      //  Object.defineProperty(copy, attribute, {
+      //    __proto__: null,
+      //    value: attributeValue.get()
+      //  })
+      // })
+      // state.graphViewStateMap.set(payload.chartID, copy)
+      state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_HIST)))
       // Set the chartID
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
     } else {
@@ -107,6 +132,13 @@ const mutations = {
   [types.POP_GRAPH]: (state, payload) => {
     state.graphViewStateMap.delete(payload.id)
     state.chartArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
+  },
+  [types.MARK_UPDATE]: (state, payload) => {
+    if (Math.abs(state.graphUpdated) === payload.id) {
+      state.graphUpdated *= -1
+    } else {
+      state.graphUpdated = payload.id
+    }
   }
 
 }
