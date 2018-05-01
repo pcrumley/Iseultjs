@@ -73,29 +73,29 @@
     <div class="form-group col-md-3">
       <label for="vMin"> vmin </label>
       <input class="form-control" id="vMin"
-        v-model.number="histOptions.vmin" @change="updatePlot">
+        v-model.number="histOptions.vmin" @change="updatePlot('vmin')">
     </div>
     <div class="form-group col-md-3">
       <label for="vMax"> vmax </label>
       <input class="form-control"
-        id="vMax" v-model.number="histOptions.vmax" @change="updatePlot">
+        id="vMax" v-model.number="histOptions.vmax" @change="updatePlot('vmax')">
     </div>
     <div class="form-group col-md-3">
       <label for="xbins"> xbins </label>
       <input type="number" step="1" class="form-control" id="xBins"
-        v-model.number="histOptions.xbins" @change="updatePlot">
+        v-model.number="histOptions.xbins" @change="updatePlot('xbins')">
     </div>
     <div class="form-group col-md-3">
       <label for="ybins"> ybins </label>
       <input type="number" step="1" class="form-control"
-        id="ybins" v-model.number="histOptions.ybins" @change="updatePlot">
+        id="ybins" v-model.number="histOptions.ybins" @change="updatePlot('ybins')">
     </div>
   </div>
   <div class="form-row ">
     <div class="form-group col-md-5">
       <label for="xbins"> Color Norm </label>
       <select class="form-control" id="cnorm"
-        v-model="histOptions.cnorm" @change="updatePlot">
+        v-model="histOptions.cnorm" @change="updatePlot('cnorm')">
         <option> log </option>
         <option> linear </option>
         <option> pow </option>
@@ -105,34 +105,34 @@
     <div class="form-group col-md-3 offset-md-1" v-if="histOptions.cnorm === 'pow'">
         <label for="zero"> z0 </label>
         <input class="form-control"
-          id="pow_zero" v-model.number="histOptions.pow_zero" @change="updatePlot">
+          id="pow_zero" v-model.number="histOptions.pow_zero" @change="updatePlot('pow_zero')">
       </div>
       <div class="form-group col-md-3" v-if="histOptions.cnorm === 'pow'">
         <label for="gamma"> gamma </label>
         <input  class="form-control"
-          id="pow_gamma" v-model.number="histOptions.pow_gamma" @change="updatePlot">
+          id="pow_gamma" v-model.number="histOptions.pow_gamma" @change="updatePlot('pow_gamma')">
     </div>
   </div>
   <div class="form-row ">
     <div class="form-group col-md-3">
       <label for="xmin"> xmin </label>
       <input class="form-control" id="xmin"
-        v-model.number="histOptions.xmin" @change="updatePlot">
+        v-model.number="histOptions.xmin" @change="updatePlot('xmin')">
     </div>
     <div class="form-group col-md-3">
       <label for="xmax"> xmax </label>
       <input class="form-control"
-        id="xmax" v-model.number="histOptions.xmax" @change="updatePlot">
+        id="xmax" v-model.number="histOptions.xmax" @change="updatePlot('xmax')">
     </div>
     <div class="form-group col-md-3">
       <label for="ymin"> ymin </label>
       <input class="form-control" id="xBins"
-        v-model.number="histOptions.ymin" @change="updatePlot">
+        v-model.number="histOptions.ymin" @change="updatePlot('ymin')">
     </div>
     <div class="form-group col-md-3">
       <label for="chooseX"> ymax </label>
       <input class="form-control"
-        id="ymin" v-model.number="histOptions.ymin" @change="updatePlot">
+        id="ymin" v-model.number="histOptions.ymax" @change="updatePlot('ymax')">
     </div>
   </div>
   <div class="form-row pb-3">
@@ -141,7 +141,7 @@
         class="form-check-input"
         type="checkbox"
         v-model="histOptions.normhist"
-        id="NormCheck" @change="updatePlot">
+        id="NormCheck" @change="updatePlot('normhist')">
       <label class="form-check-label" for="NormCheck">
         Normalize Hist
       </label>
@@ -151,7 +151,7 @@
         class="form-check-input"
         type="checkbox"
         v-model="histOptions.mask_zeros"
-        @change="updatePlot"
+        @change="updatePlot('mask_zeros')"
         id="MaskCheck">
       <label class="form-check-label" for="MaskCheck">
         Mask Zeros
@@ -162,7 +162,7 @@
         class="form-check-input"
         type="checkbox"
         v-model="histOptions.clip"
-        @change="updatePlot"
+        @change="updatePlot('clip')"
         id="ClipValues">
       <label class="form-check-label" for="ClipValues">
         Clip Values
