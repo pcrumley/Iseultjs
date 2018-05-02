@@ -121,7 +121,7 @@ const mutations = {
   },
   [types.POP_GRAPH]: (state, payload) => {
     state.graphViewStateMap.delete(payload.id)
-    state.chartArr.splice(state.simArr.findIndex((el) => { return el === payload.id }), 1)
+    state.chartArr.splice(state.chartArr.findIndex((el) => { return el === payload.id }), 1)
   },
   [types.MARK_UPDATE]: (state, payload) => {
     if (Math.abs(state.graphUpdated) === payload.id) {

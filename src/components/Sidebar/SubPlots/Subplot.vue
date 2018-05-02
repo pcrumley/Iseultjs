@@ -10,9 +10,9 @@
   <div class="card-body" v-if="active" >
     <component :is="subplotOptsComponent" :chart-id="chartID">
     </component>
-
+    <button class="btn btn-danger float-right" @click="removeChart">Remove</button>
   </div>
-</div>
+  </div>
 </template>
 
 <script>
@@ -32,8 +32,12 @@ export default {
   props: ['chartID'],
   methods: {
     ...mapActions({
-      removeServer: types.DEL_SERVER
-    })
+      delGraph: types.DEL_GRAPH
+    }),
+    removeChart: function () {
+      this.delGraph({id: this.chartID})
+      this.active = false
+    }
   },
   computed: {
     ...mapGetters({

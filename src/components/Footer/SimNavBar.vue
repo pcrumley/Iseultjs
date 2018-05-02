@@ -8,7 +8,7 @@
     </option>
     </select>
   </form>
-  {{ simN }} {{mySim.i}}
+  {{ simN }}
   <font-awesome-icon class="clickable" :icon="stepBackIcon" />
   <font-awesome-icon class="clickable" :icon="playIcon" />
   <font-awesome-icon class="clickable" :icon="stepForwardsIcon" />
