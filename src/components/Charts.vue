@@ -3,13 +3,8 @@
   THE VUE COMPONENT THAT MANAGES EACH CHART
   -->
   <div>
-  <div>
-    GRAPHS HERE--- FIX!
-    <!--
-    <component v-for="(item, key) in chartArr" :key="key" :is="" :chartID="item[0]">
-    </component>
-    -->
-  </div>
+  <component v-for="(item, key) in chartArr" :key="key" :is="subplotComponent(item)" :chartID="item">
+  </component>
   <sidebar/>
   <chart-footer/>
   </div>
@@ -24,12 +19,20 @@ import ChartFooter from '@/components/Footer/ChartFooter.vue'
 export default {
   computed: {
     ...mapGetters({
-      graphMap: types.GET_GRAPH_STATE_MAP,
+      chartMap: types.GET_GRAPH_STATE_MAP,
       chartArr: types.GET_CHART_ARR
     })
   },
+  methods: {
+    subplotComponent (id) {
+      if (this.chartMap.get(id)['chartType'] === '2D Histograms') {
+        return TwoDimPrtlHist
+      } else {
+        return 0
+      }
+    }
+  },
   components: {
-    twoDPrtlHist: TwoDimPrtlHist,
     Sidebar,
     ChartFooter
   }

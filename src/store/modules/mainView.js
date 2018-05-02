@@ -62,8 +62,8 @@ const getters = {
   [types.GET_NEXT_CHART_ID]: (state) => {
     return state.nextChartID
   },
-  [types.GET_2D]: (state) => {
-    return state.twoD_PRTL_HIST
+  [types.GET_CHART_UPDATED]: (state) => {
+    return state.graphUpdated
   }
 }
 
@@ -102,7 +102,6 @@ const actions = {
 // mutations
 const mutations = {
   [types.MUTATE_CHART_OPT]: (state, payload) => {
-    console.log(payload)
     state.graphViewStateMap.get(payload.chartID).dataOptions[payload.key] = payload.val
   },
   [types.PUSH_GRAPH]: (state, payload) => {
@@ -111,16 +110,7 @@ const mutations = {
     // object in the array and copy our payload there.
 
     if (payload.chartID != null) {
-      // let copy = {}
-      // let attributes = Object.keys(state.twoD_PRTL_HIST)
-      // attributes.forEach(attribute => {
-      //  let attributeValue = Object.getOwnPropertyDescriptor(state.twoD_PRTL_HIST, attribute)
-      //  Object.defineProperty(copy, attribute, {
-      //    __proto__: null,
-      //    value: attributeValue.get()
-      //  })
-      // })
-      // state.graphViewStateMap.set(payload.chartID, copy)
+      // There were issues with the setters and getters being copied.
       state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_HIST)))
       // Set the chartID
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]

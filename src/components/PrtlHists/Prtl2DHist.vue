@@ -18,11 +18,11 @@
   -->
   <div>
     <h2> hey, I'm chart #  {{ chartID }} </h2>
-    <p> here's my viewState<p> </p> {{ myViewState }}
-    <p> here's mySim: </p><p> {{ mySim }} </p>
+    <!--<p> here's my viewState<p> </p> {{ myViewState }}
+    <p> here's mySim: </p><p> {{ mySim }} </p> -->
     <p> here's where my chart data lives: </p><p> {{imgURL}} </p>
     <p> here's where my cbar lives: </p><p> {{cbarURL}} </p>
-    <p> here's where my cbar lives: </p><p> {{cbarLabel}} </p>
+    <p> here's where my cbar label: </p><p> {{cbarLabel}} </p>
 
   </div>
 </template>
@@ -42,7 +42,10 @@ export default {
       xDomain: [0, 1],
       yScale: 'scaleLinear',
       yDomain: [0, 1],
-      cbarDomain: [0, 1]
+      cbarDomain: [0, 1],
+      imgURLSimPart: '',
+      imgURLOptsPart: '',
+      cmap: ''
     }
   },
   props: [
@@ -51,7 +54,10 @@ export default {
   computed: {
     ...mapGetters({
       simMap: types.GET_SIM_MAP,
-      graphMap: types.GET_GRAPH_STATE_MAP
+      graphMap: types.GET_GRAPH_STATE_MAP,
+      simUpdated: types.GET_SIM_UPDATED,
+      chartUpdated: types.GET_CHART_UPDATED
+
     }),
     cbarLabel () {
       return this.mySim.data.prtls[this.myViewState.dataOptions.prtl_type].histLabel
@@ -78,29 +84,45 @@ export default {
     imgY () {
       return this.myViewState.renderOptions.tot_height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
     },
-    n () {
-      return this.mySim.data.fileArray[this.mySim.i]
-    },
     cbarURL () {
       return this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
         '&py=' + this.imgY +
-        '&cmap=' + this.myViewState.dataOptions['cmap']
+        '&cmap=' + this.cmap
     },
     imgURL () {
-      var imgstr = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
-        'px=' + this.imgX + '&py=' + this.imgY +
-        '&sim_type=' + this.mySim.info.simType +
-        '&outdir=' + this.mySim.info.outdir +
-        '&n=' + this.n + '&'
-      var histOpts = this.myViewState.dataOptions
-      for (var key in histOpts) {
-        imgstr += key + '=' + histOpts[key] + '&'
+      return this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
+    }
+  },
+  watch: {
+    simUpdated: function (newSimID) {
+      if (this.myViewState.sims[0] === Math.abs(newSimID)) {
+        this.renderImgURLSimPart()
       }
-      return imgstr
+    },
+    chartUpdated: function (newChartID) {
+      if (this.chartID === Math.abs(newChartID)) {
+        this.renderImgURLOptsPart()
+      }
     }
   },
   methods: {
+    renderImgURLSimPart: function () {
+      this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
+        'sim_type=' + this.mySim.info.simType +
+        '&outdir=' + this.mySim.info.outdir +
+        '&n=' + this.mySim.data.fileArray[this.mySim.i]
+    },
+    renderImgURLOptsPart: function () {
+      if (this.myViewState.dataOptions.cmap !== this.cmap) {
+        this.cmap = this.myViewState.dataOptions.cmap
+      }
+      this.imgURLOptsPart = '&'
+      for (var key in this.myViewState.dataOptions) {
+        this.imgURLOptsPart += key + '=' + this.myViewState.dataOptions[key] + '&'
+      }
+      return this.imgURLOptsPart
+    },
     getImg: _.debounce(
       function () {
         var vm = this
@@ -133,12 +155,16 @@ export default {
         })
     }
   },
+  created: function () {
+    this.renderImgURLSimPart()
+    this.renderImgURLOptsPart()
+  },
   components: {
     iseultImageGraph: ImageGraph
   }
 }
 </script>
 
-<style scoped src="bulma/css/bulma.css">
+<style>
 
 </style>
