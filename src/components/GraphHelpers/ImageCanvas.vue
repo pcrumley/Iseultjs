@@ -1,7 +1,7 @@
 <template>
   <canvas :width="imgObj.imgX"
           :height="imgObj.imgY"
-          :style="{ left: imgObj.left, top: imgObj.top }"
+          :style="{ left: imgObj.left + 'px', top: imgObj.top +'px'}"
                     v-insert-image="imgObj.imgData">
   </canvas>
 </template>

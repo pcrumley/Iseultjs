@@ -2,44 +2,44 @@
   <div class="container" :style="{ width:width+'px', height:height+'px' }">
     <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
       three labels -->
-  <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
+
   <svg :style="{ width:width+'px', height:height+'px'}">
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
-    <!--<iseult-axis :orient="axisX.orient"
-                :scaleType="axisX.scaleType"
-                :range="axisX.range"
-                :domain="axisX.domain"
+    <iseult-axis :orient="'axisBottom'"
+                :scaleType="'scaleLinear'"
+                :range="[0,imgX]"
+                :domain="xDomain"
                 :height="imgY"
                 :width="imgX"
                 :margin="margin">
-    </iseult-axis> -->
+    </iseult-axis>
     <!-- The y-axis -->
-    <!--<iseult-axis :orient="axisY.orient"
-                 :scaleType="axisY.scaleType"
-                 :range="axisY.range"
-                 :domain="axisY.domain"
+    <iseult-axis :orient="'axisLeft'"
+                 :scaleType="'scaleLinear'"
+                 :range="[this.imgY, 0]"
+                 :domain="yDomain"
                  :height="imgY"
                  :width="imgX"
                  :margin="margin">
-    </iseult-axis>-->
-    <!-- The colorbar-axis -->
-    <!--<iseult-axis :orient="axisColorbar.orient"
-                 :scaleType="axisColorbar.scaleType"
-                 :range="axisColorbar.range"
-                 :domain="axisColorbar.domain"
-                 :height="imgY"
-                 :width="imgX"
-                 :margin="margin">
-    </iseult-axis> -->
-  </svg>
+    </iseult-axis>
 
+    <!-- The colorbar-axis -->
+    <iseult-axis :orient="'axisRight'"
+                 :scaleType="cbarScale"
+                 :range="[this.imgY, 0]"
+                 :domain="cbarDomain"
+                 :height="imgY"
+                 :width="imgX"
+                 :margin="margin">
+    </iseult-axis>
+  </svg>
+  <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
   <!--<iseult-image-canvas :imgX="cbarWidth" :imgY="imgY" :top="margin.top + 'px'" :left="cbarLeft+'px'" :imgData="cbarPNG"></iseult-image-canvas>-->
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   </div>
-
 </template>
 
 <script>
@@ -64,6 +64,10 @@ export default {
       yLabel: '',
       xLabel: '',
       mainImgObj: {},
+      xDomain: [],
+      yDomain: [],
+      cbarDomain: [],
+      cbarScale: 'scaleLog',
       cbarImgObj: {},
       histLabel: '',
       cbarWidth: 20,
@@ -138,12 +142,13 @@ export default {
         this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
         this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
         this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+        this.cbarScale = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
       }
     },
     imgURL (newURL) {
       if (this.cache.has(this.mySim.i)) {
         if (this.cache.get(this.mySim.i).url === newURL) {
-          this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
+          this.updatePlot()
         } else {
           this.getImg()
         }
@@ -158,6 +163,13 @@ export default {
         'sim_type=' + this.mySim.info.simType +
         '&outdir=' + this.mySim.info.outdir +
         '&n=' + this.mySim.data.fileArray[this.mySim.i]
+    },
+    updatePlot: function () {
+      this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
+      this.xDomain = this.cache.get(this.mySim.i).xDomain
+      this.yDomain = this.cache.get(this.mySim.i).yDomain
+      this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
+      this.didIUpdate *= -1
     },
     renderImgURLOptsPart: function () {
       if (this.myViewState.dataOptions.cmap !== this.cmap) {
@@ -187,8 +199,7 @@ export default {
             })
             vm.getColorBar()
             vm.cache.get(vm.mySim.i).url = vm.imgURL
-            vm.mainImgObj = vm.cache.get(vm.mySim.i).mainImgObj
-            vm.didIUpdate *= -1
+            vm.updatePlot()
           })
           .catch(function (error) {
             // vm.imgString = ''
