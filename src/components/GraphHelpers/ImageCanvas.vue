@@ -1,15 +1,15 @@
 <template>
-  <canvas :width="imgX"
-          :height="imgY"
-          :style="{ left: left, top: top }"
-                    v-insert-image="imgData">
+  <canvas :width="imgObj.imgX"
+          :height="imgObj.imgY"
+          :style="{ left: imgObj.left, top: imgObj.top }"
+                    v-insert-image="imgObj.imgData">
   </canvas>
 </template>
 
 <script>
 export default {
   name: 'ImageCanvas',
-  props: ['imgX', 'imgY', 'imgData', 'top', 'left'],
+  props: ['imgObj'],
   computed: {
   },
   directives: {

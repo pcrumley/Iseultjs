@@ -191,6 +191,7 @@ export default {
       updateChartOptions: types.UPDATE_CHART
     }),
     updatePlot (myKey) {
+      // WE NEED TO ADD SOME HANDLERS FOR CHANGING SIM
       this.updateChartOptions({
         key: myKey,
         val: this.histOptions[myKey],

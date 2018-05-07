@@ -8,6 +8,9 @@ const state = {
   chartArr: [],
   twoD_PRTL_HIST: {
     chartType: '2D Histograms',
+    ylabel: '\\gamma_i\\beta_{i,x}',
+    xlabel: 'x\\ [c/\\omega_{pe}]',
+    histlabel: 'f_i (p)',
     dataOptions: {
       prtl_type: 'ions',
       yval: 'px',
@@ -102,7 +105,18 @@ const actions = {
 // mutations
 const mutations = {
   [types.MUTATE_CHART_OPT]: (state, payload) => {
-    state.graphViewStateMap.get(payload.chartID).dataOptions[payload.key] = payload.val
+    if (state.graphViewStateMap.get(payload.chartID).chartType === '2D Histograms') {
+      state.graphViewStateMap.get(payload.chartID).dataOptions[payload.key] = payload.val
+      if (payload.hasOwnProperty('xlabel')) {
+        state.graphViewStateMap.get(payload.chartID).xlabel = payload.xlabel
+      }
+      if (payload.hasOwnProperty('ylabel')) {
+        state.graphViewStateMap.get(payload.chartID).ylabel = payload.ylabel
+      }
+      if (payload.hasOwnProperty('histlabel')) {
+        state.graphViewStateMap.get(payload.chartID).histlabel = payload.histlabel
+      }
+    }
   },
   [types.PUSH_GRAPH]: (state, payload) => {
     // a bit of a hack to avoid the fact that javascript arrays are weird.

@@ -1,51 +1,82 @@
 <template>
-  <!--
-  <iseult-image-graph
-    :width="width"
-    :height="height"
-    :xLabel="xLabel"
-    :xScale="'scaleLinear'"
-    :xDomain="xDomain"
-    :yLabel="yLabel"
-    :yScale="'scaleLinear'"
-    :yDomain="yDomain"
-    :cbarLabel="cbarLabel"
-    :cbarWidth="cbarWidth"
-    :cbarPNG="cbarPNG"
-    :cbarScale="cbarScale"
-    :cbarDomaim="cbarDomain"
-    :margin="margin"/>
-  -->
-  <div>
-    <h2> hey, I'm chart #  {{ chartID }} </h2>
-    <!--<p> here's my viewState<p> </p> {{ myViewState }}
-    <p> here's mySim: </p><p> {{ mySim }} </p> -->
-    <p> here's where my chart data lives: </p><p> {{imgURL}} </p>
-    <p> here's where my cbar lives: </p><p> {{cbarURL}} </p>
-    <p> here's where my cbar label: </p><p> {{cbarLabel}} </p>
+  <div class="container" :style="{ width:width+'px', height:height+'px' }">
+    <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
+      three labels -->
+  <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
+  <svg :style="{ width:width+'px', height:height+'px'}">
+    <!-- The svg is where we'll draw our vector elements using d3.js -->
+    <!-- The x-axis -->
+    <!--<iseult-axis :orient="axisX.orient"
+                :scaleType="axisX.scaleType"
+                :range="axisX.range"
+                :domain="axisX.domain"
+                :height="imgY"
+                :width="imgX"
+                :margin="margin">
+    </iseult-axis> -->
+    <!-- The y-axis -->
+    <!--<iseult-axis :orient="axisY.orient"
+                 :scaleType="axisY.scaleType"
+                 :range="axisY.range"
+                 :domain="axisY.domain"
+                 :height="imgY"
+                 :width="imgX"
+                 :margin="margin">
+    </iseult-axis>-->
+    <!-- The colorbar-axis -->
+    <!--<iseult-axis :orient="axisColorbar.orient"
+                 :scaleType="axisColorbar.scaleType"
+                 :range="axisColorbar.range"
+                 :domain="axisColorbar.domain"
+                 :height="imgY"
+                 :width="imgX"
+                 :margin="margin">
+    </iseult-axis> -->
+  </svg>
 
+  <!--<iseult-image-canvas :imgX="cbarWidth" :imgY="imgY" :top="margin.top + 'px'" :left="cbarLeft+'px'" :imgData="cbarPNG"></iseult-image-canvas>-->
+  <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
+  <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
+  <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   </div>
+
 </template>
 
 <script>
-import ImageGraph from '@/components/GraphHelpers/ImageGraph'
 import { mapGetters } from 'vuex'
 import * as types from '@/store/types'
 import axios from 'axios'
-import _ from 'lodash'
+import ImageCanvas from '@/components/GraphHelpers/ImageCanvas.vue'
+import iseultAxis from '@/components/GraphHelpers/IseultAxis.vue'
+import axisLabel from '@/components/GraphHelpers/AxisLabel.vue'
+
+// import _ from 'lodash'
 
 export default {
   name: 'TwoDimPrtlHist',
   data () {
     return {
-      xScale: 'scaleLinear',
-      xDomain: [0, 1],
-      yScale: 'scaleLinear',
-      yDomain: [0, 1],
-      cbarDomain: [0, 1],
       imgURLSimPart: '',
       imgURLOptsPart: '',
-      cmap: ''
+      cmap: '',
+      width: 800,
+      height: 400,
+      yLabel: '',
+      xLabel: '',
+      mainImgObj: {},
+      cbarImgObj: {},
+      histLabel: '',
+      cbarWidth: 20,
+      cbarPNG: '',
+      cache: new Map(),
+      didIUpdate: 1,
+      margin: {
+        top: 20,
+        right: 60,
+        bottom: 70,
+        left: 70,
+        hspace: 50
+      }
     }
   },
   props: [
@@ -59,9 +90,6 @@ export default {
       chartUpdated: types.GET_CHART_UPDATED
 
     }),
-    cbarLabel () {
-      return this.mySim.data.prtls[this.myViewState.dataOptions.prtl_type].histLabel
-    },
     mySim () {
       if (this.simMap.has(this.myViewState.sims[0])) {
         return this.simMap.get(this.myViewState.sims[0])
@@ -84,6 +112,9 @@ export default {
     imgY () {
       return this.myViewState.renderOptions.tot_height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
     },
+    cbarLeft () {
+      return this.myViewState.renderOptions.tot_width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
+    },
     cbarURL () {
       return this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
@@ -103,6 +134,21 @@ export default {
     chartUpdated: function (newChartID) {
       if (this.chartID === Math.abs(newChartID)) {
         this.renderImgURLOptsPart()
+        const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
+        this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
+        this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
+        this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+      }
+    },
+    imgURL (newURL) {
+      if (this.cache.has(this.mySim.i)) {
+        if (this.cache.get(this.mySim.i).url === newURL) {
+          this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
+        } else {
+          this.getImg()
+        }
+      } else {
+        this.getImg()
       }
     }
   },
@@ -123,48 +169,67 @@ export default {
       }
       return this.imgURLOptsPart
     },
-    getImg: _.debounce(
+    getImg: // _.debounce(
       function () {
         var vm = this
-        axios.get(vm.imgSrc + '&px=' + this.imgX + '&py=' + this.imgY +
-                  '&outdir=' + this.$store.state.outdir + '&n=' + this.$store.state.n)
+        axios.get(vm.imgURL)
           .then(function (response) {
-            vm.imgObj.pngData = response.data.imgString
-            vm.imgObj.cmap = response.data.cmap
-            vm.axisX.domain = [response.data.xmin, response.data.xmax]
-            vm.axisY.domain = [response.data.ymin, response.data.ymax]
-            vm.axisColorbar.domain = [response.data.vmin, response.data.vmax]
+            vm.cache.set(vm.mySim.i, {
+              mainImgObj: {
+                imgX: vm.imgX,
+                imgY: vm.imgY,
+                left: vm.margin.left,
+                top: vm.margin.top,
+                imgData: response.data.imgString},
+              xDomain: [response.data.xmin, response.data.xmax],
+              yDomain: [response.data.ymin, response.data.ymax],
+              cbarDomain: [response.data.vmin, response.data.vmax]
+            })
             vm.getColorBar()
+            vm.cache.get(vm.mySim.i).url = vm.imgURL
+            vm.mainImgObj = vm.cache.get(vm.mySim.i).mainImgObj
+            vm.didIUpdate *= -1
           })
           .catch(function (error) {
-            vm.imgString = ''
+            // vm.imgString = ''
             console.log(error)
           })
-      },
-      1
-    ),
+      }, // ,
+    //  20
+    // ),
     getColorBar () {
       var vm = this
-      axios.get(vm.cbarObj.url)
+      axios.get(vm.cbarURL)
         .then(function (response) {
-          vm.cbarPNG = response.data.cbarString
+          vm.cache.get(vm.mySim.i)['cbarPNG'] = response.data.cbarString
         })
         .catch(function (error) {
-          vm.imgString = ''
+          vm.cache.get(vm.mySim.i)['cbarPNG'] = ''
           console.log(error)
         })
     }
   },
-  created: function () {
+  mounted: function () {
     this.renderImgURLSimPart()
     this.renderImgURLOptsPart()
+    const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
+    this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
+    this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
+    this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
   },
   components: {
-    iseultImageGraph: ImageGraph
+    'iseultImageCanvas': ImageCanvas,
+    iseultAxis,
+    axisLabel
   }
 }
 </script>
 
-<style>
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+div.container {
+position: relative;
+margin: auto;
+}
 
 </style>
