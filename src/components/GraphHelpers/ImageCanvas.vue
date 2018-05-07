@@ -34,7 +34,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 canvas {
-  border: 0px solid black;
+  outline: 0px solid black;
   position: absolute;
 }
 

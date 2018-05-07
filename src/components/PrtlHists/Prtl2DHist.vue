@@ -1,8 +1,8 @@
 <template>
-  <div class="container" :style="{ width:width+'px', height:height+'px' }">
+  <div>
+  <div class="relative" :style="{ width:width+'px', height:height+'px' }">
     <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
       three labels -->
-
   <svg :style="{ width:width+'px', height:height+'px'}">
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
@@ -35,10 +35,11 @@
     </iseult-axis>
   </svg>
   <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
-  <!--<iseult-image-canvas :imgX="cbarWidth" :imgY="imgY" :top="margin.top + 'px'" :left="cbarLeft+'px'" :imgData="cbarPNG"></iseult-image-canvas>-->
+  <iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
+  </div>
   </div>
 </template>
 
@@ -119,6 +120,15 @@ export default {
     cbarLeft () {
       return this.myViewState.renderOptions.tot_width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
     },
+    cbarObj () {
+      return {
+        imgX: this.cbarWidth,
+        imgY: this.imgY,
+        left: this.width - this.margin.right - this.cbarWidth,
+        top: this.margin.top,
+        imgData: this.cbarPNG
+      }
+    },
     cbarURL () {
       return this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
@@ -135,6 +145,9 @@ export default {
         this.renderImgURLSimPart()
       }
     },
+    cbarURL: function () {
+      this.getColorBar()
+    },
     chartUpdated: function (newChartID) {
       if (this.chartID === Math.abs(newChartID)) {
         this.renderImgURLOptsPart()
@@ -143,6 +156,7 @@ export default {
         this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
         this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
         this.cbarScale = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
+        console.log(this.cbarPNG)
       }
     },
     imgURL (newURL) {
@@ -197,7 +211,7 @@ export default {
               yDomain: [response.data.ymin, response.data.ymax],
               cbarDomain: [response.data.vmin, response.data.vmax]
             })
-            vm.getColorBar()
+            // vm.getColorBar()
             vm.cache.get(vm.mySim.i).url = vm.imgURL
             vm.updatePlot()
           })
@@ -212,10 +226,10 @@ export default {
       var vm = this
       axios.get(vm.cbarURL)
         .then(function (response) {
-          vm.cache.get(vm.mySim.i)['cbarPNG'] = response.data.cbarString
+          vm.cbarPNG = response.data.cbarString
         })
         .catch(function (error) {
-          vm.cache.get(vm.mySim.i)['cbarPNG'] = ''
+          vm.cbarPNG = ''
           console.log(error)
         })
     }
@@ -238,9 +252,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-div.container {
+div.relative {
 position: relative;
 margin: auto;
 }
 
+svg {
+  position: inherit;
+}
 </style>
