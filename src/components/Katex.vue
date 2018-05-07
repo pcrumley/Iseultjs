@@ -15,9 +15,9 @@ export default {
     'mathstr'
   ],
   directives: {
-    compileLatex: function (element, binding) {
+    compileLatex: function (el, binding) {
       // Get canvas context
-      katex.render(binding.value, element)
+      katex.render(binding.value, el)
     }
   }
 
@@ -27,5 +27,6 @@ export default {
 <style scoped>
 span {
   margin: 0px;
+  font-size: 16px !important;
 }
 </style>
