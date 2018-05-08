@@ -7,18 +7,14 @@
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
     <iseult-axis :orient="'axisBottom'"
-                :scaleType="'scaleLinear'"
-                :range="[0,imgX]"
-                :domain="xDomain"
+                :scale="xScale"
                 :height="imgY"
                 :width="imgX"
                 :margin="margin">
     </iseult-axis>
     <!-- The y-axis -->
     <iseult-axis :orient="'axisLeft'"
-                 :scaleType="'scaleLinear'"
-                 :range="[this.imgY, 0]"
-                 :domain="yDomain"
+                 :scale="yScale"
                  :height="imgY"
                  :width="imgX"
                  :margin="margin">
@@ -26,9 +22,7 @@
 
     <!-- The colorbar-axis -->
     <iseult-axis :orient="'axisRight'"
-                 :scaleType="cbarScale"
-                 :range="[this.imgY, 0]"
-                 :domain="cbarDomain"
+                 :scale="cbarScale"
                  :height="imgY"
                  :width="imgX"
                  :margin="margin">
@@ -47,6 +41,7 @@
 import { mapGetters } from 'vuex'
 import * as types from '@/store/types'
 import axios from 'axios'
+import * as d3 from 'd3'
 import ImageCanvas from '@/components/GraphHelpers/ImageCanvas.vue'
 import iseultAxis from '@/components/GraphHelpers/IseultAxis.vue'
 import axisLabel from '@/components/GraphHelpers/AxisLabel.vue'
@@ -68,7 +63,7 @@ export default {
       xDomain: [],
       yDomain: [],
       cbarDomain: [],
-      cbarScale: 'scaleLog',
+      cbarScaleType: 'scaleLog',
       cbarImgObj: {},
       histLabel: '',
       cbarWidth: 20,
@@ -129,6 +124,21 @@ export default {
         imgData: this.cbarPNG
       }
     },
+    xScale () {
+      return d3['scaleLinear']()
+        .range([0, this.imgX])
+        .domain(this.xDomain)
+    },
+    yScale () {
+      return d3['scaleLinear']()
+        .range([this.imgY, 0])
+        .domain(this.xDomain)
+    },
+    cbarScale () {
+      return d3[this.cbarScaleType]()
+        .range([this.imgY, 0])
+        .domain(this.xDomain)
+    },
     cbarURL () {
       return this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
@@ -155,7 +165,7 @@ export default {
         this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
         this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
         this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
-        this.cbarScale = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
+        this.cbarScaleType = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
         console.log(this.cbarPNG)
       }
     },

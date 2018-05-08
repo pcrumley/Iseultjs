@@ -10,6 +10,7 @@ export const AVAIL_CHART_TYPES = 'defaultGraphs/AVAIL_CHART_TYPES'
 export const GET_SERVER_MAP = 'servers/GET_SERVER_MAP'
 export const GET_SERVER_ARR = 'servers/GET_SERVER_ARR'
 export const GET_NEXT_CHART_ID = 'views/GET_NEXT_CHART_ID'
+export const GET_NAVBAR_STATE = 'ui/GET_NAVBAR_STATE'
 
 // Mutations
 export const PUSH_SIMULATION = 'simulations/PUSH_SIMULATION'
@@ -34,3 +35,4 @@ export const DEL_SERVER = 'servers/DEL_SERVER'
 export const CHANGE_SIM_TSTEP = 'sims/CHANGE_SIM_TSTEP'
 export const UPDATE_CHART = 'views/UPDATE_CHART'
 export const TOGGLE_UPDATE = 'views/TOGGLE_UPDATE'
+export const SET_NAVBAR_STATE = 'ui/SET_NAVBAR_STATE'

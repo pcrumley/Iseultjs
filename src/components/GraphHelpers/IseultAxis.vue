@@ -9,9 +9,7 @@ export default {
   name: 'IseultAxis',
   props: [
     'orient',
-    'scaleType',
-    'range',
-    'domain',
+    'scale',
     'height',
     'width',
     'margin'
@@ -22,11 +20,6 @@ export default {
       var y = this.orient === 'axisBottom' ? this.height + this.margin.top : this.margin.top
 
       return 'translate(' + x + ',' + y + ')'
-    },
-    scale () {
-      return d3[this.scaleType]()
-        .range(this.range)
-        .domain(this.domain)
     }
   },
   methods: {
@@ -40,7 +33,7 @@ export default {
       this.drawAxis()
     }
   },
-  mounted: function () {
+  aftermounted: function () {
     this.drawAxis()
   }
 }
