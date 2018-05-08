@@ -10,8 +10,6 @@
 export default {
   name: 'ImageCanvas',
   props: ['imgObj'],
-  computed: {
-  },
   directives: {
     insertImage: function (canvasElement, binding) {
       // Get canvas context

@@ -4,7 +4,7 @@
   <font-awesome-icon class="clickable" :icon="undoIcon" />
   <font-awesome-icon class="clickable" :icon="redoIcon" />
   <font-awesome-icon class="clickable" :icon="arrowsIcon" />
-  <font-awesome-icon class="clickable" :icon="searchIcon" @click="setNavSate('zoom-in')"/>
+  <font-awesome-icon class="clickable" :icon="searchIcon" @click="setNavState('zoom-in')"/>
 </span>
 </template>
 <script>

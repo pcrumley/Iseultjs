@@ -30,7 +30,11 @@ const mutations = {
     state.sidebarOpen = !state.sidebarOpen
   },
   mutateNavbar (state, payload) {
-    state.navbarState = payload
+    if (state.navbarState === payload) {
+      state.navbarState = ''
+    } else {
+      state.navbarState = payload
+    }
   }
 }
 

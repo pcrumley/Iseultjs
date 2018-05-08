@@ -1,9 +1,8 @@
 <template>
-  <div>
-  <div class="relative" :style="{ width:width+'px', height:height+'px' }">
+  <div class="relative" :style="{ width:width+'px', height:height+'px' }" @mousedown.stop="mouseIsDown" @mousemove.stop="mouseIsMoving" @mouseup.stop="mouseIsUp" @mouseleave="mouseIsUp">
     <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
       three labels -->
-  <svg :style="{ width:width+'px', height:height+'px'}">
+  <svg :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
     <iseult-axis :orient="'axisBottom'"
@@ -12,6 +11,7 @@
                 :width="imgX"
                 :margin="margin">
     </iseult-axis>
+    <rect v-if='myMouseIsDown' :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
     <!-- The y-axis -->
     <iseult-axis :orient="'axisLeft'"
                  :scale="yScale"
@@ -33,7 +33,6 @@
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
-  </div>
   </div>
 </template>
 
@@ -59,6 +58,11 @@ export default {
       height: 400,
       yLabel: '',
       xLabel: '',
+      rectX1: 0,
+      rectX2: 0,
+      rectY1: 0,
+      rectY2: 0,
+      myMouseIsDown: false,
       mainImgObj: {},
       xDomain: [],
       yDomain: [],
@@ -147,6 +151,12 @@ export default {
     },
     imgURL () {
       return this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
+    },
+    rectObj () {
+      return {left: Math.min(this.rectX1, this.rectX2),
+        top: Math.min(this.rectY1, this.rectY2),
+        width: Math.abs(this.rectX1 - this.rectX2),
+        height: Math.abs(this.rectY1 - this.rectY2)}
     }
   },
   watch: {
@@ -166,7 +176,6 @@ export default {
         this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
         this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
         this.cbarScaleType = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
-        console.log(this.cbarPNG)
       }
     },
     imgURL (newURL) {
@@ -204,6 +213,22 @@ export default {
         this.imgURLOptsPart += key + '=' + this.myViewState.dataOptions[key] + '&'
       }
       return this.imgURLOptsPart
+    },
+    mouseIsDown (event) {
+      // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
+      // console.log(event.clientX) // x coordinate
+      this.rectY1 = event.clientY - this.$el.getBoundingClientRect().top
+      this.rectX1 = event.clientX - this.$el.getBoundingClientRect().left// y coordinateoffsetWidth // y coordinate
+      this.myMouseIsDown = true
+    },
+    mouseIsMoving (event) {
+      this.rectY2 = event.clientY - this.$el.getBoundingClientRect().top
+      this.rectX2 = event.clientX - this.$el.getBoundingClientRect().left
+    },
+    mouseIsUp (event) {
+      // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
+      // console.log(event.clientX) // x coordinate
+      this.myMouseIsDown = false
     },
     getImg: // _.debounce(
       function () {
