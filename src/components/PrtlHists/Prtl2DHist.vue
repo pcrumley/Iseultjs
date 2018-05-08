@@ -141,7 +141,7 @@ export default {
     cbarScale () {
       return d3[this.cbarScaleType]()
         .range([this.imgY, 0])
-        .domain(this.xDomain)
+        .domain(this.cbarDomain)
     },
     cbarURL () {
       return this.mySim.info.serverURL + '/api/colorbar/' +
@@ -217,13 +217,15 @@ export default {
     mouseIsDown (event) {
       // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
       // console.log(event.clientX) // x coordinate
-      this.rectY1 = event.clientY - this.$el.getBoundingClientRect().top
-      this.rectX1 = event.clientX - this.$el.getBoundingClientRect().left// y coordinateoffsetWidth // y coordinate
+      const bbox = this.$el.getBoundingClientRect()
+      this.rectY1 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
+      this.rectX1 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
       this.myMouseIsDown = true
     },
     mouseIsMoving (event) {
-      this.rectY2 = event.clientY - this.$el.getBoundingClientRect().top
-      this.rectX2 = event.clientX - this.$el.getBoundingClientRect().left
+      const bbox = this.$el.getBoundingClientRect()
+      this.rectY2 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
+      this.rectX2 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
     },
     mouseIsUp (event) {
       // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
@@ -246,6 +248,7 @@ export default {
               yDomain: [response.data.ymin, response.data.ymax],
               cbarDomain: [response.data.vmin, response.data.vmax]
             })
+            console.log([response.data.vmin, response.data.vmax])
             // vm.getColorBar()
             vm.cache.get(vm.mySim.i).url = vm.imgURL
             vm.updatePlot()
