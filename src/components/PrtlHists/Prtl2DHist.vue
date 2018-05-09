@@ -239,6 +239,8 @@ export default {
         const bbox = this.$el.getBoundingClientRect()
         this.rectY1 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
         this.rectX1 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
+        this.rectY2 = this.rectY1
+        this.rectX2 = this.rectX1
         this.myMouseIsDown = true
       }
     },
