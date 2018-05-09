@@ -1,10 +1,12 @@
 <template>
 <span class="align-middle" id="MyNavBar" >
-  <font-awesome-icon class="clickable" :icon="homeIcon" />
-  <font-awesome-icon class="clickable" :icon="undoIcon" />
-  <font-awesome-icon class="clickable" :icon="redoIcon" />
-  <font-awesome-icon class="clickable" :icon="arrowsIcon" />
-  <font-awesome-icon class="clickable" :icon="searchIcon" @click="setNavState('zoom-in')"/>
+  <font-awesome-icon class="clickable"  size="sm" :icon="homeIcon" />
+  <!--<font-awesome-icon class="clickable" :icon="undoIcon" />-->
+  <!--<font-awesome-icon class="clickable" :icon="redoIcon" />-->
+  <!--<font-awesome-icon class="clickable" :icon="arrowsIcon" /-->
+  <span class="clickable p-1" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
+  <font-awesome-icon  size="sm" :icon="searchIcon"/>
+  </span>
 </span>
 </template>
 <script>
@@ -15,10 +17,16 @@ import faArrows from '@fortawesome/fontawesome-free-solid/faArrowsAlt'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearchPlus'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import * as types from '@/store/types'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   computed: {
+    ...mapGetters({
+      navbarState: types.GET_NAVBAR_STATE
+    }),
+    zoomClicked () {
+      return this.navbarState === 'zoom-in'
+    },
     homeIcon () {
       return faHome
     },
@@ -47,10 +55,14 @@ export default {
 </script>
 
 <style scoped>
-/*.clickable {cursor: pointer;}*/
+.clickable {cursor: pointer;}
 #MyNavBar{
-  opacity:0.1;
+  color: var(--primary-color);
+  opacity: 1;
   user-select: none;
 }
-
+.active{
+  background-color:  var(--secondary-color);
+  outline: 1px solid black;
+}
 </style>

@@ -3,7 +3,7 @@ import * as types from '../types'
 // This module holds the state of the main graph layout.
 // The state contains an array of simulation objects
 const state = {
-  graphUpdated: 0,
+  graphsUpdated: [0],
   nextChartID: 1,
   chartArr: [],
   twoD_PRTL_HIST: {
@@ -65,8 +65,8 @@ const getters = {
   [types.GET_NEXT_CHART_ID]: (state) => {
     return state.nextChartID
   },
-  [types.GET_CHART_UPDATED]: (state) => {
-    return state.graphUpdated
+  [types.GET_UPDATED_CHARTS]: (state) => {
+    return state.graphsUpdated
   }
 }
 
@@ -138,13 +138,8 @@ const mutations = {
     state.chartArr.splice(state.chartArr.findIndex((el) => { return el === payload.id }), 1)
   },
   [types.MARK_UPDATE]: (state, payload) => {
-    if (Math.abs(state.graphUpdated) === payload.id) {
-      state.graphUpdated *= -1
-    } else {
-      state.graphUpdated = payload.id
-    }
+    state.graphsUpdated = [payload.id]
   }
-
 }
 
 export default {

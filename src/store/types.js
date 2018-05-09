@@ -2,7 +2,7 @@
 export const GET_SIM_MAP = 'simulations/GET_SIM_MAP'
 export const GET_SIM_ARR = 'simulations/GET_SIM_ARR'
 export const GET_SIM_UPDATED = 'simulations/GET_SIM_UPDATED'
-export const GET_CHART_UPDATED = 'views/GET_CHART_UPDATED'
+export const GET_UPDATED_CHARTS = 'views/GET_CHARTS_UPDATED'
 export const GET_GRAPH_STATE_MAP = 'mainView/GET_GRAPH_STATE_MAP'
 export const GET_CHART_ARR = 'mainView/GET_CHART_ARR'
 export const DEFAULT_TWOD_PRTL_HIST = 'defaultGraphs/TWO_D_PRTL_HIST'

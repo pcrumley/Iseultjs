@@ -59,6 +59,7 @@ div.outer{
 }
 div.inner{
   position: absolute;
+  user-select: none;
 }
 
 div.labelBottom{

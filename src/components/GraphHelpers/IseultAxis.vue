@@ -40,6 +40,7 @@ export default {
 </script>
 <style scoped>
 g {
+  user-select: none;
   font: 14px Avenir;
   shape-rendering: crispEdges;
 }

@@ -1,7 +1,10 @@
 <template>
-  <div class="relative" :style="{ width:width+'px', height:height+'px' }" @mousedown.stop="mouseIsDown" @mousemove.stop="mouseIsMoving" @mouseup.stop="mouseIsUp" @mouseleave="mouseIsUp">
+  <div class="relative" :style="{ width:width+'px', height:height+'px' }" @mousedown.stop="mouseIsDown" @mousemove.stop="mouseIsMoving" @mouseup.stop="mouseIsUp" @mouseleave="mouseLeft">
     <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
       three labels -->
+  <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
+  <iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>
+
   <svg :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
@@ -11,7 +14,7 @@
                 :width="imgX"
                 :margin="margin">
     </iseult-axis>
-    <rect v-if='myMouseIsDown' :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
+    <rect v-if='myMouseIsDown' :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
     <!-- The y-axis -->
     <iseult-axis :orient="'axisLeft'"
                  :scale="yScale"
@@ -28,8 +31,6 @@
                  :margin="margin">
     </iseult-axis>
   </svg>
-  <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
-  <iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
@@ -37,7 +38,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/store/types'
 import axios from 'axios'
 import * as d3 from 'd3'
@@ -91,8 +92,8 @@ export default {
       simMap: types.GET_SIM_MAP,
       graphMap: types.GET_GRAPH_STATE_MAP,
       simUpdated: types.GET_SIM_UPDATED,
-      chartUpdated: types.GET_CHART_UPDATED
-
+      chartsUpdated: types.GET_UPDATED_CHARTS,
+      navbarState: types.GET_NAVBAR_STATE
     }),
     mySim () {
       if (this.simMap.has(this.myViewState.sims[0])) {
@@ -168,8 +169,8 @@ export default {
     cbarURL: function () {
       this.getColorBar()
     },
-    chartUpdated: function (newChartID) {
-      if (this.chartID === Math.abs(newChartID)) {
+    chartsUpdated: function (newChartArr) {
+      if (newChartArr.includes(this.chartID)) {
         this.renderImgURLOptsPart()
         const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
         this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
@@ -191,6 +192,10 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      toggleGraph: types.TOGGLE_UPDATE,
+      updateChartOptions: types.UPDATE_CHART
+    }),
     renderImgURLSimPart: function () {
       this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
         'sim_type=' + this.mySim.info.simType +
@@ -215,22 +220,36 @@ export default {
       return this.imgURLOptsPart
     },
     mouseIsDown (event) {
-      // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
-      // console.log(event.clientX) // x coordinate
-      const bbox = this.$el.getBoundingClientRect()
-      this.rectY1 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
-      this.rectX1 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
-      this.myMouseIsDown = true
+      if (this.navbarState === 'zoom-in') {
+        // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
+        // console.log(event.clientX) // x coordinate
+        const bbox = this.$el.getBoundingClientRect()
+        this.rectY1 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
+        this.rectX1 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
+        this.myMouseIsDown = true
+      }
     },
     mouseIsMoving (event) {
-      const bbox = this.$el.getBoundingClientRect()
-      this.rectY2 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
-      this.rectX2 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
+      if (this.navbarState === 'zoom-in') {
+        const bbox = this.$el.getBoundingClientRect()
+        this.rectY2 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
+        this.rectX2 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
+      }
+    },
+    mouseLeft (event) {
+      if (this.myMouseIsDown) {
+        this.mouseIsUp(event)
+      }
     },
     mouseIsUp (event) {
       // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
       // console.log(event.clientX) // x coordinate
-      this.myMouseIsDown = false
+      if (this.navbarState === 'zoom-in') {
+        console.log([this.xScale.invert(this.rectX1 - this.margin.left), this.xScale.invert(this.rectX2 - this.margin.left)])
+        console.log([this.yScale.invert(this.rectY1 - this.margin.top), this.yScale.invert(this.rectY2 - this.margin.top)])
+        this.myMouseIsDown = false
+        this.toggleGraph({id: this.chartId})
+      }
     },
     getImg: // _.debounce(
       function () {
@@ -248,7 +267,6 @@ export default {
               yDomain: [response.data.ymin, response.data.ymax],
               cbarDomain: [response.data.vmin, response.data.vmax]
             })
-            console.log([response.data.vmin, response.data.vmax])
             // vm.getColorBar()
             vm.cache.get(vm.mySim.i).url = vm.imgURL
             vm.updatePlot()

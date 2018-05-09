@@ -18,7 +18,8 @@ export default {
   color: #2c3e50;
   --accent-color: #DCD6E0;
   --secondary-color: #DCD6E0;
-  margin-top: 60px;
+  margin-top: 0px;
+  margin-bottom: 70px;
 }
 span.katex-html {
   display: none;
