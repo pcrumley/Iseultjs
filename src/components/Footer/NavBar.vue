@@ -1,10 +1,10 @@
 <template>
 <span class="align-middle" id="MyNavBar" >
-  <font-awesome-icon class="clickable"  size="sm" :icon="homeIcon" />
+  <font-awesome-icon class="clickable"  size="sm" :icon="homeIcon" @click="goHome"/>
   <!--<font-awesome-icon class="clickable" :icon="undoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="redoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="arrowsIcon" /-->
-  <span class="clickable p-1" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
+  <span class="clickable p-1 px-2" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
   <font-awesome-icon  size="sm" :icon="searchIcon"/>
   </span>
 </span>
@@ -48,7 +48,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      setNavState: types.SET_NAVBAR_STATE
+      setNavState: types.SET_NAVBAR_STATE,
+      goHome: types.GO_HOME
     })
   }
 }

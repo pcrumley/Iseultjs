@@ -110,6 +110,14 @@ export default {
         return {}
       }
     },
+    dataOptions () {
+      // data options minus xmin, xmax, ymin, ymax
+      return Object.keys(this.myViewState.dataOptions).filter(e =>
+        (e !== 'xmin' &&
+         e !== 'xmax' &&
+         e !== 'ymin' &&
+         e !== 'ymax'))
+    },
     imgX () {
       // return this.width - this.right-this.left
       return this.myViewState.renderOptions.tot_width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace
@@ -137,7 +145,7 @@ export default {
     yScale () {
       return d3['scaleLinear']()
         .range([this.imgY, 0])
-        .domain(this.xDomain)
+        .domain(this.yDomain)
     },
     cbarScale () {
       return d3[this.cbarScaleType]()
@@ -193,8 +201,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      toggleGraph: types.TOGGLE_UPDATE,
-      updateChartOptions: types.UPDATE_CHART
+      updateChartOptions: types.UPDATE_CHART,
+      setView: types.SET_CUR_VIEW
     }),
     renderImgURLSimPart: function () {
       this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
@@ -211,12 +219,17 @@ export default {
     },
     renderImgURLOptsPart: function () {
       if (this.myViewState.dataOptions.cmap !== this.cmap) {
-        this.cmap = this.myViewState.dataOptions.cmap
+        this.cmap = this.dataOptions.cmap
       }
+      var i
       this.imgURLOptsPart = '&'
-      for (var key in this.myViewState.dataOptions) {
-        this.imgURLOptsPart += key + '=' + this.myViewState.dataOptions[key] + '&'
+      for (i = 0; i < this.dataOptions.length; i++) {
+        this.imgURLOptsPart += this.dataOptions[i] + '=' + this.myViewState.dataOptions[this.dataOptions[i]] + '&'
       }
+      this.imgURLOptsPart += 'xmin=' + this.myViewState.curView[0] + '&'
+      this.imgURLOptsPart += 'xmax=' + this.myViewState.curView[1] + '&'
+      this.imgURLOptsPart += 'ymin=' + this.myViewState.curView[2] + '&'
+      this.imgURLOptsPart += 'ymax=' + this.myViewState.curView[3] + '&'
       return this.imgURLOptsPart
     },
     mouseIsDown (event) {
@@ -245,10 +258,18 @@ export default {
       // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
       // console.log(event.clientX) // x coordinate
       if (this.navbarState === 'zoom-in') {
-        console.log([this.xScale.invert(this.rectX1 - this.margin.left), this.xScale.invert(this.rectX2 - this.margin.left)])
-        console.log([this.yScale.invert(this.rectY1 - this.margin.top), this.yScale.invert(this.rectY2 - this.margin.top)])
+        // calculate xmin in data space.
+        var xmin = Math.min(this.rectX1, this.rectX2)
+        var xmax = Math.max(this.rectX1, this.rectX2)
+        var ymin = Math.max(this.rectY1, this.rectY2)
+        var ymax = Math.min(this.rectY1, this.rectY2)
+
+        xmin = (xmin === this.margin.left) ? this.myViewState.curView[0] : this.xScale.invert(xmin - this.margin.left)
+        xmax = (xmax === this.margin.left + this.imgX) ? this.myViewState.curView[1] : this.xScale.invert(xmax - this.margin.left)
+        ymax = (ymax === this.margin.top) ? this.myViewState.curView[2] : this.yScale.invert(ymax - this.margin.top)
+        ymin = (ymin === this.margin.top + this.imgY) ? this.myViewState.curView[3] : this.yScale.invert(ymin - this.margin.top)
+        this.setView({id: this.chartID, view: [xmin, xmax, ymin, ymax]})
         this.myMouseIsDown = false
-        this.toggleGraph({id: this.chartId})
       }
     },
     getImg: // _.debounce(

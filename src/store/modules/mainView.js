@@ -3,7 +3,7 @@ import * as types from '../types'
 // This module holds the state of the main graph layout.
 // The state contains an array of simulation objects
 const state = {
-  graphsUpdated: [0],
+  graphsUpdated: [],
   nextChartID: 1,
   chartArr: [],
   twoD_PRTL_HIST: {
@@ -11,6 +11,7 @@ const state = {
     ylabel: '\\gamma_i\\beta_{i,x}',
     xlabel: 'x\\ [c/\\omega_{pe}]',
     histlabel: 'f_i (p)',
+    curView: ['', '', '', ''],
     dataOptions: {
       prtl_type: 'ions',
       yval: 'px',
@@ -72,6 +73,9 @@ const getters = {
 
 // actions
 const actions = {
+  [types.SET_CUR_VIEW]: ({ commit, state }, payload) => {
+    commit(types.MUTATE_CUR_VIEW, payload)
+  },
   [types.OPEN_GRAPH]: ({ commit, state }, payload) => {
     // We don't have to do any async operations here, just
     // pass on the payload
@@ -99,6 +103,13 @@ const actions = {
     // have to use this kludgy hack as a way to make the plots
     // reactive.
     commit(types.MARK_UPDATE, payload)
+  },
+  [types.GO_HOME]: ({ commit, state }) => {
+    var i
+    for (i = 0; i < state.chartArr.length; i++) {
+      commit(types.MUTATE_CHART_OPT, {chartID: state.chartArr[i], keepView: ''})
+    }
+    commit(types.MARK_UPDATE, {})
   }
 }
 
@@ -106,17 +117,42 @@ const actions = {
 const mutations = {
   [types.MUTATE_CHART_OPT]: (state, payload) => {
     if (state.graphViewStateMap.get(payload.chartID).chartType === '2D Histograms') {
-      state.graphViewStateMap.get(payload.chartID).dataOptions[payload.key] = payload.val
+      const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
+      if (payload.key != null) {
+        tmpChartObj.dataOptions[payload.key] = payload.val
+      }
+      // Handle keeping of the view:
+      const tmpStr = payload.keepView
+      if (tmpStr.search('x0') === -1) {
+        tmpChartObj.curView[0] = tmpChartObj.dataOptions['xmin']
+      }
+      if (tmpStr.search('x1') === -1) {
+        tmpChartObj.curView[1] = tmpChartObj.dataOptions['xmax']
+      }
+      if (tmpStr.search('y0') === -1) {
+        tmpChartObj.curView[2] = tmpChartObj.dataOptions['ymin']
+      }
+      if (tmpStr.search('y1') === -1) {
+        tmpChartObj.curView[3] = tmpChartObj.dataOptions['ymax']
+      }
       if (payload.hasOwnProperty('xlabel')) {
-        state.graphViewStateMap.get(payload.chartID).xlabel = payload.xlabel
+        tmpChartObj.xlabel = payload.xlabel
       }
       if (payload.hasOwnProperty('ylabel')) {
-        state.graphViewStateMap.get(payload.chartID).ylabel = payload.ylabel
+        tmpChartObj.ylabel = payload.ylabel
       }
       if (payload.hasOwnProperty('histlabel')) {
-        state.graphViewStateMap.get(payload.chartID).histlabel = payload.histlabel
+        tmpChartObj.histlabel = payload.histlabel
       }
     }
+  },
+  [types.MUTATE_CUR_VIEW]: (state, payload) => {
+    const tmpViewArr = state.graphViewStateMap.get(payload.id).curView
+    tmpViewArr[0] = payload.view[0]
+    tmpViewArr[1] = payload.view[1]
+    tmpViewArr[2] = payload.view[2]
+    tmpViewArr[3] = payload.view[3]
+    state.graphsUpdated = [payload.id]
   },
   [types.PUSH_GRAPH]: (state, payload) => {
     // a bit of a hack to avoid the fact that javascript arrays are weird.
@@ -138,7 +174,11 @@ const mutations = {
     state.chartArr.splice(state.chartArr.findIndex((el) => { return el === payload.id }), 1)
   },
   [types.MARK_UPDATE]: (state, payload) => {
-    state.graphsUpdated = [payload.id]
+    if (payload.ids != null) {
+      state.graphsUpdated = payload.ids.filter(el => true)
+    } else {
+      state.graphsUpdated = state.chartArr.filter(el => true)
+    }
   }
 }
 
