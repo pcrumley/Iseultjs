@@ -153,6 +153,10 @@ export default {
         .domain(this.cbarDomain)
     },
     cbarURL () {
+      console.log(this.mySim.info.serverURL + '/api/colorbar/' +
+        '?px=' + this.myViewState.renderOptions.cbarWidth +
+        '&py=' + this.imgY +
+        '&cmap=' + this.cmap)
       return this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
         '&py=' + this.imgY +
@@ -219,7 +223,7 @@ export default {
     },
     renderImgURLOptsPart: function () {
       if (this.myViewState.dataOptions.cmap !== this.cmap) {
-        this.cmap = this.dataOptions.cmap
+        this.cmap = this.myViewState.dataOptions.cmap
       }
       var i
       this.imgURLOptsPart = '&'

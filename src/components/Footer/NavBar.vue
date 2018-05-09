@@ -1,10 +1,12 @@
 <template>
 <span class="align-middle" id="MyNavBar" >
-  <font-awesome-icon class="clickable"  size="sm" :icon="homeIcon" @click="goHome"/>
+  <span class="clickable py-1 px-1"  @click="goHome">
+    <font-awesome-icon  size="sm" :icon="homeIcon"/>
+  </span>
   <!--<font-awesome-icon class="clickable" :icon="undoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="redoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="arrowsIcon" /-->
-  <span class="clickable px-2" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
+  <span class="clickable px-1 py-1" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
   <font-awesome-icon  size="sm" :icon="searchIcon"/>
   </span>
 </span>
