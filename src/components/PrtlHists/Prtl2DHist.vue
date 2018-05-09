@@ -55,6 +55,7 @@ export default {
       imgURLSimPart: '',
       imgURLOptsPart: '',
       cmap: '',
+      cnormStr: '',
       width: 800,
       height: 400,
       yLabel: '',
@@ -153,14 +154,11 @@ export default {
         .domain(this.cbarDomain)
     },
     cbarURL () {
-      console.log(this.mySim.info.serverURL + '/api/colorbar/' +
-        '?px=' + this.myViewState.renderOptions.cbarWidth +
-        '&py=' + this.imgY +
-        '&cmap=' + this.cmap)
-      return this.mySim.info.serverURL + '/api/colorbar/' +
+      var tmpStr = this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
         '&py=' + this.imgY +
         '&cmap=' + this.cmap
+      return tmpStr + this.cnormStr
     },
     imgURL () {
       return this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
@@ -224,6 +222,12 @@ export default {
     renderImgURLOptsPart: function () {
       if (this.myViewState.dataOptions.cmap !== this.cmap) {
         this.cmap = this.myViewState.dataOptions.cmap
+      }
+      var tmpcnormStr = '&cnorm=' + this.myViewState.dataOptions['cnorm'] +
+        '&pow_zero=' + this.myViewState.dataOptions['pow_zero'] +
+        '&pow_gamma=' + this.myViewState.dataOptions['pow_gamma']
+      if (tmpcnormStr !== this.cnormStr) {
+        this.cnormStr = tmpcnormStr
       }
       var i
       this.imgURLOptsPart = '&'
