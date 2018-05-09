@@ -4,7 +4,7 @@
   <!--<font-awesome-icon class="clickable" :icon="undoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="redoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="arrowsIcon" /-->
-  <span class="clickable p-1 px-2" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
+  <span class="clickable px-2" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
   <font-awesome-icon  size="sm" :icon="searchIcon"/>
   </span>
 </span>
@@ -56,14 +56,18 @@ export default {
 </script>
 
 <style scoped>
-.clickable {cursor: pointer;}
+.clickable {cursor: pointer;
+  border: 1px solid transparent;
+}
 #MyNavBar{
   color: var(--primary-color);
   opacity: 1;
   user-select: none;
 }
 .active{
-  background-color:  var(--secondary-color);
-  outline: 1px solid black;
+  background-color: #2c3e50;
+  color: whiteSmoke;
+  border: 1px solid #2c3e50;
+  border-radius: 3px
 }
 </style>
