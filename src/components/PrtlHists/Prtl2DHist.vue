@@ -243,7 +243,7 @@ export default {
       }
     },
     mouseIsMoving (event) {
-      if (this.navbarState === 'zoom-in') {
+      if (this.navbarState === 'zoom-in' && this.myMouseIsDown === true) {
         const bbox = this.$el.getBoundingClientRect()
         this.rectY2 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
         this.rectX2 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
@@ -257,7 +257,7 @@ export default {
     mouseIsUp (event) {
       // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
       // console.log(event.clientX) // x coordinate
-      if (this.navbarState === 'zoom-in') {
+      if (this.navbarState === 'zoom-in' && this.myMouseIsDown === true) {
         // calculate xmin in data space.
         var xmin = Math.min(this.rectX1, this.rectX2)
         var xmax = Math.max(this.rectX1, this.rectX2)
