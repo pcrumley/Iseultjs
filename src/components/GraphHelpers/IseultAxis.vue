@@ -25,7 +25,7 @@ export default {
   methods: {
     drawAxis () {
       d3.select(this.$el)
-        .call(d3[this.orient](this.scale))
+        .call(d3[this.orient](this.scale).tickSizeOuter(0))
     }
   },
   watch: {
