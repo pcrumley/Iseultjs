@@ -14,7 +14,7 @@
                 :width="imgX"
                 :margin="margin">
     </iseult-axis>
-    <rect v-if='myMouseIsDown' :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
+    <rect v-if="showZoomRect" :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
     <!-- The y-axis -->
     <iseult-axis :orient="'axisLeft'"
                  :scale="yScale"
@@ -159,6 +159,9 @@ export default {
     imgURL () {
       return this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
     },
+    showZoomRect () {
+      return this.myMouseIsDown && this.navbarState === 'zoom-in'
+    },
     rectObj () {
       return {left: Math.min(this.rectX1, this.rectX2),
         top: Math.min(this.rectY1, this.rectY2),
@@ -238,7 +241,7 @@ export default {
       return this.imgURLOptsPart
     },
     mouseIsDown (event) {
-      if (this.navbarState === 'zoom-in') {
+      if (this.navbarState === 'zoom-in' || this.navbarState === 'pan') {
         // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
         // console.log(event.clientX) // x coordinate
         const bbox = this.$el.getBoundingClientRect()
@@ -250,7 +253,7 @@ export default {
       }
     },
     mouseIsMoving (event) {
-      if (this.navbarState === 'zoom-in' && this.myMouseIsDown === true) {
+      if (this.myMouseIsDown) {
         const bbox = this.$el.getBoundingClientRect()
         this.rectY2 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
         this.rectX2 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
@@ -264,20 +267,30 @@ export default {
     mouseIsUp (event) {
       // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
       // console.log(event.clientX) // x coordinate
-      if (this.navbarState === 'zoom-in' && this.myMouseIsDown === true) {
-        // calculate xmin in data space.
-        var xmin = Math.min(this.rectX1, this.rectX2)
-        var xmax = Math.max(this.rectX1, this.rectX2)
-        var ymin = Math.max(this.rectY1, this.rectY2)
-        var ymax = Math.min(this.rectY1, this.rectY2)
-
-        xmin = (xmin === this.margin.left) ? this.myViewState.curView[0] : this.xScale.invert(xmin - this.margin.left)
-        xmax = (xmax === this.margin.left + this.imgX) ? this.myViewState.curView[1] : this.xScale.invert(xmax - this.margin.left)
-        ymax = (ymax === this.margin.top) ? this.myViewState.curView[2] : this.yScale.invert(ymax - this.margin.top)
-        ymin = (ymin === this.margin.top + this.imgY) ? this.myViewState.curView[3] : this.yScale.invert(ymin - this.margin.top)
-        this.setView({id: this.chartID, view: [xmin, xmax, ymin, ymax]})
-        this.myMouseIsDown = false
+      if (this.myMouseIsDown) {
+        if (this.navbarState === 'zoom-in') {
+          // calculate xmin in data space.
+          var xmin = Math.min(this.rectX1, this.rectX2)
+          var xmax = Math.max(this.rectX1, this.rectX2)
+          var ymin = Math.max(this.rectY1, this.rectY2)
+          var ymax = Math.min(this.rectY1, this.rectY2)
+          if ((xmin !== xmax) && (ymin !== ymax)) {
+            xmin = (xmin === this.margin.left) ? this.myViewState.curView[0] : this.xScale.invert(xmin - this.margin.left)
+            xmax = (xmax === this.margin.left + this.imgX) ? this.myViewState.curView[1] : this.xScale.invert(xmax - this.margin.left)
+            ymin = (ymin === this.margin.top + this.imgY) ? this.myViewState.curView[2] : this.yScale.invert(ymin - this.margin.top)
+            ymax = (ymax === this.margin.top) ? this.myViewState.curView[3] : this.yScale.invert(ymax - this.margin.top)
+            this.setView({id: this.chartID, view: [xmin, xmax, ymin, ymax]})
+          }
+        } else if (this.navbarState === 'pan') {
+          var delX = this.xScale.invert(this.rectX2 - this.margin.left) - this.xScale.invert(this.rectX1 - this.margin.left)
+          var delY = this.yScale.invert(this.rectY2 - this.margin.top) - this.yScale.invert(this.rectY1 - this.margin.top)
+          // console.log(this.xDomain)
+          // console.log(this.yDomain)
+          this.setView({id: this.chartID,
+            view: [this.xDomain[0] - delX, this.xDomain[1] - delX, this.yDomain[0] - delY, this.yDomain[1] - delY]})
+        }
       }
+      this.myMouseIsDown = false
     },
     getImg: // _.debounce(
       function () {

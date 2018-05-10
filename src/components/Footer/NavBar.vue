@@ -5,7 +5,9 @@
   </span>
   <!--<font-awesome-icon class="clickable" :icon="undoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="redoIcon" />-->
-  <!--<font-awesome-icon class="clickable" :icon="arrowsIcon" /-->
+  <span class="clickable px-1 py-1" :class="{active: panClicked}"  @click="setNavState('pan')">
+  <font-awesome-icon size="sm" :icon="arrowsIcon"/>
+  </span>
   <span class="clickable px-1 py-1" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
   <font-awesome-icon  size="sm" :icon="searchIcon"/>
   </span>
@@ -13,8 +15,8 @@
 </template>
 <script>
 import faHome from '@fortawesome/fontawesome-free-solid/faHome'
-import faUndo from '@fortawesome/fontawesome-free-solid/faUndoAlt'
-import faRedo from '@fortawesome/fontawesome-free-solid/faRedoAlt'
+// import faUndo from '@fortawesome/fontawesome-free-solid/faUndoAlt'
+// import faRedo from '@fortawesome/fontawesome-free-solid/faRedoAlt'
 import faArrows from '@fortawesome/fontawesome-free-solid/faArrowsAlt'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearchPlus'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
@@ -29,15 +31,18 @@ export default {
     zoomClicked () {
       return this.navbarState === 'zoom-in'
     },
+    panClicked () {
+      return this.navbarState === 'pan'
+    },
     homeIcon () {
       return faHome
     },
-    undoIcon () {
-      return faUndo
-    },
-    redoIcon () {
-      return faRedo
-    },
+    // undoIcon () {
+    //  return faUndo
+    // },
+    // redoIcon () {
+    //  return faRedo
+    // },
     arrowsIcon () {
       return faArrows
     },
