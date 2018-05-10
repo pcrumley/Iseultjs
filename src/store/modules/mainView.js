@@ -97,6 +97,9 @@ const actions = {
   },
   [types.UPDATE_CHART]: ({ commit, state }, payload) => {
     commit(types.MUTATE_CHART_OPT, payload)
+    if (payload.sim != null) {
+      commit(types.MARK_SIM_UPDATE, {ids: [payload.sim]})
+    }
   },
   [types.TOGGLE_UPDATE]: ({ commit, state }, payload) => {
     // since we mess with the state outside of vuex norms, we
@@ -120,6 +123,9 @@ const mutations = {
       const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
       if (payload.key != null) {
         tmpChartObj.dataOptions[payload.key] = payload.val
+      }
+      if (payload.sim != null) {
+        tmpChartObj.sims = [payload.sim]
       }
       // Handle keeping of the view:
       const tmpStr = payload.keepView

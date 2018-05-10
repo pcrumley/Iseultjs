@@ -9,7 +9,7 @@
       <select class="form-control"
         id="chooseSimulation"
         v-model="simID"
-        @change="updatePlot">
+        @change="updatePlot({sim: simID})">
         <option v-for="(item, key) in simArr" :key="item" :value="item">
           {{ simNames[key] }}
         </option>
@@ -196,8 +196,13 @@ export default {
       if (payload.hasOwnProperty('keepView')) {
         tmpObj.keepView = payload.keepView
       }
-      tmpObj.key = payload.key
-      tmpObj.val = this.histOptions[payload.key]
+      if (payload.hasOwnProperty('sim')) {
+        tmpObj.sim = payload.sim
+      }
+      if (payload.hasOwnProperty('key')) {
+        tmpObj.key = payload.key
+        tmpObj.val = this.histOptions[payload.key]
+      }
       tmpObj.chartID = this.chartId
       this.updateChartOptions(tmpObj)
       this.toggleGraph({ids: [this.chartId]})
@@ -210,7 +215,6 @@ export default {
     ...mapGetters({
       simMap: types.GET_SIM_MAP,
       simArr: types.GET_SIM_ARR,
-      simUpdated: types.GET_SIM_UPDATED,
       chartMap: types.GET_GRAPH_STATE_MAP
     }),
     mySim () {
@@ -240,6 +244,7 @@ export default {
   },
   created: function () {
     this.histOptions = JSON.parse(JSON.stringify(this.chartMap.get(this.chartId).dataOptions))
+    this.simID = this.chartMap.get(this.chartId).sims[0]
   }
 }
 </script>

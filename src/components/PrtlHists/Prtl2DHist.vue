@@ -61,6 +61,7 @@ export default {
       yLabel: '',
       xLabel: '',
       rectX1: 0,
+      mySim: '',
       rectX2: 0,
       rectY1: 0,
       rectY2: 0,
@@ -96,14 +97,6 @@ export default {
       chartsUpdated: types.GET_UPDATED_CHARTS,
       navbarState: types.GET_NAVBAR_STATE
     }),
-    mySim () {
-      if (this.simMap.has(this.myViewState.sims[0])) {
-        return this.simMap.get(this.myViewState.sims[0])
-      } else {
-        // just a placeholder
-        return {}
-      }
-    },
     myViewState () {
       if (this.graphMap.has(this.chartID)) {
         return this.graphMap.get(this.chartID)
@@ -154,10 +147,13 @@ export default {
         .domain(this.cbarDomain)
     },
     cbarURL () {
-      var tmpStr = this.mySim.info.serverURL + '/api/colorbar/' +
+      var tmpStr = ''
+      if (this.mySim.hasOwnProperty('info')) {
+        tmpStr += this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
         '&py=' + this.imgY +
-        '&cmap=' + this.cmap
+        '&cmap=' + this.cmaps
+      }
       return tmpStr + this.cnormStr
     },
     imgURL () {
@@ -171,8 +167,9 @@ export default {
     }
   },
   watch: {
-    simUpdated: function (newSimID) {
-      if (this.myViewState.sims[0] === Math.abs(newSimID)) {
+    simUpdated: function (newSimArr) {
+      if (newSimArr.includes(this.myViewState.sims[0])) {
+        this.mySim = this.simMap.get(this.myViewState.sims[0])
         this.renderImgURLSimPart()
       }
     },
@@ -321,7 +318,8 @@ export default {
         })
     }
   },
-  mounted: function () {
+  created: function () {
+    this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
     this.renderImgURLSimPart()
     this.renderImgURLOptsPart()
     const tmpPrtlType = this.myViewState.dataOptions['prtl_type']

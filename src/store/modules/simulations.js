@@ -30,7 +30,7 @@ const state = {
   // We use simUpdated to tell us when properties of a sim are changed, basically
   // an event bus. Right now we set simUpdated equal to the sim ID of the sim
   // that changed, using the sign as a toggle.
-  simUpdated: 0,
+  simsUpdated: [0],
   // simMap: new Map() // we keep an ID here to keep the keys unique
   // EVENTUALLY WE WILL LOAD THIS STATE FROM A SERVER, BUT WE KEEP IT THIS WAY
   // FOR TESTING PURPOSES
@@ -41,7 +41,7 @@ const state = {
 // getters
 const getters = {
   [types.GET_SIM_UPDATED]: (state) => {
-    return state.simUpdated
+    return state.simsUpdated
   },
   [types.GET_SIM_MAP]: (state) => {
     return state.simMap
@@ -77,6 +77,7 @@ const actions = {
   [types.CHANGE_SIM_TSTEP]: ({ commit, state }, payload) => {
     // Payload must include simID
     commit(types.MUTATE_TSTEP, payload)
+    commit(types.MARK_SIM_UPDATE, {ids: [payload.id]})
   }
 }
 
@@ -102,10 +103,12 @@ const mutations = {
   },
   [types.MUTATE_TSTEP]: (state, payload) => {
     state.simMap.get(payload.id).i = payload.ind
-    if (Math.abs(state.simUpdated) === payload.id) {
-      state.simUpdated *= -1
+  },
+  [types.MARK_SIM_UPDATE]: (state, payload) => {
+    if (payload.ids != null) {
+      state.simsUpdated = payload.ids.filter(el => true)
     } else {
-      state.simUpdated = payload.id
+      state.simsUpdated = state.simArr.filter(el => true)
     }
   }
 }

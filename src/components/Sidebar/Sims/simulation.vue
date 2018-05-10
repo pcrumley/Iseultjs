@@ -36,8 +36,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      simMap: types.GET_SIM_MAP,
-      simUpdated: types.GET_SIM_UPDATED
+      simMap: types.GET_SIM_MAP
     }),
     mySim () {
       return this.simMap.get(this.simID)

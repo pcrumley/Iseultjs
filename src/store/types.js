@@ -25,6 +25,7 @@ export const MARK_UPDATE = 'views/MARK_UPDATE'
 export const MUTATE_CHART_OPT = 'views/MUTATE_CHART_OPT'
 export const MUTATE_CUR_VIEW = 'views/MUTATE_CUR_VIEW'
 export const IM_HOME = 'views/IM_HOME'
+export const MARK_SIM_UPDATE = 'sims/MARK_SIMS_UPDATE'
 
 // Actions
 export const OPEN_SIMULATION = 'simulations/OPEN_SIMULATION'
