@@ -32,7 +32,6 @@
     </iseult-axis>
     <rect :x="margin.left" :y ="margin.top" :width = "imgX" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
     <rect :x="imgX + margin.left + margin.hspace - cbarWidth" :y ="margin.top" :width = "cbarWidth" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
-
   </svg>
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
@@ -155,7 +154,7 @@ export default {
         tmpStr += this.mySim.info.serverURL + '/api/colorbar/' +
         '?px=' + this.myViewState.renderOptions.cbarWidth +
         '&py=' + this.imgY +
-        '&cmap=' + this.cmaps
+        '&cmap=' + this.cmap
       }
       return tmpStr + this.cnormStr
     },
@@ -212,8 +211,9 @@ export default {
     renderImgURLSimPart: function () {
       this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
         'sim_type=' + this.mySim.info.simType +
-        '&outdir=' + this.mySim.info.outdir +
-        '&n=' + this.mySim.data.fileArray[this.mySim.i]
+        '&outdir=' + this.mySim.info.outdir.replace(/\//g, '%2F') +
+        '&n=' + this.mySim.data.fileArray[this.mySim.i] +
+        '&i=' + this.mySim.i
     },
     updatePlot: function () {
       this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
@@ -300,10 +300,10 @@ export default {
         var vm = this
         axios.get(vm.imgURL)
           .then(function (response) {
-            vm.cache.set(vm.mySim.i, {
+            vm.cache.set(response.data.i, {
               mainImgObj: {
-                imgX: vm.imgX,
-                imgY: vm.imgY,
+                imgX: response.data.imgX,
+                imgY: response.data.imgY,
                 left: vm.margin.left,
                 top: vm.margin.top,
                 imgData: response.data.imgString},
@@ -312,7 +312,7 @@ export default {
               cbarDomain: [response.data.vmin, response.data.vmax]
             })
             // vm.getColorBar()
-            vm.cache.get(vm.mySim.i).url = vm.imgURL
+            vm.cache.get(response.data.i).url = response.data.url
             vm.updatePlot()
           })
           .catch(function (error) {
@@ -360,5 +360,6 @@ margin: auto;
 
 svg {
   position: inherit;
+  user-select: none;
 }
 </style>

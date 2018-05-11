@@ -93,7 +93,7 @@
   </div>
   <div class="form-row ">
     <div class="form-group col-md-5">
-      <label for="xbins"> Color Norm </label>
+      <label for="cnorm"> Color Norm </label>
       <select class="form-control" id="cnorm"
         v-model="histOptions.cnorm" @change="updatePlot({key:'cnorm'})">
         <option> log </option>
@@ -135,6 +135,15 @@
         id="ymin" v-model.number="histOptions.ymax" @change="updatePlot({key:'ymax', keepView:'x0x1y0'})">
     </div>
   </div>
+  <div class="form-row ">
+    <div class="form-group col-md-12">
+      <label for="BoolString"> Boolean String </label>
+      <input class="form-control"
+        id="ymin" v-model="histOptions.boolstr" @change="updatePlot({key:'boolstr'})">
+      <small id="boolStrHelp" class="form-text text-muted" >e.g. [x.ge.40]AND[x.le.60]</small>
+      </div>
+
+  </div>
   <div class="form-row pb-3">
     <div class="form-check px-3">
       <input
@@ -169,6 +178,18 @@
       </label>
     </div>
   </div>
+  <!--<div class="form-row pb-3">
+    <div class="form-check px-3">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        v-model="histOptions.aspect"
+        id="ApsectCheck" @change="updatePlot({key:'aspect'})">
+      <label class="form-check-label" for="AspectCheck">
+        Aspect = 1
+      </label>
+    </div>
+  </div> -->
   </form>
   </div>
 </template>
