@@ -198,14 +198,16 @@ export default {
       }
     },
     imgURL (newURL) {
-      if (this.cache.has(this.mySim.i)) {
-        if (this.cache.get(this.mySim.i).url === newURL) {
-          this.updatePlot()
+      if (this.imgURLOptsPart !== '') {
+        if (this.cache.has(this.mySim.i)) {
+          if (this.cache.get(this.mySim.i).url === newURL) {
+            this.updatePlot()
+          } else {
+            this.getImg()
+          }
         } else {
           this.getImg()
         }
-      } else {
-        this.getImg()
       }
     }
   },
@@ -217,7 +219,7 @@ export default {
     renderImgURLSimPart: function () {
       this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
         'sim_type=' + this.mySim.info.simType +
-        '&outdir=' + this.mySim.info.outdir.replace(/\/'/g, '%2F') +
+        '&outdir=' + this.mySim.info.outdir.replace(/\//g, '%2F') +
         '&n=' + this.mySim.data.fileArray[this.mySim.i] +
         '&i=' + this.mySim.i
     },
@@ -342,11 +344,12 @@ export default {
   },
   mounted: function () {
     this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
-    this.renderImgURLSimPart()
+
     const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
     this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
     this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
     this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+    this.renderImgURLSimPart()
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
       var pHeight = pStyle.slice(pStyle.search(/height/g))
