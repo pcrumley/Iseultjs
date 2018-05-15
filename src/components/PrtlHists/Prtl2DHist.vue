@@ -349,7 +349,6 @@ export default {
     this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
-      console.log(pStyle)
       var pHeight = pStyle.slice(pStyle.search(/height/g))
       pHeight = parseInt(pHeight.slice(pHeight.search(/:/g) + 1, pHeight.search(/;/g) - 2))
       var pWidth = pStyle.slice(pStyle.search(/width/g))

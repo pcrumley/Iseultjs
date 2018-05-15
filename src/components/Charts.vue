@@ -8,8 +8,8 @@
              :layout="layout"
              :col-num="12"
              :row-height="100"
-             :is-draggable="true"
-             :is-resizable="true"
+             :is-draggable="resizeActive"
+             :is-resizable="resizeActive"
              :vertical-compact="true"
              :use-css-transforms="true"
 >
@@ -56,8 +56,12 @@ export default {
   computed: {
     ...mapGetters({
       chartMap: types.GET_GRAPH_STATE_MAP,
-      chartArr: types.GET_CHART_ARR
+      chartArr: types.GET_CHART_ARR,
+      navbarState: types.GET_NAVBAR_STATE
     }),
+    resizeActive () {
+      return this.navbarState === 'resize-grid'
+    },
     layoutFromStore: {
       get () {
         return this.$store.getters[types.GET_CHART_LAYOUT]

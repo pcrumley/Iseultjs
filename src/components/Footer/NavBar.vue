@@ -5,6 +5,9 @@
   </span>
   <!--<font-awesome-icon class="clickable" :icon="undoIcon" />-->
   <!--<font-awesome-icon class="clickable" :icon="redoIcon" />-->
+  <span class="clickable px-1 py-1" :class="{active: gridClicked}"  @click="setNavState('resize-grid')">
+  <font-awesome-icon size="sm" :icon="gridIcon"/>
+  </span>
   <span class="clickable px-1 py-1" :class="{active: panClicked}"  @click="setNavState('pan')">
   <font-awesome-icon size="sm" :icon="arrowsIcon"/>
   </span>
@@ -18,6 +21,7 @@ import faHome from '@fortawesome/fontawesome-free-solid/faHome'
 // import faUndo from '@fortawesome/fontawesome-free-solid/faUndoAlt'
 // import faRedo from '@fortawesome/fontawesome-free-solid/faRedoAlt'
 import faArrows from '@fortawesome/fontawesome-free-solid/faArrowsAlt'
+import faTh from '@fortawesome/fontawesome-free-solid/faTh'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearchPlus'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import * as types from '@/store/types'
@@ -34,8 +38,14 @@ export default {
     panClicked () {
       return this.navbarState === 'pan'
     },
+    gridClicked () {
+      return this.navbarState === 'resize-grid'
+    },
     homeIcon () {
       return faHome
+    },
+    gridIcon () {
+      return faTh
     },
     // undoIcon () {
     //  return faUndo
