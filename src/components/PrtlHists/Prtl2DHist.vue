@@ -116,13 +116,13 @@ export default {
     },
     imgX () {
       // return this.width - this.right-this.left
-      return this.myViewState.renderOptions.tot_width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace
+      return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace
     },
     imgY () {
-      return this.myViewState.renderOptions.tot_height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
+      return this.height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
     },
     cbarLeft () {
-      return this.myViewState.renderOptions.tot_width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
+      return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
     },
     cbarObj () {
       return {
@@ -183,6 +183,12 @@ export default {
     },
     chartsUpdated: function (newChartArr) {
       if (newChartArr.includes(this.chartID)) {
+        if (this.width !== this.myViewState.renderOptions.tot_width) {
+          this.width = this.myViewState.renderOptions.tot_width
+        }
+        if (this.height !== this.myViewState.renderOptions.tot_height) {
+          this.height = this.myViewState.renderOptions.tot_height
+        }
         this.renderImgURLOptsPart()
         const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
         this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
@@ -211,7 +217,7 @@ export default {
     renderImgURLSimPart: function () {
       this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
         'sim_type=' + this.mySim.info.simType +
-        '&outdir=' + this.mySim.info.outdir.replace(/\//g, '%2F') +
+        '&outdir=' + this.mySim.info.outdir.replace(/\/'/g, '%2F') +
         '&n=' + this.mySim.data.fileArray[this.mySim.i] +
         '&i=' + this.mySim.i
     },
@@ -334,14 +340,24 @@ export default {
         })
     }
   },
-  created: function () {
+  mounted: function () {
     this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
     this.renderImgURLSimPart()
-    this.renderImgURLOptsPart()
     const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
     this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
     this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
     this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+    this.$nextTick(function () {
+      var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
+      console.log(pStyle)
+      var pHeight = pStyle.slice(pStyle.search(/height/g))
+      pHeight = parseInt(pHeight.slice(pHeight.search(/:/g) + 1, pHeight.search(/;/g) - 2))
+      var pWidth = pStyle.slice(pStyle.search(/width/g))
+      pWidth = parseInt(pWidth.slice(pWidth.search(/:/g) + 1, pWidth.search(/;/g) - 2))
+
+      this.$store.commit(types.MUTATE_RENDER_OPTS, {chartID: this.chartID, wVal: pWidth, hVal: pHeight})
+      this.$store.commit(types.MARK_UPDATE, {ids: [this.chartID]})
+    })
   },
   components: {
     'iseultImageCanvas': ImageCanvas,

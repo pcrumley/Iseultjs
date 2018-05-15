@@ -6,6 +6,7 @@ const state = {
   graphsUpdated: [],
   nextChartID: 1,
   chartArr: [],
+  layout: [],
   twoD_PRTL_HIST: {
     chartType: '2D Histograms',
     ylabel: '\\gamma_i\\beta_{i,x}',
@@ -68,6 +69,9 @@ const getters = {
   },
   [types.GET_UPDATED_CHARTS]: (state) => {
     return state.graphsUpdated
+  },
+  [types.GET_CHART_LAYOUT]: (state) => {
+    return state.layout
   }
 }
 
@@ -118,6 +122,9 @@ const actions = {
 
 // mutations
 const mutations = {
+  [types.UPDATE_LAYOUT]: (state, payload) => {
+    state.layout = payload
+  },
   [types.MUTATE_CHART_OPT]: (state, payload) => {
     if (state.graphViewStateMap.get(payload.chartID).chartType === '2D Histograms') {
       const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
@@ -152,6 +159,10 @@ const mutations = {
       }
     }
   },
+  [types.MUTATE_RENDER_OPTS]: (state, payload) => {
+    state.graphViewStateMap.get(payload.chartID).renderOptions.tot_width = payload.wVal
+    state.graphViewStateMap.get(payload.chartID).renderOptions.tot_height = payload.hVal
+  },
   [types.MUTATE_CUR_VIEW]: (state, payload) => {
     const tmpViewArr = state.graphViewStateMap.get(payload.id).curView
     tmpViewArr[0] = payload.view[0]
@@ -172,12 +183,14 @@ const mutations = {
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
     } else {
       state.chartArr.push(state.nextChartID)
+      state.layout.push({'x': 0, 'y': 0, 'w': 4, 'h': 5, 'i': state.nextChartID.toString()})
       state.nextChartID += 1
     }
   },
   [types.POP_GRAPH]: (state, payload) => {
     state.graphViewStateMap.delete(payload.id)
     state.chartArr.splice(state.chartArr.findIndex((el) => { return el === payload.id }), 1)
+    state.layout = state.layout.filter(el => el.i !== payload.id.toString())
   },
   [types.MARK_UPDATE]: (state, payload) => {
     if (payload.ids != null) {

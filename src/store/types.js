@@ -11,6 +11,7 @@ export const GET_SERVER_MAP = 'servers/GET_SERVER_MAP'
 export const GET_SERVER_ARR = 'servers/GET_SERVER_ARR'
 export const GET_NEXT_CHART_ID = 'views/GET_NEXT_CHART_ID'
 export const GET_NAVBAR_STATE = 'ui/GET_NAVBAR_STATE'
+export const GET_CHART_LAYOUT = 'layout/GET_CHART_LAYOUT'
 
 // Mutations
 export const PUSH_SIMULATION = 'simulations/PUSH_SIMULATION'
@@ -26,7 +27,8 @@ export const MUTATE_CHART_OPT = 'views/MUTATE_CHART_OPT'
 export const MUTATE_CUR_VIEW = 'views/MUTATE_CUR_VIEW'
 export const IM_HOME = 'views/IM_HOME'
 export const MARK_SIM_UPDATE = 'sims/MARK_SIMS_UPDATE'
-
+export const UPDATE_LAYOUT = 'layout/UPDATE_LAYOUT'
+export const MUTATE_RENDER_OPTS = 'layout/MUTATE_RENDER_OPTS'
 // Actions
 export const OPEN_SIMULATION = 'simulations/OPEN_SIMULATION'
 export const DEL_SIMULATION = 'simulations/DEL_SIMULATION'
