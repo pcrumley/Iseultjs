@@ -3,6 +3,7 @@
   THE VUE COMPONENT THAT MANAGES EACH CHART
   -->
   <div>
+
     <grid-layout
              @layout-updated="layoutUpdatedEvent"
              :layout="layout"
@@ -12,7 +13,7 @@
              :is-resizable="resizeActive"
              :vertical-compact="true"
              :use-css-transforms="true"
->
+             >
     <grid-item v-for="item in layout"
                v-bind:id="'VueGrid'+item.i"
                :x="item.x"
@@ -22,16 +23,18 @@
                :i="item.i"
                :key="item.i"
                @resized="resizedEvent"
+               >
 
-    >
         <!--@resize="resizeEvent"-->
         <!--@move="moveEvent"-->
         <!--@resized="resizedEvent"-->
         <!--@moved="movedEvent"-->
-        <component :is="subplotComponent(parseInt(item.i))" :chartID="parseInt(item.i)"> ><!-- :height="heightArr[i]"> -->
+
+        <component :is="subplotComponent(parseInt(item.i))" :chartID="parseInt(item.i)"> >
         </component>
+        <span v-if="resizeActive" class="clickable close-btn" @click="closeClicked(parseInt(item.i))"> X </span>
     </grid-item>
-</grid-layout>
+  </grid-layout>
   <sidebar/>
   <chart-footer/>
   </div>
@@ -40,7 +43,7 @@
 <script>
 import TwoDimPrtlHist from '@/components/PrtlHists/Prtl2DHist'
 import * as types from '@/store/types'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import _ from 'lodash'
 import { GridLayout, GridItem } from 'vue-grid-layout'
 import Sidebar from '@/components/Sidebar/sidebar.vue'
@@ -72,12 +75,18 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      delGraph: types.DEL_GRAPH
+    }),
     subplotComponent (id) {
       if (this.chartMap.get(id)['chartType'] === '2D Histograms') {
         return TwoDimPrtlHist
       } else {
         return 0
       }
+    },
+    closeClicked: function (i) {
+      this.delGraph({id: i})
     },
     resizedEvent: function (i, newH, newW, newHPx, newWPx) {
       this.$store.commit(types.MUTATE_RENDER_OPTS, {chartID: parseInt(i), wVal: newWPx, hVal: newHPx})
@@ -136,6 +145,19 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+span.clickable {cursor: pointer}
+span.close-btn {
+  right:0;
+  user-select: none;
+  font-size: 18pt;
+  color: white;
+  line-height: 40px;
+  box-shadow: 2px 2px 2px #00214B;
+  vertical-align: middle;
+  padding:0px 15px;
+  background:red;
+  position: absolute;
+  border-radius: 10px
+}
 </style>

@@ -1,10 +1,9 @@
 <template>
-  <div class="relative" :style="{ width:width+'px', height:height+'px' }" @mousedown.stop="mouseIsDown" @mousemove.stop="mouseIsMoving" @mouseup.stop="mouseIsUp" @mouseleave="mouseLeft">
+  <div class="absolute" :style="{ width:width+'px', height:height+'px' }" @mousedown="mouseIsDown" @mousemove="mouseIsMoving" @mouseup="mouseIsUp" @mouseleave="mouseLeft">
     <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
       three labels -->
   <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
   <iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>
-
   <svg :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
@@ -371,8 +370,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-div.relative {
-position: relative;
+div.absolute {
+position: absolute;
 margin: auto;
 }
 
