@@ -333,7 +333,9 @@ export default {
       var vm = this
       axios.get(vm.cbarURL)
         .then(function (response) {
-          vm.cbarPNG = response.data.cbarString
+          if (vm.cbarURL === response.data.url) {
+            vm.cbarPNG = response.data.cbarString
+          }
         })
         .catch(function (error) {
           vm.cbarPNG = ''
