@@ -4,7 +4,7 @@
       three labels -->
   <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
   <iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>
-  <svg :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
+  <svg :id="svgID" :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
     <iseult-axis :orient="'axisBottom'"
@@ -14,6 +14,9 @@
                 :margin="margin">
     </iseult-axis>
     <rect v-if="showZoomRect" :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
+    <path v-if="showPolygon" :d="pathString" fill-opacity =".3" style="fill:#d5d8dc ;stroke-width:2px;stroke:rgb(0,0,0);" />
+    <path v-if="closePolygon" :d="closeString" stroke-dasharray="3,3" style="stroke-width:2px;stroke:rgb(0,0,0);" />
+
     <!-- The y-axis -->
     <iseult-axis :orient="'axisLeft'"
                  :scale="yScale"
@@ -64,6 +67,7 @@ export default {
       rectX1: 0,
       mySim: '',
       rectX2: 0,
+      pathString: '',
       rectY1: 0,
       rectY2: 0,
       myMouseIsDown: false,
@@ -98,6 +102,9 @@ export default {
       chartsUpdated: types.GET_UPDATED_CHARTS,
       navbarState: types.GET_NAVBAR_STATE
     }),
+    svgID () {
+      return 'svg' + this.chartID
+    },
     myViewState () {
       if (this.graphMap.has(this.chartID)) {
         return this.graphMap.get(this.chartID)
@@ -162,6 +169,23 @@ export default {
     },
     showZoomRect () {
       return this.myMouseIsDown && this.navbarState === 'zoom-in'
+    },
+    showPolygon () {
+      return this.myMouseIsDown && this.navbarState === 'lasso'
+    },
+    closePolygon () {
+      var pathArr = this.pathString.slice(1).split(' ')
+      var radius = Math.pow(Number(pathArr[0]) - Number(pathArr.slice(-2)[0]), 2) +
+        Math.pow(Number(pathArr[1]) - Number(pathArr.slice(-1)[0]), 2)
+      return (Math.sqrt(radius) < 50 && this.showPolygon)
+    },
+    closeString () {
+      if (this.closePolygon) {
+        var pathArr = this.pathString.split(' ')
+        return pathArr[0] + ' ' + pathArr[1] + ' ' + pathArr.slice(-2)[0] + ' ' + pathArr.slice(-2)[1]
+      } else {
+        return ''
+      }
     },
     rectObj () {
       return {left: Math.min(this.rectX1, this.rectX2),
@@ -260,13 +284,33 @@ export default {
         this.rectY2 = this.rectY1
         this.rectX2 = this.rectX1
         this.myMouseIsDown = true
+      } else {
+        if (this.navbarState === 'lasso') {
+          this.myMouseIsDown = true
+          const bbox = this.$el.getBoundingClientRect()
+          this.pathString = 'M' +
+          String((event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left) +
+          ' ' +
+          String((event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top)
+        }
       }
     },
     mouseIsMoving (event) {
       if (this.myMouseIsDown) {
-        const bbox = this.$el.getBoundingClientRect()
-        this.rectY2 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
-        this.rectX2 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
+        if (this.navbarState === 'zoom-in' || this.navbarState === 'pan') {
+          const bbox = this.$el.getBoundingClientRect()
+          this.rectY2 = (event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top
+          this.rectX2 = (event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left
+        } else {
+          if (this.navbarState === 'lasso') {
+            /* Let's save the path data */
+            const bbox = this.$el.getBoundingClientRect()
+            this.pathString += ' ' +
+              String((event.clientX - bbox.left >= this.margin.left) ? Math.min(event.clientX - bbox.left, this.margin.left + this.imgX) : this.margin.left) +
+              ' ' +
+              String((event.clientY - bbox.top >= this.margin.top) ? Math.min(event.clientY - bbox.top, this.margin.top + this.imgY) : this.margin.top)
+          }
+        }
       }
     },
     mouseLeft (event) {

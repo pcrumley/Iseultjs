@@ -21,7 +21,7 @@ import { mapGetters, mapActions } from 'vuex'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faMinus from '@fortawesome/fontawesome-free-solid/faMinus'
-import prtl2DHistForm from '@/components/PrtLHists/Prtl2DHistForm'
+import prtlHistForm from '@/components/PrtlHists/PrtlHistForm'
 
 export default {
   data () {
@@ -45,8 +45,8 @@ export default {
     }),
 
     subplotOptsComponent () {
-      if (this.chartMap.get(this.chartID)['chartType'] === '2D Histograms') {
-        return prtl2DHistForm
+      if (this.chartMap.get(this.chartID)['chartType'] === 'Prtl Histograms') {
+        return prtlHistForm
       } else {
         return 0
       }

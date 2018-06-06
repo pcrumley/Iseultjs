@@ -8,7 +8,7 @@ const state = {
   chartArr: [],
   layout: [],
   twoD_PRTL_HIST: {
-    chartType: '2D Histograms',
+    chartType: 'Prtl Histograms',
     ylabel: '\\gamma_i\\beta_{i,x}',
     xlabel: 'x\\ [c/\\omega_{pe}]',
     histlabel: 'f_i (p)',
@@ -126,7 +126,7 @@ const mutations = {
     state.layout = payload
   },
   [types.MUTATE_CHART_OPT]: (state, payload) => {
-    if (state.graphViewStateMap.get(payload.chartID).chartType === '2D Histograms') {
+    if (state.graphViewStateMap.get(payload.chartID).chartType === 'Prtl Histograms') {
       const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
       if (payload.key != null) {
         tmpChartObj.dataOptions[payload.key] = payload.val

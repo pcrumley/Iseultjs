@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import TwoDimPrtlHist from '@/components/PrtlHists/Prtl2DHist'
+import PrtlHist from '@/components/PrtlHists/PrtlHist'
 import * as types from '@/store/types'
 import { mapGetters, mapActions } from 'vuex'
 import _ from 'lodash'
@@ -79,8 +79,8 @@ export default {
       delGraph: types.DEL_GRAPH
     }),
     subplotComponent (id) {
-      if (this.chartMap.get(id)['chartType'] === '2D Histograms') {
-        return TwoDimPrtlHist
+      if (this.chartMap.get(id)['chartType'] === 'Prtl Histograms') {
+        return PrtlHist
       } else {
         return 0
       }

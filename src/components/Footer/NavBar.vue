@@ -14,6 +14,10 @@
   <span class="clickable px-1 py-1" :class="{active: zoomClicked}"  @click="setNavState('zoom-in')">
   <font-awesome-icon  size="sm" :icon="searchIcon"/>
   </span>
+  <span class="clickable px-1 py-1" :class="{active: lassoClicked}"  @click="setNavState('lasso')">
+  <!--<font-awesome-icon  size="sm" :icon="searchIcon"/>-->
+  lasso
+  </span>
 </span>
 </template>
 <script>
@@ -40,6 +44,9 @@ export default {
     },
     gridClicked () {
       return this.navbarState === 'resize-grid'
+    },
+    lassoClicked () {
+      return this.navbarState === 'lasso'
     },
     homeIcon () {
       return faHome
