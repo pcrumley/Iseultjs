@@ -38,7 +38,7 @@
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
-  </div>
+</div>
 </template>
 
 <script>
@@ -165,7 +165,18 @@ export default {
       return tmpStr + this.cnormStr
     },
     imgURL () {
-      return this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
+      var tmpStr = this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
+      // add the parts of the lassos
+      if (this.navbarState === 'lasso' && this.mySim.hasOwnProperty('lassos')) {
+        if (this.mySim.lassos.hasOwnProperty(this.myViewState.dataOptions['prtl_type'])) {
+          var curLasso = this.mySim.lassos[this.myViewState.dataOptions['prtl_type']]
+          tmpStr += '&selPolyXval=' + curLasso.xVal
+          tmpStr += '&selPolyYval=' + curLasso.yVal
+          tmpStr += '&selPolyXarr=' + curLasso.x
+          tmpStr += '&selPolyYarr=' + curLasso.y
+        }
+      }
+      return tmpStr
     },
     showZoomRect () {
       return this.myMouseIsDown && this.navbarState === 'zoom-in'
@@ -175,8 +186,8 @@ export default {
     },
     closePolygon () {
       var pathArr = this.pathString.slice(1).split(' ')
-      var radius = Math.pow(Number(pathArr[0]) - Number(pathArr.slice(-2)[0]), 2) +
-        Math.pow(Number(pathArr[1]) - Number(pathArr.slice(-1)[0]), 2)
+      var radius = Math.pow(parseFloat(pathArr[0]) - parseFloat(pathArr.slice(-2)[0]), 2) +
+        Math.pow(parseFloat(pathArr[1]) - parseFloat(pathArr.slice(-1)[0]), 2)
       return (Math.sqrt(radius) < 50 && this.showPolygon)
     },
     closeString () {
@@ -197,7 +208,7 @@ export default {
   watch: {
     simUpdated: function (newSimArr) {
       if (newSimArr.includes(this.myViewState.sims[0])) {
-        this.mySim = this.simMap.get(this.myViewState.sims[0])
+        this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
         this.renderImgURLSimPart()
       }
     },
@@ -237,7 +248,8 @@ export default {
   methods: {
     ...mapActions({
       updateChartOptions: types.UPDATE_CHART,
-      setView: types.SET_CUR_VIEW
+      setView: types.SET_CUR_VIEW,
+      setLasso: types.SET_LASSO_REGION
     }),
     renderImgURLSimPart: function () {
       this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
@@ -342,6 +354,33 @@ export default {
           // console.log(this.yDomain)
           this.setView({id: this.chartID,
             view: [this.xDomain[0] - delX, this.xDomain[1] - delX, this.yDomain[0] - delY, this.yDomain[1] - delY]})
+        } else if (this.navbarState === 'lasso' && this.closePolygon) {
+          // create an array of the points in DATA SPACE!
+          var pathArr = this.pathString.slice(1).split(' ')
+          var xStr = ''
+          var yStr = ''
+          var i
+          for (i = 0; i < pathArr.length; i++) {
+            if (i % 2 === 0) {
+              // It is an x-data point
+              xStr += this.xScale.invert(parseFloat(pathArr[i]) - this.margin.left) + ','
+            } else {
+              yStr += this.yScale.invert(parseFloat(pathArr[i]) - this.margin.top) + ','
+            }
+          }
+          // CLOSE THE POLYGON
+          xStr += this.xScale.invert(parseFloat(pathArr[0]) - this.margin.left)
+          yStr += this.yScale.invert(parseFloat(pathArr[1]) - this.margin.top)
+          // PUSH THE LASSO-ED REGION TO THE SIMULATION
+          this.setLasso({id: this.myViewState.sims[0],
+            lassoType: this.myViewState.dataOptions['prtl_type'],
+            lasso: {
+              x: xStr,
+              y: yStr,
+              xVal: this.myViewState.dataOptions['xval'],
+              yVal: this.myViewState.dataOptions['yval']
+            }
+          })
         }
       }
       this.myMouseIsDown = false

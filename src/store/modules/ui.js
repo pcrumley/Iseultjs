@@ -19,7 +19,10 @@ const actions = {
   toggleSidebar ({ commit, state }) {
     commit(types.TOGGLE_SIDEBAR)
   },
-  [types.SET_NAVBAR_STATE] ({ commit, state }, payload) {
+  [types.SET_NAVBAR_STATE] ({ commit, state, dispatch }, payload) {
+    if (state.navbarState === 'lasso') {
+      dispatch(types.DEL_LASSOES)
+    }
     commit('mutateNavbar', payload)
   }
 }
@@ -31,6 +34,7 @@ const mutations = {
   },
   mutateNavbar (state, payload) {
     if (state.navbarState === payload) {
+      // Delete old lassos
       state.navbarState = ''
     } else {
       state.navbarState = payload

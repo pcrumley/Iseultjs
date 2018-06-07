@@ -8,6 +8,7 @@ import axios from 'axios'
 // { i: 10 // the timestep we want to output it looks at simObj.data.fileArray[i]
 //   info: { STUFF ABOUT HOW TO ACCESS THE SIMULATION }
 //   data: { THINGS WE HAVE TO TALK TO THE SERVER FOR }}
+//   lasso: {STUFF FOR THE LASSOED REGION}
 
 // Inside of the info you should find:
 // { simID: 0, The ID of where the sim lives in the SimMap
@@ -60,7 +61,7 @@ const actions = {
     // load the simulation data
     axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + payload.outdir)
       .then(function (response) {
-        var simObj = { info: {}, data: {}, i: 0 }
+        var simObj = { info: {}, data: {}, i: 0, lassos: {} }
         Object.assign(simObj.info, payload)
         Object.assign(simObj.data, response.data)
         simObj.i = simObj.data.fileArray.length - 1
@@ -78,6 +79,15 @@ const actions = {
     // Payload must include simID
     commit(types.MUTATE_TSTEP, payload)
     commit(types.MARK_SIM_UPDATE, {ids: [payload.id]})
+  },
+  [types.SET_LASSO_REGION]: ({ commit, state }, payload) => {
+    // payload must include simID as 'id'
+    commit(types.MUTATE_LASSO_REGION, payload)
+    commit(types.MARK_SIM_UPDATE, {ids: [payload.id]})
+  },
+  [types.DEL_LASSOES]: ({ commit, state }) => {
+    state.simArr.forEach(el => commit(types.MUTATE_LASSO_REGION, {id: el}))
+    commit(types.MARK_SIM_UPDATE, {ids: state.simArr})
   }
 }
 
@@ -100,6 +110,15 @@ const mutations = {
       state.simUpdated = payload.id
     }
     */
+  },
+  [types.MUTATE_LASSO_REGION]: (state, payload) => {
+    var tmpObj = Object.assign({}, state.simMap.get(payload.id))
+    if (payload.hasOwnProperty('lassoType')) {
+      tmpObj.lassos[payload.lassoType] = payload.lasso
+    } else {
+      tmpObj.lassos = {}
+    }
+    state.simMap.set(payload.id, tmpObj)
   },
   [types.MUTATE_TSTEP]: (state, payload) => {
     state.simMap.get(payload.id).i = payload.ind
