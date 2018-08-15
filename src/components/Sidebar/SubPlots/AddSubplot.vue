@@ -56,7 +56,7 @@ export default {
       simArr: types.GET_SIM_ARR
     }),
     subplotOptsComponent () {
-      if (this.chartTypeArr[this.subplotType] === 'Prtl Histograms') {
+      if (this.chartTypeArr[this.subplotType] === '2D Prtl Histogram') {
         return prtlHistForm
       } else {
         return 0
@@ -70,7 +70,7 @@ export default {
     }),
     openAddSubplotPanel () {
       this.openGraph({
-        chartType: 'Prtl Histograms',
+        chartType: '2D Prtl Histograms',
         simID: this.simArr[0]})
 
       this.active = true

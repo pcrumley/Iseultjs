@@ -45,7 +45,7 @@ export default {
     }),
 
     subplotOptsComponent () {
-      if (this.chartMap.get(this.chartID)['chartType'] === 'Prtl Histograms') {
+      if (this.chartMap.get(this.chartID)['chartType'] === '2D Prtl Histogram') {
         return prtlHistForm
       } else {
         return 0

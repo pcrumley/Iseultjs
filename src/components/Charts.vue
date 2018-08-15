@@ -79,7 +79,7 @@ export default {
       delGraph: types.DEL_GRAPH
     }),
     subplotComponent (id) {
-      if (this.chartMap.get(id)['chartType'] === 'Prtl Histograms') {
+      if (this.chartMap.get(id)['chartType'] === '2D Prtl Histogram') {
         return PrtlHist
       } else {
         return 0
