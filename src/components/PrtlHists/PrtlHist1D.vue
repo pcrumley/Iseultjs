@@ -1,6 +1,6 @@
 <template>
   <div class="absolute" :style="{ width:width+'px', height:height+'px' }" @mousedown="mouseIsDown" @mousemove="mouseIsMoving" @mouseup="mouseIsUp" @mouseleave="mouseLeft">
-    <!-- The div will hold 1 figure with 2 axis objects, & 2 labels -->
+  <!-- The div will hold 1 figure with 2 axis objects, & 2 labels -->
   <svg :id="svgID" :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
@@ -35,7 +35,6 @@ import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/store/types'
 import axios from 'axios'
 import * as d3 from 'd3'
-import ImageCanvas from '@/components/GraphHelpers/ImageCanvas.vue'
 import iseultAxis from '@/components/GraphHelpers/IseultAxis.vue'
 import axisLabel from '@/components/GraphHelpers/AxisLabel.vue'
 
@@ -65,7 +64,6 @@ export default {
       yDomain: [],
       histLabel: '',
       cbarWidth: 20,
-      cbarPNG: '',
       cache: new Map(),
       didIUpdate: 1,
       margin: {
@@ -405,7 +403,6 @@ export default {
     })
   },
   components: {
-    'iseultImageCanvas': ImageCanvas,
     iseultAxis,
     axisLabel
   }

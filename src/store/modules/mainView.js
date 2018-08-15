@@ -151,6 +151,9 @@ const actions = {
       commit(types.MARK_SIM_UPDATE, {ids: [payload.sim]})
     }
   },
+  [types.CHANGE_CHART_TYPE]: ({ commit, state }, payload) => {
+    commit(types.MUTATE_CHART_TYPE, payload)
+  },
   [types.TOGGLE_UPDATE]: ({ commit, state }, payload) => {
     // since we mess with the state outside of vuex norms, we
     // have to use this kludgy hack as a way to make the plots
@@ -170,6 +173,15 @@ const actions = {
 const mutations = {
   [types.UPDATE_LAYOUT]: (state, payload) => {
     state.layout = payload
+  },
+  [types.MUTATE_CHART_TYPE]: (state, payload) => {
+    if (payload.chartType === '2D Prtl Histogram') {
+      state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_HIST)))
+      state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+    } else if (payload.chartType === '1D Prtl Histogram') {
+      state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
+      state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+    }
   },
   [types.MUTATE_CHART_OPT]: (state, payload) => {
     if (state.graphViewStateMap.get(payload.chartID).chartType === '2D Prtl Histogram') {
@@ -224,13 +236,14 @@ const mutations = {
 
     if (payload.chartID != null) {
       // There were issues with the setters and getters being copied.
+      // Set the chartID
       if (payload.chartType === '2D Prtl Histogram') {
         state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_HIST)))
+        state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
       } else if (payload.chartType === '1D Prtl Histogram') {
         state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
+        state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
       }
-      // Set the chartID
-      state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
     } else {
       state.chartArr.push(state.nextChartID)
       state.layout.push({'x': 0, 'y': 0, 'w': 4, 'h': 5, 'i': state.nextChartID.toString()})

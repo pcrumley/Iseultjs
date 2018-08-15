@@ -66,14 +66,24 @@ export default {
       }
     }
   },
+  watch: {
+    subplotType: function () {
+      this.changeChartType({
+        chartID: this.nextChartID,
+        chartType: this.chartTypeArr[this.subplotType],
+        simID: this.simArr[0]
+      })
+    }
+  },
   methods: {
     ...mapActions({
       addGraph: types.ADD_GRAPH,
-      openGraph: types.OPEN_GRAPH
+      openGraph: types.OPEN_GRAPH,
+      changeChartType: types.CHANGE_CHART_TYPE
     }),
     openAddSubplotPanel () {
       this.openGraph({
-        chartType: '1D Prtl Histogram',
+        chartType: '2D Prtl Histogram',
         simID: this.simArr[0]})
 
       this.active = true
