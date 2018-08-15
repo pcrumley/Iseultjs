@@ -64,7 +64,7 @@ div.inner{
 
 div.labelBottom{
  top: 45%;
- left: 50%;
+ left: 40%;
 }
 
 div.labelLeft{
