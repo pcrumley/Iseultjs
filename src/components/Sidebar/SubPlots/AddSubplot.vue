@@ -38,6 +38,7 @@
 
 <script>
 import prtlHistForm from '@/components/PrtlHists/PrtlHistForm'
+import prtlHistForm1D from '@/components/PrtlHists/PrtlHistForm1D'
 import * as types from '@/store/types'
 import { mapActions, mapGetters } from 'vuex'
 
@@ -46,7 +47,7 @@ export default {
   data () {
     return {
       active: false,
-      subplotType: 0
+      subplotType: 1
     }
   },
   computed: {
@@ -58,6 +59,8 @@ export default {
     subplotOptsComponent () {
       if (this.chartTypeArr[this.subplotType] === '2D Prtl Histogram') {
         return prtlHistForm
+      } else if (this.chartTypeArr[this.subplotType] === '1D Prtl Histogram') {
+        return prtlHistForm1D
       } else {
         return 0
       }
@@ -70,7 +73,7 @@ export default {
     }),
     openAddSubplotPanel () {
       this.openGraph({
-        chartType: '2D Prtl Histograms',
+        chartType: '1D Prtl Histogram',
         simID: this.simArr[0]})
 
       this.active = true
@@ -78,12 +81,8 @@ export default {
     },
     wrappedAddSubplot () {
       this.active = false
-      this.addGraph({id: this.nextChartID})
+      this.addGraph({id: this.nextChartID, chartType: this.chartTypeArr[this.subplotType]})
     }
-  },
-  components:
-  {
-    PrtlHistForm: prtlHistForm
   }
 }
 

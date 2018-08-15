@@ -3,7 +3,10 @@ import * as types from '../types'
 // This module holds the state of the main graph layout.
 // The state contains an array of simulation objects
 const state = {
-  availChartTypes: ['2D Prtl Histogram'] // THIS SHOULD BE SENT BY SERVER PROBABLY... NEED TO THINK ABOUT IT.
+  availChartTypes: [
+    '2D Prtl Histogram',
+    '1D Prtl Histogram'
+  ] // THIS SHOULD BE SENT BY SERVER PROBABLY... NEED TO THINK ABOUT IT.
 }
 
 // getters

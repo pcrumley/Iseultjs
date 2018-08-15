@@ -22,6 +22,7 @@ import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
 import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faMinus from '@fortawesome/fontawesome-free-solid/faMinus'
 import prtlHistForm from '@/components/PrtlHists/PrtlHistForm'
+import prtlHistForm1D from '@/components/PrtlHists/PrtlHistForm1D'
 
 export default {
   data () {
@@ -47,8 +48,8 @@ export default {
     subplotOptsComponent () {
       if (this.chartMap.get(this.chartID)['chartType'] === '2D Prtl Histogram') {
         return prtlHistForm
-      } else {
-        return 0
+      } else if (this.chartMap.get(this.chartID)['chartType'] === '1D Prtl Histogram') {
+        return prtlHistForm1D
       }
     },
 

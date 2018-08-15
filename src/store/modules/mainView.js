@@ -53,6 +53,52 @@ const state = {
       cbarWidth: 20
     }
   },
+  oneD_PRTL_HIST: {
+    chartType: '1D Prtl Histogram',
+    ylabel: '\\gamma_i\\beta_{i,x}',
+    xlabel: 'x\\ [c/\\omega_{pe}]',
+    histlabel: 'f_i (p)',
+    curView: ['', '', '', ''],
+    dataOptions: {
+      prtl_type: 'ions',
+      yval: 'px',
+      xval: 'x',
+      weights: '',
+      boolstr: '',
+      ybins: 200,
+      xbins: 200,
+      yvalmin: '',
+      yvalmax: '',
+      xvalmin: '',
+      xvalmax: '',
+      normhist: true,
+      cmap: 'viridis',
+      cnorm: 'log',
+      pow_zero: 0,
+      pow_gamma: 1.0,
+      vmin: '',
+      vmax: '',
+      clip: true,
+      xmin: '',
+      xmax: '',
+      ymin: '',
+      ymax: '',
+      aspect: 'auto',
+      mask_zeros: true,
+      interpolation: 'bicubic'},
+    renderOptions: {
+      tot_width: 800,
+      tot_height: 400,
+      margin: {
+        top: 20,
+        right: 60,
+        bottom: 70,
+        left: 70,
+        hspace: 50
+      },
+      cbarWidth: 20
+    }
+  },
   graphViewStateMap: new Map([])
 }
 
@@ -178,7 +224,11 @@ const mutations = {
 
     if (payload.chartID != null) {
       // There were issues with the setters and getters being copied.
-      state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_HIST)))
+      if (payload.chartType === '2D Prtl Histogram') {
+        state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_HIST)))
+      } else if (payload.chartType === '1D Prtl Histogram') {
+        state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
+      }
       // Set the chartID
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
     } else {
