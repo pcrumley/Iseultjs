@@ -83,7 +83,7 @@ export default {
     }),
     openAddSubplotPanel () {
       this.openGraph({
-        chartType: '2D Prtl Histogram',
+        chartType: this.chartTypeArr[this.subplotType],
         simID: this.simArr[0]})
 
       this.active = true
