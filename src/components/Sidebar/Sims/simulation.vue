@@ -3,11 +3,11 @@
   THE VUE COMPONENT THAT MANAGES THE SIMULATION STATE
   -->
   <div class="card my-2 ">
-  <div class="card-header text-left clickable" @click="active = !active">
+  <div class="card-header text-left clickable" @click="isActive = !isActive">
     <span>{{ mySim.info.name }}@{{ mySim.info.serverName }}</span>
     <div class="float-right" ><font-awesome-icon :icon="icon" /></div>
   </div>
-  <div class="card-body" v-if="active" >
+  <div class="card-body" v-if="isActive" >
     <!--<h5 class="card-title"> URL: {{ myServer.url }}</h5>-->
     <p class="card-text text-left">{{mySim}}</p>
     <button class="btn btn-danger float-right" @click="removeSim({id: simID})">Remove</button>
@@ -25,7 +25,7 @@ import faMinus from '@fortawesome/fontawesome-free-solid/faMinus'
 export default {
   data () {
     return {
-      active: false
+      isActive: false
     }
   },
   props: ['simID'],
@@ -42,7 +42,7 @@ export default {
       return this.simMap.get(this.simID)
     },
     icon () {
-      if (this.active) {
+      if (this.isActive) {
         return faMinus
       } else {
         return faPlus

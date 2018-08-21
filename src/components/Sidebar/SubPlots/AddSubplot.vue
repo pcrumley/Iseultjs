@@ -28,7 +28,7 @@
     <button type="button"
       class="btn btn-lg btn-success"
       @click="wrappedAddSubplot">
-        Add
+        Add Chart
     </button>
   </div>
 </div>
@@ -47,7 +47,7 @@ export default {
   data () {
     return {
       active: false,
-      subplotType: 1
+      subplotType: 0
     }
   },
   computed: {

@@ -62,7 +62,7 @@
         @change="updatePlot({key:'yval', keepView:'x0x1'})">
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
-      <label for="chooseWeights" class="col-form-label col-sm-2  offset-sm-1"> weights</label>
+      <label for="chooseWeights" class="col-form-label col-sm-2  offset-sm-1">weights</label>
       <select class="form-control col-sm-2" id="weights"
         v-model="histOptions.weights" @change="updatePlot({key:'weights'})">
         <option> </option>
@@ -260,7 +260,7 @@ export default {
       return Object.keys(this.mySim.data.prtls)
     },
     prtlQuants () {
-      return this.mySim.data.prtls['ions'].quantities
+      return this.mySim.data.prtls[this.histOptions.prtl_type].quantities
     }
   },
   created: function () {

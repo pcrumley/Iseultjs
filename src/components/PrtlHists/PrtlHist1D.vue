@@ -4,29 +4,36 @@
   <svg :id="svgID" :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
+    <!--
     <iseult-axis :orient="'axisBottom'"
                 :scale="xScale"
                 :height="imgY"
                 :width="imgX"
                 :margin="margin">
     </iseult-axis>
+    -->
     <!--  objects that appear from interaction with the plot-->
     <rect v-if="showZoomRect" :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
     <path v-if="showPolygon" :d="pathString" fill-opacity =".3" style="fill:#d5d8dc ;stroke-width:2px;stroke:rgb(0,0,0);" />
     <path v-if="closePolygon" :d="closeString" stroke-dasharray="3,3" style="stroke-width:2px;stroke:rgb(0,0,0);" />
 
     <!-- The y-axis -->
+    <!--
     <iseult-axis :orient="'axisLeft'"
                  :scale="yScale"
                  :height="imgY"
                  :width="imgX"
                  :margin="margin">
     </iseult-axis>
+    -->
     <!-- border of plot-->
     <rect :x="margin.left" :y ="margin.top" :width = "imgX" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
   </svg>
+  <!--
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
+  -->
+  {{linesMap}}
 </div>
 </template>
 
@@ -64,7 +71,7 @@ export default {
       yDomain: [],
       histLabel: '',
       cbarWidth: 20,
-      cache: new Map(),
+      linesMap: new Map(),
       didIUpdate: 1,
       margin: {
         top: 20,
@@ -164,13 +171,11 @@ export default {
   },
   watch: {
     simUpdated: function (newSimArr) {
-      if (newSimArr.includes(this.myViewState.sims[0])) {
-        this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
-        this.renderImgURLSimPart()
-      }
-    },
-    cbarURL: function () {
-      this.getColorBar()
+      this.linesMap.forEach((line, lineObj) => {
+        if (newSimArr.includes(lineObj.simID)) {
+          lineObj.sim = JSON.parse(JSON.stringify(this.simMap.get(lineObj.nextSimID)))
+        }
+      })
     },
     chartsUpdated: function (newChartArr) {
       if (newChartArr.includes(this.chartID)) {
@@ -189,17 +194,17 @@ export default {
       }
     },
     histURL (newURL) {
-      if (this.imgURLOptsPart !== '') {
-        if (this.cache.has(this.mySim.i)) {
-          if (this.cache.get(this.mySim.i).url === newURL) {
-            this.updatePlot()
-          } else {
-            this.getImg()
-          }
-        } else {
-          this.getImg()
-        }
-      }
+      // if (this.imgURLOptsPart !== '') {
+      //  if (this.cache.has(this.mySim.i)) {
+      //    if (this.cache.get(this.mySim.i).url === newURL) {
+      //      this.updatePlot()
+      //    } else {
+      //      this.getImg()
+      //    }
+      //  } else {
+      //    this.getImg()
+      //  }
+      // }
     }
   },
   methods: {
@@ -223,15 +228,6 @@ export default {
       this.didIUpdate *= -1
     },
     renderImgURLOptsPart: function () {
-      if (this.myViewState.dataOptions.cmap !== this.cmap) {
-        this.cmap = this.myViewState.dataOptions.cmap
-      }
-      var tmpcnormStr = '&cnorm=' + this.myViewState.dataOptions['cnorm'] +
-        '&pow_zero=' + this.myViewState.dataOptions['pow_zero'] +
-        '&pow_gamma=' + this.myViewState.dataOptions['pow_gamma']
-      if (tmpcnormStr !== this.cnormStr) {
-        this.cnormStr = tmpcnormStr
-      }
       var i
       this.imgURLOptsPart = '&'
       for (i = 0; i < this.dataOptions.length; i++) {
@@ -390,7 +386,7 @@ export default {
     this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
     this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
     this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
-    this.renderImgURLSimPart()
+    // this.renderImgURLSimPart()
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
       var pHeight = pStyle.slice(pStyle.search(/height/g))

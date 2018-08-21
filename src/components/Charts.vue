@@ -42,6 +42,7 @@
 
 <script>
 import PrtlHist from '@/components/PrtlHists/PrtlHist'
+import PrtlHist1D from '@/components/PrtlHists/PrtlHist1D'
 import * as types from '@/store/types'
 import { mapGetters, mapActions } from 'vuex'
 import _ from 'lodash'
@@ -81,8 +82,8 @@ export default {
     subplotComponent (id) {
       if (this.chartMap.get(id)['chartType'] === '2D Prtl Histogram') {
         return PrtlHist
-      } else {
-        return 0
+      } else if (this.chartMap.get(id)['chartType'] === '1D Prtl Histogram') {
+        return PrtlHist1D
       }
     },
     closeClicked: function (i) {
