@@ -101,9 +101,10 @@
       <div class="form-check px-3">
         <input
           class="form-check-input"
-          type="checkbox">
-          <!--v-model="histOptions.normhist"
-          id="NormCheck" @change="updatePlot({key:'normhist'})">-->
+          type="checkbox"
+          v-model="normHist"
+          id="NormCheck"
+          @change="updatePlot({key:'normhist', val:normHist})">
         <label class="form-check-label" for="NormCheck">
           Normalize Hist
         </label>
@@ -111,10 +112,10 @@
       <div class="form-check px-3">
         <input
           class="form-check-input"
-          type="checkbox">
-          <!--v-model="histOptions.mask_zeros"
-          @change="updatePlot({key: 'mask_zeros'})"
-          id="MaskCheck">-->
+          type="checkbox"
+          v-model="xlog"
+          @change="updatePlot({key:'xscale', val: xlog ? 'log': 'linear'})"
+          >
         <label class="form-check-label" for="MaskCheck">
           logscale x
         </label>
@@ -122,10 +123,10 @@
       <div class="form-check px-3">
         <input
           class="form-check-input"
-          type="checkbox">
-          <!--v-model="histOptions.clip"
-          @change="updatePlot({key: 'clip'})"
-          id="ClipValues">-->
+          type="checkbox"
+          v-model="ylog"
+          @change="updatePlot({key:'xscale', val: ylog ? 'log': 'linear'})"
+        >
         <label class="form-check-label" for="ClipValues">
           logscale y
         </label>
@@ -181,6 +182,9 @@ export default {
       myLineArr: [],
       activeIndex: 0,
       curLine: {},
+      xlog: false,
+      normHist: false,
+      ylog: false,
       showColors: false
     }
   },
@@ -191,7 +195,6 @@ export default {
       updateChartOptions: types.UPDATE_CHART
     }),
     updateLines (payload) {
-      console.log(payload)
       if (payload.hasOwnProperty('keepView')) {
         this.updateChartOptions({
           chartID: this.chartId,
@@ -205,6 +208,24 @@ export default {
           keepView: 'x0x1y0y1',
           key: 'lineArr',
           val: JSON.parse(JSON.stringify(this.myLineArr))
+        })
+      }
+      this.toggleGraph({ids: [this.chartId]})
+    },
+    updatePlot (payload) {
+      if (payload.hasOwnProperty('keepView')) {
+        this.updateChartOptions({
+          chartID: this.chartId,
+          keepView: payload.keepView,
+          key: payload.key,
+          val: payload.val
+        })
+      } else {
+        this.updateChartOptions({
+          chartID: this.chartId,
+          keepView: 'x0x1y0y1',
+          key: payload.key,
+          val: payload.val
         })
       }
       this.toggleGraph({ids: [this.chartId]})
@@ -257,6 +278,9 @@ export default {
   },
   created: function () {
     this.myLineArr = JSON.parse(JSON.stringify(this.chartMap.get(this.chartId).dataOptions.lineArr))
+    this.normHist = this.chartMap.get(this.chartId).dataOptions.normhist
+    this.xlog = this.chartMap.get(this.chartId).dataOptions.xscale === 'log'
+    this.Ylog = this.chartMap.get(this.chartId).dataOptions.yscale === 'log'
     // this.simID = this.chartMap.get(this.chartId).sims[0]
   }
   /*

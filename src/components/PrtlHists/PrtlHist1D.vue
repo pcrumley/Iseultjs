@@ -33,7 +33,6 @@
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   -->
-  {{ graphMap.get(chartID) }}
 </div>
 </template>
 

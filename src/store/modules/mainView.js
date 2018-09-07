@@ -66,11 +66,11 @@ const state = {
           boolstr: '',
           xbins: 50,
           xvalmin: '',
-          xvalmax: '',
-          normhist: true,
-          xscale: 'linear'
+          xvalmax: ''
         }
-      ]
+      ],
+      normhist: true,
+      xscale: 'linear'
     },
     curView: ['', '', '', ''],
     renderOptions: {
@@ -174,7 +174,6 @@ const mutations = {
   [types.MUTATE_CHART_OPT]: (state, payload) => {
     const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
     if (payload.key != null) {
-      console.log(payload.val)
       tmpChartObj.dataOptions[payload.key] = payload.val
     }
     if (payload.sim != null) {
