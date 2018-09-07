@@ -125,7 +125,7 @@
           class="form-check-input"
           type="checkbox"
           v-model="ylog"
-          @change="updatePlot({key:'xscale', val: ylog ? 'log': 'linear'})"
+          @change="updatePlot({key:'yscale', val: ylog ? 'log': 'linear'})"
         >
         <label class="form-check-label" for="ClipValues">
           logscale y
