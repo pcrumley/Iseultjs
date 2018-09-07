@@ -33,7 +33,7 @@
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   -->
-  {{linesMap}}
+  {{ graphMap.get(chartID) }}
 </div>
 </template>
 
@@ -69,9 +69,8 @@ export default {
       mainImgObj: {},
       xDomain: [],
       yDomain: [],
-      histLabel: '',
+      cbarLabel: '',
       cbarWidth: 20,
-      linesMap: new Map(),
       didIUpdate: 1,
       margin: {
         top: 20,
@@ -189,7 +188,7 @@ export default {
         const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
         this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
         this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
-        this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+        this.cbarLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
         this.cbarScaleType = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
       }
     },
@@ -385,7 +384,7 @@ export default {
     const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
     this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
     this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
-    this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+    this.cbarLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
     // this.renderImgURLSimPart()
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')

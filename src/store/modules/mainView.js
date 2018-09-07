@@ -11,7 +11,6 @@ const state = {
     chartType: '2D Prtl Histogram',
     ylabel: '\\gamma_i\\beta_{i,x}',
     xlabel: 'x\\ [c/\\omega_{pe}]',
-    histlabel: 'f_i (p)',
     curView: ['', '', '', ''],
     dataOptions: {
       prtl_type: 'ions',
@@ -57,10 +56,10 @@ const state = {
     chartType: '1D Prtl Histogram',
     ylabel: '\\gamma_i\\beta_{i,x}',
     xlabel: 'x\\ [c/\\omega_{pe}]',
-    lineArr: [
-      { name: 'Line 1',
-        color: '#4e79a7',
-        dataOptions: {
+    dataOptions: {
+      lineArr: [
+        { name: 'Line 1',
+          color: '#4e79a7',
           prtl_type: 'ions',
           xval: 'x',
           weights: '',
@@ -69,9 +68,10 @@ const state = {
           xvalmin: '',
           xvalmax: '',
           normhist: true,
-          xscale: 'linear'}
-      }
-    ],
+          xscale: 'linear'
+        }
+      ]
+    },
     curView: ['', '', '', ''],
     renderOptions: {
       tot_width: 800,
@@ -168,41 +168,37 @@ const mutations = {
     } else if (payload.chartType === '1D Prtl Histogram') {
       state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
-      state.graphViewStateMap.get(payload.chartID).lineArr[0].sim = payload.simID
+      state.graphViewStateMap.get(payload.chartID).dataOptions.lineArr[0].sim = payload.simID
     }
   },
   [types.MUTATE_CHART_OPT]: (state, payload) => {
-    if (state.graphViewStateMap.get(payload.chartID).chartType === '2D Prtl Histogram') {
-      const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
-      if (payload.key != null) {
-        tmpChartObj.dataOptions[payload.key] = payload.val
-      }
-      if (payload.sim != null) {
-        tmpChartObj.sims = [payload.sim]
-      }
-      // Handle keeping of the view:
-      const tmpStr = payload.keepView
-      if (tmpStr.search('x0') === -1) {
-        tmpChartObj.curView[0] = tmpChartObj.dataOptions['xmin']
-      }
-      if (tmpStr.search('x1') === -1) {
-        tmpChartObj.curView[1] = tmpChartObj.dataOptions['xmax']
-      }
-      if (tmpStr.search('y0') === -1) {
-        tmpChartObj.curView[2] = tmpChartObj.dataOptions['ymin']
-      }
-      if (tmpStr.search('y1') === -1) {
-        tmpChartObj.curView[3] = tmpChartObj.dataOptions['ymax']
-      }
-      if (payload.hasOwnProperty('xlabel')) {
-        tmpChartObj.xlabel = payload.xlabel
-      }
-      if (payload.hasOwnProperty('ylabel')) {
-        tmpChartObj.ylabel = payload.ylabel
-      }
-      if (payload.hasOwnProperty('histlabel')) {
-        tmpChartObj.histlabel = payload.histlabel
-      }
+    const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
+    if (payload.key != null) {
+      console.log(payload.val)
+      tmpChartObj.dataOptions[payload.key] = payload.val
+    }
+    if (payload.sim != null) {
+      tmpChartObj.sims = [payload.sim]
+    }
+    // Handle keeping of the view:
+    const tmpStr = payload.keepView
+    if (tmpStr.search('x0') === -1) {
+      tmpChartObj.curView[0] = tmpChartObj.dataOptions['xmin']
+    }
+    if (tmpStr.search('x1') === -1) {
+      tmpChartObj.curView[1] = tmpChartObj.dataOptions['xmax']
+    }
+    if (tmpStr.search('y0') === -1) {
+      tmpChartObj.curView[2] = tmpChartObj.dataOptions['ymin']
+    }
+    if (tmpStr.search('y1') === -1) {
+      tmpChartObj.curView[3] = tmpChartObj.dataOptions['ymax']
+    }
+    if (payload.hasOwnProperty('xlabel')) {
+      tmpChartObj.xlabel = payload.xlabel
+    }
+    if (payload.hasOwnProperty('ylabel')) {
+      tmpChartObj.ylabel = payload.ylabel
     }
   },
   [types.MUTATE_RENDER_OPTS]: (state, payload) => {
@@ -231,7 +227,7 @@ const mutations = {
       } else if (payload.chartType === '1D Prtl Histogram') {
         state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
         state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
-        state.graphViewStateMap.get(payload.chartID).lineArr[0].sim = payload.simID
+        state.graphViewStateMap.get(payload.chartID).dataOptions.lineArr[0].sim = payload.simID
       }
     } else {
       state.chartArr.push(state.nextChartID)

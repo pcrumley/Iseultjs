@@ -207,7 +207,6 @@ export default {
   props: ['chartId'],
   methods: {
     ...mapActions({
-      addSim: types.OPEN_SIMULATION,
       toggleGraph: types.TOGGLE_UPDATE,
       updateChartOptions: types.UPDATE_CHART
     }),

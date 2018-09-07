@@ -38,7 +38,9 @@
           Simulation:
         </label>
         <select class="form-control"
-          id="chooseSimulation">
+          id="chooseSimulation"
+          v-model="myLineArr[activeIndex].sim"
+          @change="updateLines({})">
           <option v-for="(item, key) in simArr" :key="item" :value="item">
             {{ simNames[key] }}
           </option>
@@ -49,7 +51,9 @@
           Particle:
         </label>
         <select class="form-control"
-          id="particle">
+          id="particle"
+          v-model="myLineArr[activeIndex].prtl_type"
+          @change="updateLines({})">
           <option v-for="item in prtlTypes" :key="item"> {{ item }} </option>
         </select>
       </div>
@@ -58,42 +62,40 @@
           xval:
         </label>
         <select class="form-control"
-          id="particle">
+          id="xVal"
+          v-model="myLineArr[activeIndex].xval"
+          @change="updateLines({keepView: 'y0y1'})">
           <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
         </select>
       </div>
     </div>
-    <div class="form-group form-row">
-      <label for="chooseX" class="col-form-label col-md-1 offset-md-1" >
-        x:
-      </label>
-      <select class="form-control col-md-2"
-        id="xval">
-        <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
-      </select>
-      <label for="chooseWeights" class="col-form-label col-md-2  offset-md-1">weights</label>
-      <select class="form-control col-md-2" id="weights">
-      <!--v-model="histOptions.weights" @change="updatePlot({key:'weights'})">-->
-        <option> </option>
-        <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
-      </select>
-    </div>
     <div class="form-row ">
       <div class="form-group col-md-3">
         <label for="vMin"> xvalmin </label>
-        <input class="form-control" id="xvalMin">
-          <!--v-model.number="histOptions.vmin" @change="updatePlot({key:'vmin'})">-->
+        <input class="form-control" id="xvalMin"
+        v-model.number="myLineArr[activeIndex].xvalmin" @change="updateLines({keepView: 'x0y0y1'})">
       </div>
       <div class="form-group col-md-3">
-        <label for="vMax"> xvalmax </label>
-        <input class="form-control"  id="xvalMax" >
-        <!--v-model.number="histOptions.vmax" @change="updatePlot({key:'vmax'})">-->
+        <label for="xMax"> xvalmax </label>
+        <input class="form-control"  id="xvalMax"
+        v-model.number="myLineArr[activeIndex].xvalmax" @change="updateLines({keepView: 'x0y0y1'})">
       </div>
       <div class="form-group col-md-3">
         <label for="xbins"> xbins </label>
-        <input type="number" step="1" class="form-control" id="xBins">
-        <!--  v-model.number="histOptions.xbins" @change="updatePlot({key: 'xbins'})">-->
+        <input type="number" step="1" class="form-control" id="xBins"
+        v-model.number="myLineArr[activeIndex].xbins" @change="updateLines({keepView: 'x0x1y0y1'})">
       </div>
+      <div class="form-group col-md-3">
+        <label for="ChooseWeights"> Weights </label>
+        <select class="form-control" id="weights"
+        v-model="myLineArr[activeIndex].weights"
+        @change="updateLines({keepView: 'x0x1y0y1'})">
+          <option> </option>
+          <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
+        </select>
+
+      </div>
+
     </div>
     <div class="form-row pb-3">
       <div class="form-check px-3">
@@ -158,7 +160,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/store/types'
 
 export default {
@@ -176,23 +178,53 @@ export default {
         {name: 'Line 9', color: '#9c755f'},
         {name: 'Line 10', color: '#bab0ac'}
       ],
+      myLineArr: [],
       activeIndex: 0,
-      showColors: false,
-      histOptions: {}
+      curLine: {},
+      showColors: false
     }
   },
   props: ['chartId'],
   methods: {
+    ...mapActions({
+      toggleGraph: types.TOGGLE_UPDATE,
+      updateChartOptions: types.UPDATE_CHART
+    }),
+    updateLines (payload) {
+      console.log(payload)
+      if (payload.hasOwnProperty('keepView')) {
+        this.updateChartOptions({
+          chartID: this.chartId,
+          keepView: payload.keepView,
+          key: 'lineArr',
+          val: JSON.parse(JSON.stringify(this.myLineArr))
+        })
+      } else {
+        this.updateChartOptions({
+          chartID: this.chartId,
+          keepView: 'x0x1y0y1',
+          key: 'lineArr',
+          val: JSON.parse(JSON.stringify(this.myLineArr))
+        })
+      }
+      this.toggleGraph({ids: [this.chartId]})
+    },
     addLine () {
-      this.myLineArr.push(JSON.parse(JSON.stringify(this.defaultValues[this.items.length])))
-      this.activeIndex = this.items.length - 1
+      var tmpLine = JSON.parse(JSON.stringify(this.myLineArr[this.myLineArr.length - 1]))
+      tmpLine.name = this.defaultValues[this.myLineArr.length].name
+      tmpLine.color = this.defaultValues[this.myLineArr.length].color
+      this.myLineArr.push(tmpLine)
+      this.activeIndex = this.myLineArr.length - 1
+      this.updateLines({})
     },
     removeLine (ind) {
       this.myLineArr.splice(ind, 1)
-      this.activeIndex = (ind < this.items.length - 1) ? ind : this.items.length - 1
+      this.activeIndex = (ind < this.myLineArr.length - 1) ? ind : this.myLineArr.length - 1
+      this.updateLines({})
     },
     changeColor (ind) {
-      this.items[this.activeIndex].color = this.defaultValues[ind].color
+      this.myLineArr[this.activeIndex].color = this.defaultValues[ind].color
+      this.updateLines({})
     }
   },
   computed: {
@@ -220,14 +252,13 @@ export default {
       return Object.keys(this.mySim.data.prtls)
     },
     prtlQuants () {
-      return this.mySim.data.prtls[this.myLineArr[this.activeIndex].dataOptions.prtl_type].quantities
+      return this.mySim.data.prtls[this.myLineArr[this.activeIndex].prtl_type].quantities
     }
   },
   created: function () {
-    this.myLineArr = JSON.parse(JSON.stringify(this.chartMap.get(this.chartId)['lineArr']))
+    this.myLineArr = JSON.parse(JSON.stringify(this.chartMap.get(this.chartId).dataOptions.lineArr))
     // this.simID = this.chartMap.get(this.chartId).sims[0]
   }
-
   /*
   },
   props: ['chartId'],
