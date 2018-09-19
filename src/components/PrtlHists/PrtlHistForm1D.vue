@@ -4,7 +4,7 @@
   <span> Add a histogram: </span>
   <ul class="flex-container wrap">
     <li class="flex-item clickable"
-      v-for="(item, index) in myLineArr"
+      v-for="(item, index) in lineArr"
       @click="activeIndex=index"
       :key="index"
       :style="{ background: index === activeIndex ? item.color : 'white',
@@ -12,8 +12,7 @@
                 borderColor: item.color}" >
       {{ item.name }}
     </li>
-    <li v-if="myLineArr.length < defaultValues.length"
-      class="flex-item clickable"
+    <li class="flex-item clickable"
       @click="addLine()"
       :style="{background: 'gainsboro',
                 color: 'white',
@@ -29,7 +28,7 @@
         <label for="Line name:">
         Name:
         </label>
-        <input v-model="myLineArr[activeIndex].name">
+        <input v-model="curLine.name" @change="changeName()">
       </div>
     </div>
     <div class="form-row ">
@@ -39,7 +38,7 @@
         </label>
         <select class="form-control"
           id="chooseSimulation"
-          v-model="myLineArr[activeIndex].sim"
+          v-model="curLine.sim"
           @change="updateLines({})">
           <option v-for="(item, key) in simArr" :key="item" :value="item">
             {{ simNames[key] }}
@@ -52,7 +51,7 @@
         </label>
         <select class="form-control"
           id="particle"
-          v-model="myLineArr[activeIndex].prtl_type"
+          v-model="curLine.prtl_type"
           @change="updateLines({})">
           <option v-for="item in prtlTypes" :key="item"> {{ item }} </option>
         </select>
@@ -63,7 +62,7 @@
         </label>
         <select class="form-control"
           id="xVal"
-          v-model="myLineArr[activeIndex].xval"
+          v-model="curLine.xval"
           @change="updateLines({keepView: 'y0y1'})">
           <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
         </select>
@@ -73,22 +72,22 @@
       <div class="form-group col-md-3">
         <label for="vMin"> xvalmin </label>
         <input class="form-control" id="xvalMin"
-        v-model.number="myLineArr[activeIndex].xvalmin" @change="updateLines({keepView: 'x0y0y1'})">
+        v-model.number="curLine.xvalmin" @change="updateLines({keepView: 'x0y0y1'})">
       </div>
       <div class="form-group col-md-3">
         <label for="xMax"> xvalmax </label>
         <input class="form-control"  id="xvalMax"
-        v-model.number="myLineArr[activeIndex].xvalmax" @change="updateLines({keepView: 'x0y0y1'})">
+        v-model.number="curLine.xvalmax" @change="updateLines({keepView: 'x0y0y1'})">
       </div>
       <div class="form-group col-md-3">
         <label for="xbins"> xbins </label>
         <input type="number" step="1" class="form-control" id="xBins"
-        v-model.number="myLineArr[activeIndex].xbins" @change="updateLines({keepView: 'x0x1y0y1'})">
+        v-model.number="curLine.xbins" @change="updateLines({keepView: 'x0x1y0y1'})">
       </div>
       <div class="form-group col-md-3">
         <label for="ChooseWeights"> Weights </label>
         <select class="form-control" id="weights"
-        v-model="myLineArr[activeIndex].weights"
+        v-model="curLine.weights"
         @change="updateLines({keepView: 'x0x1y0y1'})">
           <option> </option>
           <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
@@ -138,16 +137,16 @@
       </div>
       <ul v-if="showColors" class="color-wrapper wrap">
         <li class="color-patch clickable"
-          v-for="(val, index) in defaultValues"
+          v-for="(val, index) in colors"
           @click="changeColor(index)"
           :key="index"
-          :style="{ background: val.color,
-                    borderColor: val.color}" >
+          :style="{ background: val,
+                    borderColor: val}" >
         </li>
       </ul>
 
     </div>
-    <div v-if="myLineArr.length>1"
+    <div v-if="lineArr.length>1"
       class="form-row ">
       <button type="button"
         class="btn btn-lg btn-danger"
@@ -167,21 +166,37 @@ import * as types from '@/store/types'
 export default {
   data () {
     return {
-      defaultValues: [
-        {name: 'Line 1', color: '#4e79a7'},
-        {name: 'Line 2', color: '#f28e2b'},
-        {name: 'Line 3', color: '#e15759'},
-        {name: 'Line 4', color: '#76b6b2'},
-        {name: 'Line 5', color: '#59a14f'},
-        {name: 'Line 6', color: '#edc948'},
-        {name: 'Line 7', color: '#b07aa1'},
-        {name: 'Line 8', color: '#ff9da7'},
-        {name: 'Line 9', color: '#9c755f'},
-        {name: 'Line 10', color: '#bab0ac'}
+      colors: [
+        '#4e79a7',
+        '#f28e2b',
+        '#e15759',
+        '#76b6b2',
+        '#59a14f',
+        '#edc948',
+        '#b07aa1',
+        '#ff9da7',
+        '#9c755f',
+        '#bab0ac'
       ],
-      myLineArr: [],
+      curLine: {
+        name: 'Line 1',
+        color: '#4e79a7',
+        prtl_type: 'ions',
+        xval: 'x',
+        weights: '',
+        boolstr: '',
+        xbins: 50,
+        xvalmin: '',
+        xvalmax: ''
+      },
+      lineArr: [{
+        name: 'Line 1',
+        color: '#4e79a7',
+        key: 0
+      }],
+      myLineMap: new Map(),
       activeIndex: 0,
-      curLine: {},
+      maxKey: 0,
       xlog: false,
       normHist: false,
       ylog: false,
@@ -194,20 +209,39 @@ export default {
       toggleGraph: types.TOGGLE_UPDATE,
       updateChartOptions: types.UPDATE_CHART
     }),
+    changeName () {
+      this.updateLines({})
+      this.refreshLineArr()
+    },
+    refreshLineArr () {
+      this.lineArr = []
+      this.myLineMap.forEach((val, key) => {
+        this.maxKey = Math.max(key, this.maxKey)
+        this.lineArr.push({
+          key: key,
+          name: val.name,
+          color: val.color
+        })
+      })
+    },
     updateLines (payload) {
+      var tmpObj = {}
+      Object.entries(this.curLine)
+        .forEach(x => { tmpObj[x[0]] = x[1] })
+      this.myLineMap.set(this.activeKey, tmpObj)
       if (payload.hasOwnProperty('keepView')) {
         this.updateChartOptions({
           chartID: this.chartId,
           keepView: payload.keepView,
-          key: 'lineArr',
-          val: JSON.parse(JSON.stringify(this.myLineArr))
+          key: 'lineMap',
+          val: this.myLineMap
         })
       } else {
         this.updateChartOptions({
           chartID: this.chartId,
           keepView: 'x0x1y0y1',
-          key: 'lineArr',
-          val: JSON.parse(JSON.stringify(this.myLineArr))
+          key: 'lineMap',
+          val: this.myLineMap
         })
       }
       this.toggleGraph({ids: [this.chartId]})
@@ -231,29 +265,47 @@ export default {
       this.toggleGraph({ids: [this.chartId]})
     },
     addLine () {
-      var tmpLine = JSON.parse(JSON.stringify(this.myLineArr[this.myLineArr.length - 1]))
-      tmpLine.name = this.defaultValues[this.myLineArr.length].name
-      tmpLine.color = this.defaultValues[this.myLineArr.length].color
-      this.myLineArr.push(tmpLine)
-      this.activeIndex = this.myLineArr.length - 1
+      var tmpLine = JSON.parse(JSON.stringify(this.myLineMap.get(this.maxKey)))
+      this.maxKey += 1
+      tmpLine.name = `Line ${this.maxKey + 1}`
+      tmpLine.color = this.colors[this.maxKey % this.colors.length]
+      this.myLineMap.set(this.maxKey, tmpLine)
+      this.refreshLineArr()
+      this.activeIndex = this.lineArr.length - 1
+      this.curLine = {}
+      Object.entries(this.myLineMap.get(this.activeKey))
+        .forEach(x => { this.curLine[x[0]] = x[1] })
       this.updateLines({})
     },
     removeLine (ind) {
-      this.myLineArr.splice(ind, 1)
-      this.activeIndex = (ind < this.myLineArr.length - 1) ? ind : this.myLineArr.length - 1
+      this.myLineMap.delete(this.lineArr[ind])
+      this.refreshLineArr()
+      this.activeIndex = (ind < this.lineArr.length - 1) ? ind : this.lineArr.length - 1
       this.updateLines({})
     },
     changeColor (ind) {
-      this.myLineArr[this.activeIndex].color = this.defaultValues[ind].color
+      this.myLineMap.get(this.activeKey).color = this.colors[ind]
+      this.curLine.color = this.colors[ind]
+      this.refreshLineArr()
       this.updateLines({})
     }
   },
+  watch: {
+    activeKey: function () {
+      this.curLine = {}
+      Object.entries(this.myLineMap.get(this.activeKey))
+        .forEach(x => { this.curLine[x[0]] = x[1] })
+    }
+  },
   computed: {
     ...mapGetters({
       simMap: types.GET_SIM_MAP,
       simArr: types.GET_SIM_ARR,
       chartMap: types.GET_GRAPH_STATE_MAP
     }),
+    activeKey () {
+      return this.lineArr[this.activeIndex].key
+    },
     simNames () {
       var tmpArr = []
       this.simArr.forEach((el) =>
@@ -262,7 +314,7 @@ export default {
       return tmpArr
     },
     mySim () {
-      const tmpArr = this.simArr.filter(id => id === this.myLineArr[this.activeIndex].sim)
+      const tmpArr = this.simArr.filter(id => id === this.curLine.sim)
       if (tmpArr.length === 0) {
         return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x']}}}}
       } else {
@@ -273,82 +325,24 @@ export default {
       return Object.keys(this.mySim.data.prtls)
     },
     prtlQuants () {
-      return this.mySim.data.prtls[this.myLineArr[this.activeIndex].prtl_type].quantities
+      return this.mySim.data.prtls[this.curLine.prtl_type].quantities
     }
   },
   created: function () {
-    this.myLineArr = JSON.parse(JSON.stringify(this.chartMap.get(this.chartId).dataOptions.lineArr))
+    this.myLineMap = new Map()
+
+    this.chartMap.get(this.chartId).dataOptions.lineMap.forEach((val, key) => {
+      this.myLineMap.set(key, JSON.parse(JSON.stringify(val)))
+    })
+    this.refreshLineArr()
+    this.activeIndex = this.lineArr.length - 1
+    this.curLine = {}
+    Object.entries(this.myLineMap.get(this.activeKey))
+      .forEach(x => { this.curLine[x[0]] = x[1] })
     this.normHist = this.chartMap.get(this.chartId).dataOptions.normhist
     this.xlog = this.chartMap.get(this.chartId).dataOptions.xscale === 'log'
     this.Ylog = this.chartMap.get(this.chartId).dataOptions.yscale === 'log'
-    // this.simID = this.chartMap.get(this.chartId).sims[0]
   }
-  /*
-  },
-  props: ['chartId'],
-  methods: {
-    ...mapActions({
-      addSim: types.OPEN_SIMULATION,
-      toggleGraph: types.TOGGLE_UPDATE,
-      updateChartOptions: types.UPDATE_CHART
-    }),
-    updatePlot (payload) {
-      // WE NEED TO ADD SOME HANDLERS FOR CHANGING SIM
-      const tmpObj = {keepView: 'x0x1y0y1'}
-      if (payload.hasOwnProperty('keepView')) {
-        tmpObj.keepView = payload.keepView
-      }
-      if (payload.hasOwnProperty('sim')) {
-        tmpObj.sim = payload.sim
-      }
-      if (payload.hasOwnProperty('key')) {
-        tmpObj.key = payload.key
-        tmpObj.val = this.histOptions[payload.key]
-      }
-      tmpObj.chartID = this.chartId
-      this.updateChartOptions(tmpObj)
-      this.toggleGraph({ids: [this.chartId]})
-    },
-    submitted () {
-      this.isSubmitted = true
-    }
-  },
-  computed: {
-    ...mapGetters({
-      simMap: types.GET_SIM_MAP,
-      simArr: types.GET_SIM_ARR,
-      chartMap: types.GET_GRAPH_STATE_MAP
-    }),
-    mySim () {
-      const tmpArr = this.simArr.filter(id => id === this.simID)
-      if (tmpArr.length === 0) {
-        return {data: {cmaps: ['viridis'], prtls: {ions: {quantities: ['x']}}}}
-      } else {
-        return this.simMap.get(tmpArr[0])
-      }
-    },
-    simNames () {
-      var tmpArr = []
-      this.simArr.forEach((el) =>
-        tmpArr.push(this.simMap.get(el).info.name)
-      )
-      return tmpArr
-    },
-    cmapOpts () {
-      return this.mySim.data.cmaps
-    },
-    prtlTypes () {
-      return Object.keys(this.mySim.data.prtls)
-    },
-    prtlQuants () {
-      return this.mySim.data.prtls['ions'].quantities
-    }
-  },
-  created: function () {
-    this.histOptions = JSON.parse(JSON.stringify(this.chartMap.get(this.chartId).dataOptions))
-    this.simID = this.chartMap.get(this.chartId).sims[0]
-  }
-*/
 }
 </script>
 

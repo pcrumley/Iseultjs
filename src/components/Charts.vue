@@ -14,7 +14,7 @@
              :vertical-compact="true"
              :use-css-transforms="true"
              >
-    <grid-item v-for="item in layout"
+        <grid-item v-for="item in layout"
                v-bind:id="'VueGrid'+item.i"
                :x="item.x"
                :y="item.y"
@@ -30,8 +30,8 @@
         <!--@resized="resizedEvent"-->
         <!--@moved="movedEvent"-->
 
-        <component :is="subplotComponent(parseInt(item.i))" :chartID="parseInt(item.i)"> >
-        </component>
+        <!--<component :is="subplotComponent(parseInt(item.i))" :chartID="parseInt(item.i)"> >
+        </component>-->
         <span v-if="resizeActive" class="clickable close-btn" @click="closeClicked(parseInt(item.i))"> X </span>
     </grid-item>
   </grid-layout>

@@ -50,8 +50,8 @@ export default {
   name: 'OneDimPrtlHist',
   data () {
     return {
-      imgURLSimPart: '',
-      imgURLOptsPart: '',
+      urlArr: [],
+      dataArr: [],
       cmap: '',
       cnormStr: '',
       width: 800,
@@ -126,20 +126,6 @@ export default {
         .range([this.imgY, 0])
         .domain(this.yDomain)
     },
-    histURL () {
-      var tmpStr = this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
-      // add the parts of the lassos
-      if (this.navbarState === 'lasso' && this.mySim.hasOwnProperty('lassos')) {
-        if (this.mySim.lassos.hasOwnProperty(this.myViewState.dataOptions['prtl_type'])) {
-          var curLasso = this.mySim.lassos[this.myViewState.dataOptions['prtl_type']]
-          tmpStr += '&selPolyXval=' + curLasso.xVal
-          tmpStr += '&selPolyYval=' + curLasso.yVal
-          tmpStr += '&selPolyXarr=' + curLasso.x
-          tmpStr += '&selPolyYarr=' + curLasso.y
-        }
-      }
-      return tmpStr
-    },
     showZoomRect () {
       return this.myMouseIsDown && this.navbarState === 'zoom-in'
     },
@@ -169,11 +155,20 @@ export default {
   },
   watch: {
     simUpdated: function (newSimArr) {
-      this.linesMap.forEach((line, lineObj) => {
-        if (newSimArr.includes(lineObj.simID)) {
-          lineObj.sim = JSON.parse(JSON.stringify(this.simMap.get(lineObj.nextSimID)))
+      var i
+      var needsUpdate = false
+      for (i = 0; i < this.myViewState.dataOptions.lineArr.length; i++) {
+        if (newSimArr.includes(this.myViewState.dataOptions.lineArr[i].sim)) {
+          needsUpdate = true
+          break
         }
-      })
+      }
+      if (needsUpdate) {
+        this.urlArr = this.myViewState.dataOptions.lineArr
+          .map((x) => this.renderHistURL(x))
+          // .filter(d => !(this.urlArr.includes(d)))
+          .filter(d => true)
+      }
     },
     chartsUpdated: function (newChartArr) {
       if (newChartArr.includes(this.chartID)) {
@@ -183,26 +178,14 @@ export default {
         if (this.height !== this.myViewState.renderOptions.tot_height) {
           this.height = this.myViewState.renderOptions.tot_height
         }
-        this.renderImgURLOptsPart()
-        const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
-        this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
-        this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
-        this.cbarLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
-        this.cbarScaleType = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
+        this.urlArr = this.myViewState.dataOptions.lineArr
+          .map((x) => this.renderHistURL(x))
+          // .filter(d => !(this.urlArr.includes(d)))
+          .filter(d => true)
       }
     },
-    histURL (newURL) {
-      // if (this.imgURLOptsPart !== '') {
-      //  if (this.cache.has(this.mySim.i)) {
-      //    if (this.cache.get(this.mySim.i).url === newURL) {
-      //      this.updatePlot()
-      //    } else {
-      //      this.getImg()
-      //    }
-      //  } else {
-      //    this.getImg()
-      //  }
-      // }
+    urlArr: function () {
+      this.getData()
     }
   },
   methods: {
@@ -211,12 +194,31 @@ export default {
       setView: types.SET_CUR_VIEW,
       setLasso: types.SET_LASSO_REGION
     }),
-    renderImgURLSimPart: function () {
-      this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
-        'sim_type=' + this.mySim.info.simType +
-        '&outdir=' + this.mySim.info.outdir.replace(/\//g, '%2F') +
-        '&n=' + this.mySim.data.fileArray[this.mySim.i] +
-        '&i=' + this.mySim.i
+    renderHistURL: function (lineObj) {
+      var mySim = this.simMap.get(lineObj.sim)
+      var tmpURL = mySim.info.serverURL + '/api/1dhist/?' +
+        'sim_type=' + mySim.info.simType +
+        '&outdir=' + mySim.info.outdir.replace(/\//g, '%2F') +
+        '&n=' + mySim.data.fileArray[mySim.i] +
+        '&i=' + mySim.i +
+        '&xval=' + lineObj.xval +
+        '&xvalmin=' + lineObj.xvalmin +
+        '&xvalmax=' + lineObj.xvalmax +
+        '&xbins=' + lineObj.xbins +
+        '&weights=' + lineObj.weights +
+        '&prtl_type=' + lineObj.prtl_type
+
+      // add the parts of the lassos
+      if (this.navbarState === 'lasso' && this.mySim.hasOwnProperty('lassos')) {
+        if (this.mySim.lassos.hasOwnProperty(this.myViewState.dataOptions['prtl_type'])) {
+          var curLasso = this.mySim.lassos[this.myViewState.dataOptions['prtl_type']]
+          tmpURL += '&selPolyXval=' + curLasso.xVal
+          tmpURL += '&selPolyYval=' + curLasso.yVal
+          tmpURL += '&selPolyXarr=' + curLasso.x
+          tmpURL += '&selPolyYarr=' + curLasso.y
+        }
+      }
+      return tmpURL
     },
     updatePlot: function () {
       this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
@@ -224,18 +226,6 @@ export default {
       this.yDomain = this.cache.get(this.mySim.i).yDomain
       this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
       this.didIUpdate *= -1
-    },
-    renderImgURLOptsPart: function () {
-      var i
-      this.imgURLOptsPart = '&'
-      for (i = 0; i < this.dataOptions.length; i++) {
-        this.imgURLOptsPart += this.dataOptions[i] + '=' + this.myViewState.dataOptions[this.dataOptions[i]] + '&'
-      }
-      this.imgURLOptsPart += 'xmin=' + this.myViewState.curView[0] + '&'
-      this.imgURLOptsPart += 'xmax=' + this.myViewState.curView[1] + '&'
-      this.imgURLOptsPart += 'ymin=' + this.myViewState.curView[2] + '&'
-      this.imgURLOptsPart += 'ymax=' + this.myViewState.curView[3] + '&'
-      return this.imgURLOptsPart
     },
     mouseIsDown (event) {
       if (this.navbarState === 'zoom-in' || this.navbarState === 'pan') {
@@ -336,11 +326,15 @@ export default {
       }
       this.myMouseIsDown = false
     },
-    getImg: // _.debounce(
+    getData: // _.debounce(
       function () {
         var vm = this
-        axios.get(vm.imgURL)
-          .then(function (response) {
+        vm.urlArr.forEach((url, ind) =>
+          axios.get(url)
+            .then(function (response) {
+              vm.dataArr[ind] = response.data
+              console.log(vm.dataArr)
+            /*
             vm.cache.set(response.data.i, {
               mainImgObj: {
                 imgX: response.data.imgX,
@@ -351,40 +345,22 @@ export default {
               xDomain: [response.data.xmin, response.data.xmax],
               yDomain: [response.data.ymin, response.data.ymax],
               cbarDomain: [response.data.vmin, response.data.vmax]
+
             })
             // vm.getColorBar()
             vm.cache.get(response.data.i).url = response.data.url
             vm.updatePlot()
-          })
-          .catch(function (error) {
+            */
+            })
+            .catch(function (error) {
             // vm.imgString = ''
-            console.log(error)
-          })
-      }, // ,
-    //  20
-    // ),
-    getColorBar () {
-      var vm = this
-      axios.get(vm.cbarURL)
-        .then(function (response) {
-          if (vm.cbarURL === response.data.url) {
-            vm.cbarPNG = response.data.cbarString
-          }
-        })
-        .catch(function (error) {
-          vm.cbarPNG = ''
-          console.log(error)
-        })
-    }
+              console.log(error)
+            })
+        )
+      }
   },
   mounted: function () {
-    this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
-
-    const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
-    this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
-    this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
-    this.cbarLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
-    // this.renderImgURLSimPart()
+    this.urlArr = this.myViewState.dataOptions.lineArr.map((lineObj) => this.renderHistURL(lineObj))
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
       var pHeight = pStyle.slice(pStyle.search(/height/g))

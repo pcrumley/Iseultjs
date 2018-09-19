@@ -57,7 +57,7 @@ const state = {
     ylabel: '\\gamma_i\\beta_{i,x}',
     xlabel: 'x\\ [c/\\omega_{pe}]',
     dataOptions: {
-      lineArr: [
+      lineMap: new Map([[0,
         { name: 'Line 1',
           color: '#4e79a7',
           prtl_type: 'ions',
@@ -68,7 +68,7 @@ const state = {
           xvalmin: '',
           xvalmax: ''
         }
-      ],
+      ]]),
       normhist: true,
       xscale: 'linear'
     },
@@ -168,13 +168,25 @@ const mutations = {
     } else if (payload.chartType === '1D Prtl Histogram') {
       state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
-      state.graphViewStateMap.get(payload.chartID).dataOptions.lineArr[0].sim = payload.simID
+      // Map isn't deep copied correctly. Hack to fix
+      state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap = new Map()
+      state.oneD_PRTL_HIST.dataOptions.lineMap.forEach((val, key) => {
+        state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.set(key, JSON.parse(JSON.stringify(val)))
+      })
+      state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.get(0).sim = payload.simID
     }
   },
   [types.MUTATE_CHART_OPT]: (state, payload) => {
     const tmpChartObj = state.graphViewStateMap.get(payload.chartID)
     if (payload.key != null) {
-      tmpChartObj.dataOptions[payload.key] = payload.val
+      if (payload.key === 'lineMap') {
+        tmpChartObj.dataOptions.lineMap.clear()
+        payload.val.forEach((val, key) => {
+          tmpChartObj.dataOptions.lineMap.set(key, JSON.parse(JSON.stringify(val)))
+        })
+      } else {
+        tmpChartObj.dataOptions[payload.key] = payload.val
+      }
     }
     if (payload.sim != null) {
       tmpChartObj.sims = [payload.sim]
@@ -225,8 +237,13 @@ const mutations = {
         state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
       } else if (payload.chartType === '1D Prtl Histogram') {
         state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
+        // Map isn't deep copied correctly. Hack to fix
+        state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap = new Map()
+        state.oneD_PRTL_HIST.dataOptions.lineMap.forEach((val, key) => {
+          state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.set(key, JSON.parse(JSON.stringify(val)))
+        })
         state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
-        state.graphViewStateMap.get(payload.chartID).dataOptions.lineArr[0].sim = payload.simID
+        state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.get(0).sim = payload.simID
       }
     } else {
       state.chartArr.push(state.nextChartID)
