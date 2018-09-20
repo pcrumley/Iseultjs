@@ -4,28 +4,27 @@
   <svg :id="svgID" :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
-    <!--
     <iseult-axis :orient="'axisBottom'"
                 :scale="xScale"
                 :height="imgY"
                 :width="imgX"
                 :margin="margin">
     </iseult-axis>
-    -->
+
     <!--  objects that appear from interaction with the plot-->
     <rect v-if="showZoomRect" :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
     <path v-if="showPolygon" :d="pathString" fill-opacity =".3" style="fill:#d5d8dc ;stroke-width:2px;stroke:rgb(0,0,0);" />
     <path v-if="closePolygon" :d="closeString" stroke-dasharray="3,3" style="stroke-width:2px;stroke:rgb(0,0,0);" />
 
     <!-- The y-axis -->
-    <!--
+
     <iseult-axis :orient="'axisLeft'"
                  :scale="yScale"
                  :height="imgY"
                  :width="imgX"
                  :margin="margin">
     </iseult-axis>
-    -->
+
     <!-- border of plot-->
     <rect :x="margin.left" :y ="margin.top" :width = "imgX" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
   </svg>
@@ -33,6 +32,7 @@
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   -->
+  <!--<div>{{ lineCache }}</div>-->
 </div>
 </template>
 
@@ -50,8 +50,9 @@ export default {
   name: 'OneDimPrtlHist',
   data () {
     return {
-      urlArr: [],
-      dataArr: [],
+      lineCache: new Map(),
+      needsUpdateKeys: [],
+      numOfChartsWithData: 0,
       cmap: '',
       cnormStr: '',
       width: 800,
@@ -155,20 +156,10 @@ export default {
   },
   watch: {
     simUpdated: function (newSimArr) {
-      var i
-      var needsUpdate = false
-      for (i = 0; i < this.myViewState.dataOptions.lineArr.length; i++) {
-        if (newSimArr.includes(this.myViewState.dataOptions.lineArr[i].sim)) {
-          needsUpdate = true
-          break
-        }
-      }
-      if (needsUpdate) {
-        this.urlArr = this.myViewState.dataOptions.lineArr
-          .map((x) => this.renderHistURL(x))
-          // .filter(d => !(this.urlArr.includes(d)))
-          .filter(d => true)
-      }
+      this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
+        this.lineCache.set(key, {url: this.renderHistURL(val), data: {}})
+      })
+      this.getData()
     },
     chartsUpdated: function (newChartArr) {
       if (newChartArr.includes(this.chartID)) {
@@ -178,14 +169,16 @@ export default {
         if (this.height !== this.myViewState.renderOptions.tot_height) {
           this.height = this.myViewState.renderOptions.tot_height
         }
-        this.urlArr = this.myViewState.dataOptions.lineArr
-          .map((x) => this.renderHistURL(x))
-          // .filter(d => !(this.urlArr.includes(d)))
-          .filter(d => true)
+        this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
+          this.lineCache.set(key, {url: this.renderHistURL(val), data: {}})
+        })
+        this.getData()
       }
     },
-    urlArr: function () {
-      this.getData()
+    numOfChartsWithData: function () {
+      if (this.numOfChartsWithData === this.lineCache.size) {
+        this.updatePlot()
+      }
     }
   },
   methods: {
@@ -221,11 +214,28 @@ export default {
       return tmpURL
     },
     updatePlot: function () {
-      this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
-      this.xDomain = this.cache.get(this.mySim.i).xDomain
-      this.yDomain = this.cache.get(this.mySim.i).yDomain
-      this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
-      this.didIUpdate *= -1
+      var xmin = NaN
+      var xmax = NaN
+      var ymin = NaN
+      var ymax = NaN
+      this.lineCache.forEach(line => {
+        if (isNaN(xmin)) {
+          xmin = line.data.xmin
+          xmax = line.data.xmax
+          ymin = line.data.vmin
+          ymax = line.data.vmax
+        } else {
+          xmin = Math.min(xmin, line.data.xmin)
+          xmax = Math.max(xmax, line.data.xmax)
+          ymin = Math.min(ymin, line.data.vmin)
+          ymax = Math.max(ymax, line.data.vmax)
+        }
+      })
+      // this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
+      this.xDomain = [xmin, xmax]
+      this.yDomain = [ymin, ymax]
+      // this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
+      // this.didIUpdate *= -1
     },
     mouseIsDown (event) {
       if (this.navbarState === 'zoom-in' || this.navbarState === 'pan') {
@@ -329,11 +339,12 @@ export default {
     getData: // _.debounce(
       function () {
         var vm = this
-        vm.urlArr.forEach((url, ind) =>
-          axios.get(url)
+        vm.numOfChartsWithData = 0
+        vm.lineCache.forEach((obj, key) =>
+          axios.get(obj.url)
             .then(function (response) {
-              vm.dataArr[ind] = response.data
-              console.log(vm.dataArr)
+              obj.data = response.data
+              vm.numOfChartsWithData += 1
             /*
             vm.cache.set(response.data.i, {
               mainImgObj: {
@@ -360,7 +371,10 @@ export default {
       }
   },
   mounted: function () {
-    this.urlArr = this.myViewState.dataOptions.lineArr.map((lineObj) => this.renderHistURL(lineObj))
+    this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
+      this.lineCache.set(key, {url: this.renderHistURL(val), data: {}})
+    })
+    // this.getData()
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
       var pHeight = pStyle.slice(pStyle.search(/height/g))

@@ -265,7 +265,7 @@ export default {
       this.toggleGraph({ids: [this.chartId]})
     },
     addLine () {
-      var tmpLine = JSON.parse(JSON.stringify(this.myLineMap.get(this.maxKey)))
+      var tmpLine = JSON.parse(JSON.stringify(this.myLineMap.get(this.myLineMap.keys().next().value)))
       this.maxKey += 1
       tmpLine.name = `Line ${this.maxKey + 1}`
       tmpLine.color = this.colors[this.maxKey % this.colors.length]
@@ -278,9 +278,12 @@ export default {
       this.updateLines({})
     },
     removeLine (ind) {
-      this.myLineMap.delete(this.lineArr[ind])
+      this.myLineMap.delete(this.activeKey)
       this.refreshLineArr()
       this.activeIndex = (ind < this.lineArr.length - 1) ? ind : this.lineArr.length - 1
+      this.curLine = {}
+      Object.entries(this.myLineMap.get(this.lineArr[this.activeIndex].key))
+        .forEach(x => { this.curLine[x[0]] = x[1] })
       this.updateLines({})
     },
     changeColor (ind) {
@@ -329,8 +332,6 @@ export default {
     }
   },
   created: function () {
-    this.myLineMap = new Map()
-
     this.chartMap.get(this.chartId).dataOptions.lineMap.forEach((val, key) => {
       this.myLineMap.set(key, JSON.parse(JSON.stringify(val)))
     })
