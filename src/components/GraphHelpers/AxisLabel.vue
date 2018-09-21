@@ -1,7 +1,8 @@
 <template>
   <div class="outer" :style="outerStyleObj">
     <div class="inner" :class="orient">
-      <katex :mathstr="text"/>
+      <katex v-if="useTex" :mathstr="text"/>
+      <span v-if="!useTex">{{text}}</span>
     </div>
   </div>
 </template>
@@ -15,7 +16,8 @@ export default {
     'text',
     'figWidth',
     'figHeight',
-    'figMargin'
+    'figMargin',
+    'useTex'
   ],
   computed: {
     outerStyleObj () {
@@ -50,8 +52,9 @@ export default {
 </script>
 <style scoped>
 div {
-  font: 24px Avenir;
-
+  /*font: 24px Avenir;*/
+  font:18px Avenir;
+  white-space:nowrap;
 }
 div.outer{
   position: absolute;

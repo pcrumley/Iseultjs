@@ -15,6 +15,13 @@
     <rect v-if="showZoomRect" :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
     <path v-if="showPolygon" :d="pathString" fill-opacity =".3" style="fill:#d5d8dc ;stroke-width:2px;stroke:rgb(0,0,0);" />
     <path v-if="closePolygon" :d="closeString" stroke-dasharray="3,3" style="stroke-width:2px;stroke:rgb(0,0,0);" />
+    <path v-for="(item, index) in lineArr"
+    :d=item.path
+    :key=index
+    :style="{strokeWidth:'2px',
+     stroke:item.color,
+     fill:'none'}"
+    :transform='axisTransform'/>
 
     <!-- The y-axis -->
 
@@ -28,8 +35,9 @@
     <!-- border of plot-->
     <rect :x="margin.left" :y ="margin.top" :width = "imgX" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
   </svg>
+
+  <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="false"/>
   <!--
-  <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin"/>
   -->
   <!--<div>{{ lineCache }}</div>-->
@@ -52,12 +60,13 @@ export default {
     return {
       lineCache: new Map(),
       needsUpdateKeys: [],
+      lineArr: [],
       numOfChartsWithData: 0,
       cmap: '',
       cnormStr: '',
       width: 800,
       height: 400,
-      yLabel: '',
+      yLabel: '# of particles',
       xLabel: '',
       rectX1: 0,
       mySim: '',
@@ -139,6 +148,12 @@ export default {
         Math.pow(parseFloat(pathArr[1]) - parseFloat(pathArr.slice(-1)[0]), 2)
       return (Math.sqrt(radius) < 50 && this.showPolygon)
     },
+    axisTransform () {
+      // var x = this.orient === 'axisRight' ? this.width + this.margin.left + this.margin.hspace : this.margin.left
+      // var y = this.orient === 'axisBottom' ? this.height + this.margin.top : this.margin.top
+      var y = this.margin.top
+      return 'translate(' + this.margin.left + ',' + y + ')'
+    },
     closeString () {
       if (this.closePolygon) {
         var pathArr = this.pathString.split(' ')
@@ -172,12 +187,25 @@ export default {
         this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
           this.lineCache.set(key, {url: this.renderHistURL(val), data: {}})
         })
+        this.lineCache.forEach((val, key) => {
+          if (!this.graphMap.get(this.chartID).dataOptions.lineMap.has(key)) {
+            this.lineCache.delete(key)
+          }
+        })
         this.getData()
       }
     },
     numOfChartsWithData: function () {
       if (this.numOfChartsWithData === this.lineCache.size) {
         this.updatePlot()
+        this.lineArr = []
+        this.lineCache.forEach((val, key) => {
+          this.maxKey = Math.max(key, this.maxKey)
+          this.lineArr.push({
+            color: this.graphMap.get(this.chartID).dataOptions.lineMap.get(key).color,
+            path: this.drawLine(val.data.histData)
+          })
+        })
       }
     }
   },
@@ -187,8 +215,12 @@ export default {
       setView: types.SET_CUR_VIEW,
       setLasso: types.SET_LASSO_REGION
     }),
+    drawLine: function (data) {
+      return d3.line().x(d => this.xScale(d.x)).y(d => this.yScale(d.y))(data)
+    },
     renderHistURL: function (lineObj) {
       var mySim = this.simMap.get(lineObj.sim)
+      console.log(mySim)
       var tmpURL = mySim.info.serverURL + '/api/1dhist/?' +
         'sim_type=' + mySim.info.simType +
         '&outdir=' + mySim.info.outdir.replace(/\//g, '%2F') +
@@ -202,9 +234,10 @@ export default {
         '&prtl_type=' + lineObj.prtl_type
 
       // add the parts of the lassos
-      if (this.navbarState === 'lasso' && this.mySim.hasOwnProperty('lassos')) {
-        if (this.mySim.lassos.hasOwnProperty(this.myViewState.dataOptions['prtl_type'])) {
-          var curLasso = this.mySim.lassos[this.myViewState.dataOptions['prtl_type']]
+      if (this.navbarState === 'lasso' && mySim.hasOwnProperty('lassos')) {
+        if (mySim.lassos.hasOwnProperty(lineObj.prtl_type)) {
+          var curLasso = mySim.lassos[lineObj.prtl_type]
+          console.log('hi')
           tmpURL += '&selPolyXval=' + curLasso.xVal
           tmpURL += '&selPolyYval=' + curLasso.yVal
           tmpURL += '&selPolyXarr=' + curLasso.x
@@ -233,7 +266,7 @@ export default {
       })
       // this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
       this.xDomain = [xmin, xmax]
-      this.yDomain = [ymin, ymax]
+      this.yDomain = [0, 1.1 * ymax]
       // this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
       // this.didIUpdate *= -1
     },
