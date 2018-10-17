@@ -1,6 +1,9 @@
 <template>
   <div class="absolute" :style="{ width:width+'px', height:height+'px' }" @mousedown="mouseIsDown" @mousemove="mouseIsMoving" @mouseup="mouseIsUp" @mouseleave="mouseLeft">
-  <!-- The div will hold 1 figure with 2 axis objects, & 2 labels -->
+    <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
+      three labels -->
+  <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
+  <iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>
   <svg :id="svgID" :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
@@ -10,21 +13,11 @@
                 :width="imgX"
                 :margin="margin">
     </iseult-axis>
-
-    <!--  objects that appear from interaction with the plot-->
     <rect v-if="showZoomRect" :x = "rectObj.left" :y = "rectObj.top" :width="rectObj.width" :height="rectObj.height" fill-opacity =".4" style="fill:#d5d8dc ;stroke-width:1px;stroke:rgb(0,0,0);" />
     <path v-if="showPolygon" :d="pathString" fill-opacity =".3" style="fill:#d5d8dc ;stroke-width:2px;stroke:rgb(0,0,0);" />
     <path v-if="closePolygon" :d="closeString" stroke-dasharray="3,3" style="stroke-width:2px;stroke:rgb(0,0,0);" />
-    <path v-for="(item, index) in lineArr"
-    :d=item.path
-    :key=index
-    :style="{strokeWidth:'2px',
-     stroke:item.color,
-     fill:'none'}"
-    :transform='axisTransform'/>
 
     <!-- The y-axis -->
-
     <iseult-axis :orient="'axisLeft'"
                  :scale="yScale"
                  :height="imgY"
@@ -32,14 +25,19 @@
                  :margin="margin">
     </iseult-axis>
 
-    <!-- border of plot-->
+    <!-- The colorbar-axis -->
+    <iseult-axis :orient="'axisRight'"
+                 :scale="cbarScale"
+                 :height="imgY"
+                 :width="imgX"
+                 :margin="margin">
+    </iseult-axis>
     <rect :x="margin.left" :y ="margin.top" :width = "imgX" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
+    <rect :x="imgX + margin.left + margin.hspace - cbarWidth" :y ="margin.top" :width = "cbarWidth" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
   </svg>
-
-  <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="false"/>
+  <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
-
-  <!--<div>{{ lineCache }}</div>-->
+  <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
 </div>
 </template>
 
@@ -48,24 +46,23 @@ import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/store/types'
 import axios from 'axios'
 import * as d3 from 'd3'
+import ImageCanvas from '@/components/GraphHelpers/ImageCanvas.vue'
 import iseultAxis from '@/components/GraphHelpers/IseultAxis.vue'
 import axisLabel from '@/components/GraphHelpers/AxisLabel.vue'
 
 // import _ from 'lodash'
 
 export default {
-  name: 'OneDimPrtlHist',
+  name: 'TwoDimPrtlMom',
   data () {
     return {
-      lineCache: new Map(),
-      needsUpdateKeys: [],
-      lineArr: [],
-      numOfChartsWithData: 0,
+      imgURLSimPart: '',
+      imgURLOptsPart: '',
       cmap: '',
       cnormStr: '',
       width: 800,
       height: 400,
-      yLabel: '# of particles',
+      yLabel: '',
       xLabel: '',
       rectX1: 0,
       mySim: '',
@@ -77,8 +74,13 @@ export default {
       mainImgObj: {},
       xDomain: [],
       yDomain: [],
-      cbarLabel: '',
+      cbarDomain: [],
+      cbarScaleType: 'scaleLog',
+      cbarImgObj: {},
+      histLabel: '',
       cbarWidth: 20,
+      cbarPNG: '',
+      cache: new Map(),
       didIUpdate: 1,
       margin: {
         top: 20,
@@ -125,6 +127,18 @@ export default {
     imgY () {
       return this.height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
     },
+    cbarLeft () {
+      return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
+    },
+    cbarObj () {
+      return {
+        imgX: this.cbarWidth,
+        imgY: this.imgY,
+        left: this.width - this.margin.right - this.cbarWidth,
+        top: this.margin.top,
+        imgData: this.cbarPNG
+      }
+    },
     xScale () {
       return d3['scaleLinear']()
         .range([0, this.imgX])
@@ -134,6 +148,35 @@ export default {
       return d3['scaleLinear']()
         .range([this.imgY, 0])
         .domain(this.yDomain)
+    },
+    cbarScale () {
+      return d3[this.cbarScaleType]()
+        .range([this.imgY, 0])
+        .domain(this.cbarDomain)
+    },
+    cbarURL () {
+      var tmpStr = ''
+      if (this.mySim.hasOwnProperty('info')) {
+        tmpStr += this.mySim.info.serverURL + '/api/colorbar/' +
+        '?px=' + this.myViewState.renderOptions.cbarWidth +
+        '&py=' + this.imgY +
+        '&cmap=' + this.cmap
+      }
+      return tmpStr + this.cnormStr
+    },
+    imgURL () {
+      var tmpStr = this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
+      // add the parts of the lassos
+      if (this.navbarState === 'lasso' && this.mySim.hasOwnProperty('lassos')) {
+        if (this.mySim.lassos.hasOwnProperty(this.myViewState.dataOptions['prtl_type'])) {
+          var curLasso = this.mySim.lassos[this.myViewState.dataOptions['prtl_type']]
+          tmpStr += '&selPolyXval=' + curLasso.xVal
+          tmpStr += '&selPolyYval=' + curLasso.yVal
+          tmpStr += '&selPolyXarr=' + curLasso.x
+          tmpStr += '&selPolyYarr=' + curLasso.y
+        }
+      }
+      return tmpStr
     },
     showZoomRect () {
       return this.myMouseIsDown && this.navbarState === 'zoom-in'
@@ -146,12 +189,6 @@ export default {
       var radius = Math.pow(parseFloat(pathArr[0]) - parseFloat(pathArr.slice(-2)[0]), 2) +
         Math.pow(parseFloat(pathArr[1]) - parseFloat(pathArr.slice(-1)[0]), 2)
       return (Math.sqrt(radius) < 50 && this.showPolygon)
-    },
-    axisTransform () {
-      // var x = this.orient === 'axisRight' ? this.width + this.margin.left + this.margin.hspace : this.margin.left
-      // var y = this.orient === 'axisBottom' ? this.height + this.margin.top : this.margin.top
-      var y = this.margin.top
-      return 'translate(' + this.margin.left + ',' + y + ')'
     },
     closeString () {
       if (this.closePolygon) {
@@ -170,10 +207,13 @@ export default {
   },
   watch: {
     simUpdated: function (newSimArr) {
-      this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
-        this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, label: this.getLabel(val)})
-      })
-      this.getData()
+      if (newSimArr.includes(this.myViewState.sims[0])) {
+        this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
+        this.renderImgURLSimPart()
+      }
+    },
+    cbarURL: function () {
+      this.getColorBar()
     },
     chartsUpdated: function (newChartArr) {
       if (newChartArr.includes(this.chartID)) {
@@ -183,28 +223,25 @@ export default {
         if (this.height !== this.myViewState.renderOptions.tot_height) {
           this.height = this.myViewState.renderOptions.tot_height
         }
-        this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
-          this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, label: this.getLabel(val)})
-        })
-        this.lineCache.forEach((val, key) => {
-          if (!this.graphMap.get(this.chartID).dataOptions.lineMap.has(key)) {
-            this.lineCache.delete(key)
-          }
-        })
-        this.getData()
+        this.renderImgURLOptsPart()
+        const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
+        this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
+        this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
+        this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+        this.cbarScaleType = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
       }
     },
-    numOfChartsWithData: function () {
-      if (this.numOfChartsWithData === this.lineCache.size) {
-        this.updatePlot()
-        this.lineArr = []
-        this.lineCache.forEach((val, key) => {
-          this.maxKey = Math.max(key, this.maxKey)
-          this.lineArr.push({
-            color: this.graphMap.get(this.chartID).dataOptions.lineMap.get(key).color,
-            path: this.drawLine(val.data.lineData)
-          })
-        })
+    imgURL (newURL) {
+      if (this.imgURLOptsPart !== '') {
+        if (this.cache.has(this.mySim.i)) {
+          if (this.cache.get(this.mySim.i).url === newURL) {
+            this.updatePlot()
+          } else {
+            this.getImg()
+          }
+        } else {
+          this.getImg()
+        }
       }
     }
   },
@@ -214,65 +251,40 @@ export default {
       setView: types.SET_CUR_VIEW,
       setLasso: types.SET_LASSO_REGION
     }),
-    drawLine: function (data) {
-      return d3.line().x(d => this.xScale(d.x)).y(d => this.yScale(d.y))(data)
-    },
-    renderHistURL: function (lineObj) {
-      var mySim = this.simMap.get(lineObj.sim)
-      var tmpURL = mySim.info.serverURL + '/api/1dhist/?' +
-        'sim_type=' + mySim.info.simType +
-        '&outdir=' + mySim.info.outdir.replace(/\//g, '%2F') +
-        '&n=' + mySim.data.fileArray[mySim.i] +
-        '&i=' + mySim.i +
-        '&xval=' + lineObj.xval +
-        '&xvalmin=' + lineObj.xvalmin +
-        '&xvalmax=' + lineObj.xvalmax +
-        '&xbins=' + lineObj.xbins +
-        '&weights=' + lineObj.weights +
-        '&prtl_type=' + lineObj.prtl_type
-
-      // add the parts of the lassos
-      if (this.navbarState === 'lasso' && mySim.hasOwnProperty('lassos')) {
-        if (mySim.lassos.hasOwnProperty(lineObj.prtl_type)) {
-          var curLasso = mySim.lassos[lineObj.prtl_type]
-          tmpURL += '&selPolyXval=' + curLasso.xVal
-          tmpURL += '&selPolyYval=' + curLasso.yVal
-          tmpURL += '&selPolyXarr=' + curLasso.x
-          tmpURL += '&selPolyYarr=' + curLasso.y
-        }
-      }
-      return tmpURL
-    },
-    getLabel: function (lineObj) {
-      var mySim = this.simMap.get(lineObj.sim)
-      return mySim.data.prtls[lineObj.prtl_type]
-        .oneDLabels[mySim.data['prtls'][lineObj.prtl_type].quantities.indexOf(lineObj.xval)]
+    renderImgURLSimPart: function () {
+      this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dmom/imgs/?' +
+        'sim_type=' + this.mySim.info.simType +
+        '&outdir=' + this.mySim.info.outdir.replace(/\//g, '%2F') +
+        '&n=' + this.mySim.data.fileArray[this.mySim.i] +
+        '&i=' + this.mySim.i
     },
     updatePlot: function () {
-      var xmin = NaN
-      var xmax = NaN
-      var ymin = NaN
-      var ymax = NaN
-      this.lineCache.forEach(line => {
-        if (isNaN(xmin)) {
-          xmin = line.data.xmin
-          xmax = line.data.xmax
-          ymin = line.data.vmin
-          ymax = line.data.vmax
-        } else {
-          xmin = Math.min(xmin, line.data.xmin)
-          xmax = Math.max(xmax, line.data.xmax)
-          ymin = Math.min(ymin, line.data.vmin)
-          ymax = Math.max(ymax, line.data.vmax)
-        }
-      })
-      var iter = this.lineCache.entries()
-      this.xLabel = iter.next().value[1].label
-      // this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
-      this.xDomain = [xmin, xmax]
-      this.yDomain = [0, 1.1 * ymax]
-      // this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
-      // this.didIUpdate *= -1
+      this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
+      this.xDomain = this.cache.get(this.mySim.i).xDomain
+      this.yDomain = this.cache.get(this.mySim.i).yDomain
+      this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
+      this.didIUpdate *= -1
+    },
+    renderImgURLOptsPart: function () {
+      if (this.myViewState.dataOptions.cmap !== this.cmap) {
+        this.cmap = this.myViewState.dataOptions.cmap
+      }
+      var tmpcnormStr = '&cnorm=' + this.myViewState.dataOptions['cnorm'] +
+        '&pow_zero=' + this.myViewState.dataOptions['pow_zero'] +
+        '&pow_gamma=' + this.myViewState.dataOptions['pow_gamma']
+      if (tmpcnormStr !== this.cnormStr) {
+        this.cnormStr = tmpcnormStr
+      }
+      var i
+      this.imgURLOptsPart = '&'
+      for (i = 0; i < this.dataOptions.length; i++) {
+        this.imgURLOptsPart += this.dataOptions[i] + '=' + this.myViewState.dataOptions[this.dataOptions[i]] + '&'
+      }
+      this.imgURLOptsPart += 'xmin=' + this.myViewState.curView[0] + '&'
+      this.imgURLOptsPart += 'xmax=' + this.myViewState.curView[1] + '&'
+      this.imgURLOptsPart += 'ymin=' + this.myViewState.curView[2] + '&'
+      this.imgURLOptsPart += 'ymax=' + this.myViewState.curView[3] + '&'
+      return this.imgURLOptsPart
     },
     mouseIsDown (event) {
       if (this.navbarState === 'zoom-in' || this.navbarState === 'pan') {
@@ -338,6 +350,8 @@ export default {
         } else if (this.navbarState === 'pan') {
           var delX = this.xScale.invert(this.rectX2 - this.margin.left) - this.xScale.invert(this.rectX1 - this.margin.left)
           var delY = this.yScale.invert(this.rectY2 - this.margin.top) - this.yScale.invert(this.rectY1 - this.margin.top)
+          // console.log(this.xDomain)
+          // console.log(this.yDomain)
           this.setView({id: this.chartID,
             view: [this.xDomain[0] - delX, this.xDomain[1] - delX, this.yDomain[0] - delY, this.yDomain[1] - delY]})
         } else if (this.navbarState === 'lasso' && this.closePolygon) {
@@ -371,28 +385,55 @@ export default {
       }
       this.myMouseIsDown = false
     },
-    getData: // _.debounce(
+    getImg: // _.debounce(
       function () {
         var vm = this
-        vm.numOfChartsWithData = 0
-        vm.lineCache.forEach((obj, key) =>
-          axios.get(obj.url)
-            .then(function (response) {
-              obj.data = response.data
-              vm.numOfChartsWithData += 1
+        axios.get(vm.imgURL)
+          .then(function (response) {
+            vm.cache.set(response.data.i, {
+              mainImgObj: {
+                imgX: response.data.imgX,
+                imgY: response.data.imgY,
+                left: vm.margin.left,
+                top: vm.margin.top,
+                imgData: response.data.imgString},
+              xDomain: [response.data.xmin, response.data.xmax],
+              yDomain: [response.data.ymin, response.data.ymax],
+              cbarDomain: [response.data.vmin, response.data.vmax]
             })
-            .catch(function (error) {
+            // vm.getColorBar()
+            vm.cache.get(response.data.i).url = response.data.url
+            vm.updatePlot()
+          })
+          .catch(function (error) {
             // vm.imgString = ''
-              console.log(error)
-            })
-        )
-      }
+            console.log(error)
+          })
+      }, // ,
+    //  20
+    // ),
+    getColorBar () {
+      var vm = this
+      axios.get(vm.cbarURL)
+        .then(function (response) {
+          if (vm.cbarURL === response.data.url) {
+            vm.cbarPNG = response.data.cbarString
+          }
+        })
+        .catch(function (error) {
+          vm.cbarPNG = ''
+          console.log(error)
+        })
+    }
   },
   mounted: function () {
-    this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
-      this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, label: this.getLabel(val)})
-    })
-    // this.getData()
+    this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
+
+    const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
+    this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
+    this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
+    this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
+    this.renderImgURLSimPart()
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
       var pHeight = pStyle.slice(pStyle.search(/height/g))
@@ -405,6 +446,7 @@ export default {
     })
   },
   components: {
+    'iseultImageCanvas': ImageCanvas,
     iseultAxis,
     axisLabel
   }

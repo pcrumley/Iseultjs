@@ -23,6 +23,8 @@ import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faMinus from '@fortawesome/fontawesome-free-solid/faMinus'
 import prtlHistForm from '@/components/PrtlHists/PrtlHistForm'
 import prtlHistForm1D from '@/components/PrtlHists/PrtlHistForm1D'
+import prtlMomForm1D from '@/components/PrtlHists/PrtlMomentsForm1D'
+import prtlMomForm2D from '@/components/PrtlHists/PrtlMoment2DForm'
 
 export default {
   data () {
@@ -50,6 +52,10 @@ export default {
         return prtlHistForm
       } else if (this.chartMap.get(this.chartID)['chartType'] === '1D Prtl Histogram') {
         return prtlHistForm1D
+      } else if (this.chartMap.get(this.chartID)['chartType'] === '1D Prtl Moments') {
+        return prtlMomForm1D
+      } else if (this.chartMap.get(this.chartID)['chartType'] === '2D Prtl Moments') {
+        return prtlMomForm2D
       }
     },
 

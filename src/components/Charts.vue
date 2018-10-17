@@ -43,6 +43,8 @@
 <script>
 import PrtlHist from '@/components/PrtlHists/PrtlHist'
 import PrtlHist1D from '@/components/PrtlHists/PrtlHist1D'
+import PrtlMoments1D from '@/components/PrtlHists/PrtlMoments1D'
+import PrtlMoments2D from '@/components/PrtlHists/PrtlMoment2D'
 import * as types from '@/store/types'
 import { mapGetters, mapActions } from 'vuex'
 import _ from 'lodash'
@@ -84,6 +86,10 @@ export default {
         return PrtlHist
       } else if (this.chartMap.get(id)['chartType'] === '1D Prtl Histogram') {
         return PrtlHist1D
+      } else if (this.chartMap.get(id)['chartType'] === '1D Prtl Moments') {
+        return PrtlMoments1D
+      } else if (this.chartMap.get(id)['chartType'] === '2D Prtl Moments') {
+        return PrtlMoments2D
       }
     },
     closeClicked: function (i) {

@@ -52,6 +52,51 @@ const state = {
       cbarWidth: 20
     }
   },
+  twoD_PRTL_MOMENT: {
+    chartType: '2D Prtl Moments',
+    ylabel: '\\gamma_i\\beta_{i,x}',
+    xlabel: 'x\\ [c/\\omega_{pe}]',
+    curView: ['', '', '', ''],
+    dataOptions: {
+      prtl_type: 'ions',
+      yval: 'y',
+      xval: 'x',
+      mval: 'px',
+      weights: '',
+      boolstr: '',
+      ybins: 200,
+      xbins: 200,
+      yvalmin: '',
+      yvalmax: '',
+      xvalmin: '',
+      xvalmax: '',
+      cmap: 'viridis',
+      cnorm: 'linear',
+      pow_zero: 0,
+      pow_gamma: 1.0,
+      vmin: '',
+      vmax: '',
+      clip: true,
+      xmin: '',
+      xmax: '',
+      ymin: '',
+      ymax: '',
+      aspect: 'auto',
+      mask_zeros: true,
+      interpolation: 'bicubic'},
+    renderOptions: {
+      tot_width: 800,
+      tot_height: 400,
+      margin: {
+        top: 20,
+        right: 60,
+        bottom: 70,
+        left: 70,
+        hspace: 50
+      },
+      cbarWidth: 20
+    }
+  },
   oneD_PRTL_HIST: {
     chartType: '1D Prtl Histogram',
     ylabel: '\\gamma_i\\beta_{i,x}',
@@ -61,6 +106,41 @@ const state = {
         { name: 'Line 1',
           color: '#4e79a7',
           prtl_type: 'ions',
+          xval: 'x',
+          weights: '',
+          boolstr: '',
+          xbins: 50,
+          xvalmin: '',
+          xvalmax: ''
+        }
+      ]]),
+      normhist: true,
+      xscale: 'linear'
+    },
+    curView: ['', '', '', ''],
+    renderOptions: {
+      tot_width: 800,
+      tot_height: 400,
+      margin: {
+        top: 20,
+        right: 60,
+        bottom: 70,
+        left: 70,
+        hspace: 50
+      },
+      cbarWidth: 20
+    }
+  },
+  oneD_PRTL_MOMENT: {
+    chartType: '1D Prtl Moments',
+    ylabel: '\\gamma_i\\beta_{i,x}',
+    xlabel: 'x\\ [c/\\omega_{pe}]',
+    dataOptions: {
+      lineMap: new Map([[0,
+        { name: 'Line 1',
+          color: '#4e79a7',
+          prtl_type: 'electrons',
+          yval: 'px',
           xval: 'x',
           weights: '',
           boolstr: '',
@@ -165,12 +245,24 @@ const mutations = {
     if (payload.chartType === '2D Prtl Histogram') {
       state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_HIST)))
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+    } else if (payload.chartType === '2D Prtl Moments') {
+      state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_MOMENT)))
+      state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
     } else if (payload.chartType === '1D Prtl Histogram') {
       state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
       state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
       // Map isn't deep copied correctly. Hack to fix
       state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap = new Map()
       state.oneD_PRTL_HIST.dataOptions.lineMap.forEach((val, key) => {
+        state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.set(key, JSON.parse(JSON.stringify(val)))
+      })
+      state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.get(0).sim = payload.simID
+    } else if (payload.chartType === '1D Prtl Moments') {
+      state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_MOMENT)))
+      state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+      // Map isn't deep copied correctly. Hack to fix
+      state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap = new Map()
+      state.oneD_PRTL_MOMENT.dataOptions.lineMap.forEach((val, key) => {
         state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.set(key, JSON.parse(JSON.stringify(val)))
       })
       state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.get(0).sim = payload.simID
@@ -237,6 +329,18 @@ const mutations = {
         state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
       } else if (payload.chartType === '1D Prtl Histogram') {
         state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_HIST)))
+        // Map isn't deep copied correctly. Hack to fix
+        state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap = new Map()
+        state.oneD_PRTL_HIST.dataOptions.lineMap.forEach((val, key) => {
+          state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.set(key, JSON.parse(JSON.stringify(val)))
+        })
+        state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+        state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap.get(0).sim = payload.simID
+      } else if (payload.chartType === '2D Prtl Moments') {
+        state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.twoD_PRTL_MOMENT)))
+        state.graphViewStateMap.get(payload.chartID).sims = [ payload.simID ]
+      } else if (payload.chartType === '1D Prtl Moments') {
+        state.graphViewStateMap.set(payload.chartID, JSON.parse(JSON.stringify(state.oneD_PRTL_MOMENT)))
         // Map isn't deep copied correctly. Hack to fix
         state.graphViewStateMap.get(payload.chartID).dataOptions.lineMap = new Map()
         state.oneD_PRTL_HIST.dataOptions.lineMap.forEach((val, key) => {

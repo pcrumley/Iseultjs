@@ -39,6 +39,9 @@
 <script>
 import prtlHistForm from '@/components/PrtlHists/PrtlHistForm'
 import prtlHistForm1D from '@/components/PrtlHists/PrtlHistForm1D'
+import prtlMomForm1D from '@/components/PrtlHists/PrtlMomentsForm1D'
+import prtlMomForm2D from '@/components/PrtlHists/PrtlMoment2DForm'
+
 import * as types from '@/store/types'
 import { mapActions, mapGetters } from 'vuex'
 
@@ -61,6 +64,10 @@ export default {
         return prtlHistForm
       } else if (this.chartTypeArr[this.subplotType] === '1D Prtl Histogram') {
         return prtlHistForm1D
+      } else if (this.chartTypeArr[this.subplotType] === '1D Prtl Moments') {
+        return prtlMomForm1D
+      } else if (this.chartTypeArr[this.subplotType] === '2D Prtl Moments') {
+        return prtlMomForm2D
       } else {
         return 0
       }

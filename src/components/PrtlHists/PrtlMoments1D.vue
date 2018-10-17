@@ -54,7 +54,7 @@ import axisLabel from '@/components/GraphHelpers/AxisLabel.vue'
 // import _ from 'lodash'
 
 export default {
-  name: 'OneDimPrtlHist',
+  name: 'OneDimPrtlMoment',
   data () {
     return {
       lineCache: new Map(),
@@ -219,12 +219,13 @@ export default {
     },
     renderHistURL: function (lineObj) {
       var mySim = this.simMap.get(lineObj.sim)
-      var tmpURL = mySim.info.serverURL + '/api/1dhist/?' +
+      var tmpURL = mySim.info.serverURL + '/api/1dmoments/?' +
         'sim_type=' + mySim.info.simType +
         '&outdir=' + mySim.info.outdir.replace(/\//g, '%2F') +
         '&n=' + mySim.data.fileArray[mySim.i] +
         '&i=' + mySim.i +
         '&xval=' + lineObj.xval +
+        '&yval=' + lineObj.yval +
         '&xvalmin=' + lineObj.xvalmin +
         '&xvalmax=' + lineObj.xvalmax +
         '&xbins=' + lineObj.xbins +
@@ -270,7 +271,7 @@ export default {
       this.xLabel = iter.next().value[1].label
       // this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
       this.xDomain = [xmin, xmax]
-      this.yDomain = [0, 1.1 * ymax]
+      this.yDomain = [ymin, ymax]
       // this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
       // this.didIUpdate *= -1
     },

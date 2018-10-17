@@ -5,7 +5,9 @@ import * as types from '../types'
 const state = {
   availChartTypes: [
     '2D Prtl Histogram',
-    '1D Prtl Histogram'
+    '1D Prtl Histogram',
+    '2D Prtl Moments',
+    '1D Prtl Moments'
   ] // THIS SHOULD BE SENT BY SERVER PROBABLY... NEED TO THINK ABOUT IT.
 }
 
