@@ -36,7 +36,7 @@
     <rect :x="margin.left" :y ="margin.top" :width = "imgX" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
   </svg>
 
-  <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="false"/>
+  <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
 
   <!--<div>{{ lineCache }}</div>-->
@@ -171,7 +171,7 @@ export default {
   watch: {
     simUpdated: function (newSimArr) {
       this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
-        this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, label: this.getLabel(val)})
+        this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, labels: this.getLabel(val)})
       })
       this.getData()
     },
@@ -184,7 +184,7 @@ export default {
           this.height = this.myViewState.renderOptions.tot_height
         }
         this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
-          this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, label: this.getLabel(val)})
+          this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, labels: this.getLabel(val)})
         })
         this.lineCache.forEach((val, key) => {
           if (!this.graphMap.get(this.chartID).dataOptions.lineMap.has(key)) {
@@ -246,8 +246,12 @@ export default {
     },
     getLabel: function (lineObj) {
       var mySim = this.simMap.get(lineObj.sim)
-      return mySim.data.prtls[lineObj.prtl_type]
-        .oneDLabels[mySim.data['prtls'][lineObj.prtl_type].quantities.indexOf(lineObj.xval)]
+      return [
+        mySim.data.prtls[lineObj.prtl_type]
+          .oneDLabels[mySim.data['prtls'][lineObj.prtl_type].quantities.indexOf(lineObj.xval)],
+        mySim.data.prtls[lineObj.prtl_type]
+          .oneDLabels[mySim.data['prtls'][lineObj.prtl_type].quantities.indexOf(lineObj.yval)]
+      ]
     },
     updatePlot: function () {
       var xmin = NaN
@@ -268,7 +272,9 @@ export default {
         }
       })
       var iter = this.lineCache.entries()
-      this.xLabel = iter.next().value[1].label
+      var labels = iter.next().value[1].labels
+      this.xLabel = labels[0]
+      this.yLabel = '\\langle' + labels[1] + '\\rangle'
       // this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
       this.xDomain = [xmin, xmax]
       this.yDomain = [ymin, ymax]
@@ -391,7 +397,7 @@ export default {
   },
   mounted: function () {
     this.graphMap.get(this.chartID).dataOptions.lineMap.forEach((val, key) => {
-      this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, label: this.getLabel(val)})
+      this.lineCache.set(key, {url: this.renderHistURL(val), data: {}, labels: this.getLabel(val)})
     })
     // this.getData()
     this.$nextTick(function () {

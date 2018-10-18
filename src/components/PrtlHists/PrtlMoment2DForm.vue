@@ -43,6 +43,12 @@
         @change="updatePlot({key: 'prtl_type', keepView: ''})">
         <option v-for="item in prtlTypes" :key="item"> {{ item }} </option>
       </select>
+      <label for="chooseWeights" class="col-form-label col-sm-2  offset-sm-1">weights</label>
+      <select class="form-control col-sm-2" id="weights"
+        v-model="histOptions.weights" @change="updatePlot({key:'weights'})">
+        <option> </option>
+        <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
+      </select>
     </div>
     <div class="form-group form-row">
       <label for="chooseX" class="col-form-label col-sm-1" >
@@ -62,12 +68,15 @@
         @change="updatePlot({key:'yval', keepView:'x0x1'})">
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
-      <label for="chooseWeights" class="col-form-label col-sm-2  offset-sm-1">weights</label>
-      <select class="form-control col-sm-2" id="weights"
-        v-model="histOptions.weights" @change="updatePlot({key:'weights'})">
-        <option> </option>
+      <label for="chooseY" class="col-form-label col-sm-1 offset-sm-1"> v:</label>
+      <select
+        class="form-control col-sm-2"
+        id="mval"
+        v-model="histOptions.mval"
+        @change="updatePlot({key:'mval', keepView:'x0x1'})">
         <option v-for="item in prtlQuants" :key="item"> {{ item }} </option>
       </select>
+
     </div>
   <div class="form-row ">
     <div class="form-group col-md-3">
