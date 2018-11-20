@@ -351,7 +351,7 @@ const mutations = {
       }
     } else {
       state.chartArr.push(state.nextChartID)
-      state.layout.push({'x': 0, 'y': 0, 'w': 4, 'h': 5, 'i': state.nextChartID.toString()})
+      state.layout.push({'x': 0, 'y': 0, 'w': 4, 'h': 20, 'i': state.nextChartID.toString()})
       state.nextChartID += 1
     }
   },

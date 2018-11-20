@@ -3,12 +3,13 @@
   THE VUE COMPONENT THAT MANAGES EACH CHART
   -->
   <div>
-
+    <div v-if="sidebarOpen" class="spacer">&nbsp; </div>
+    <div :class ="{withroom: sidebarOpen, inner: true}">
     <grid-layout
              @layout-updated="layoutUpdatedEvent"
              :layout="layout"
              :col-num="12"
-             :row-height="100"
+             :row-height="10"
              :is-draggable="resizeActive"
              :is-resizable="resizeActive"
              :vertical-compact="true"
@@ -35,6 +36,7 @@
         <span v-if="resizeActive" class="clickable close-btn" @click="closeClicked(parseInt(item.i))"> X </span>
     </grid-item>
   </grid-layout>
+  </div>
   <sidebar/>
   <chart-footer/>
   </div>
@@ -65,6 +67,9 @@ export default {
       chartArr: types.GET_CHART_ARR,
       navbarState: types.GET_NAVBAR_STATE
     }),
+    sidebarOpen () {
+      return this.$store.state.ui.sidebarOpen
+    },
     resizeActive () {
       return this.navbarState === 'resize-grid'
     },
@@ -137,6 +142,9 @@ export default {
     wWidth (val) {
       this.debouncedResize()
     },
+    sidebarOpen (val) {
+      this.debouncedResize()
+    },
     layoutFromStore (val) {
       if (val) {
         this.layout = JSON.parse(JSON.stringify(this.layoutFromStore))
@@ -153,6 +161,18 @@ export default {
 </script>
 
 <style scoped>
+.inner {
+  top: 0px;
+}
+div.spacer {
+  float: left;
+  width: 440px;
+}
+div.withroom {
+  float: left;
+  width: calc(100% - 460px);
+}
+
 span.clickable {cursor: pointer}
 span.close-btn {
   right:0;

@@ -59,7 +59,8 @@ const actions = {
     // Add some AJAX here that would open the sim from the server & give us
     // some info about what sim... until then
     // load the simulation data
-    axios.get(payload.serverURL + '/api/openSim/' + '?sim_type=' + payload.simType + '&outdir=' + payload.outdir)
+    console.log(payload.serverURL + '/api/openSim/' + '?simType=' + payload.simType + '&outdir=' + payload.outdir)
+    axios.get(payload.serverURL + '/api/openSim/' + '?simType=' + payload.simType + '&outdir=' + payload.outdir)
       .then(function (response) {
         var simObj = { info: {}, data: {}, i: 0, lassos: {} }
         Object.assign(simObj.info, payload)

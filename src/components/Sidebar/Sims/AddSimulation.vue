@@ -167,6 +167,7 @@ export default {
     pingServer:
       function () {
         var vm = this
+        console.log(vm.cleanedServerURL + '/dirs' + vm.curDir)
         axios.get(vm.cleanedServerURL + '/dirs' + vm.curDir)
           .then(function (response) {
             vm.dirList = response.data.dirs
@@ -178,8 +179,8 @@ export default {
       }
   },
   mounted () {
-    this.pingServer()
     this.curDir = this.serverMap.get(this.serverID).serverDir
+    this.pingServer()
   },
   components: {
     FontAwesomeIcon,

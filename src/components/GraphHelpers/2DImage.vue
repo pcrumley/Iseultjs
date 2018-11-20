@@ -44,7 +44,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/store/types'
-import axios from 'axios'
 import * as d3 from 'd3'
 import ImageCanvas from '@/components/GraphHelpers/ImageCanvas.vue'
 import iseultAxis from '@/components/GraphHelpers/IseultAxis.vue'
@@ -53,21 +52,16 @@ import axisLabel from '@/components/GraphHelpers/AxisLabel.vue'
 // import _ from 'lodash'
 
 export default {
-  name: 'TwoDimPrtlHist',
+  name: '2DImage',
   data () {
     return {
-      imgURLSimPart: '',
-      imgURLOptsPart: '',
-      cmap: '',
-      cnormStr: '',
       width: 800,
       height: 400,
       yLabel: '',
       xLabel: '',
-      rectX1: 0,
-      mySim: '',
-      rectX2: 0,
       pathString: '',
+      rectX1: 0,
+      rectX2: 0,
       rectY1: 0,
       rectY2: 0,
       myMouseIsDown: false,
@@ -79,8 +73,6 @@ export default {
       cbarImgObj: {},
       histLabel: '',
       cbarWidth: 20,
-      cbarPNG: '',
-      cache: new Map(),
       didIUpdate: 1,
       margin: {
         top: 20,
@@ -96,29 +88,10 @@ export default {
   ],
   computed: {
     ...mapGetters({
-      simMap: types.GET_SIM_MAP,
-      graphMap: types.GET_GRAPH_STATE_MAP,
-      simUpdated: types.GET_SIM_UPDATED,
-      chartsUpdated: types.GET_UPDATED_CHARTS,
       navbarState: types.GET_NAVBAR_STATE
     }),
     svgID () {
       return 'svg' + this.chartID
-    },
-    myViewState () {
-      if (this.graphMap.has(this.chartID)) {
-        return this.graphMap.get(this.chartID)
-      } else {
-        return {}
-      }
-    },
-    dataOptions () {
-      // data options minus xmin, xmax, ymin, ymax
-      return Object.keys(this.myViewState.dataOptions).filter(e =>
-        (e !== 'xmin' &&
-         e !== 'xmax' &&
-         e !== 'ymin' &&
-         e !== 'ymax'))
     },
     imgX () {
       // return this.width - this.right-this.left
@@ -129,15 +102,6 @@ export default {
     },
     cbarLeft () {
       return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
-    },
-    cbarObj () {
-      return {
-        imgX: this.cbarWidth,
-        imgY: this.imgY,
-        left: this.width - this.margin.right - this.cbarWidth,
-        top: this.margin.top,
-        imgData: this.cbarPNG
-      }
     },
     xScale () {
       return d3['scaleLinear']()
@@ -153,30 +117,6 @@ export default {
       return d3[this.cbarScaleType]()
         .range([this.imgY, 0])
         .domain(this.cbarDomain)
-    },
-    cbarURL () {
-      var tmpStr = ''
-      if (this.mySim.hasOwnProperty('info')) {
-        tmpStr += this.mySim.info.serverURL + '/api/colorbar/' +
-        '?px=' + this.myViewState.renderOptions.cbarWidth +
-        '&py=' + this.imgY +
-        '&cmap=' + this.cmap
-      }
-      return tmpStr + this.cnormStr
-    },
-    imgURL () {
-      var tmpStr = this.imgURLSimPart + this.imgURLOptsPart + '&px=' + this.imgX + '&py=' + this.imgY
-      // add the parts of the lassos
-      if (this.navbarState === 'lasso' && this.mySim.hasOwnProperty('lassos')) {
-        if (this.mySim.lassos.hasOwnProperty(this.myViewState.dataOptions['prtl_type'])) {
-          var curLasso = this.mySim.lassos[this.myViewState.dataOptions['prtl_type']]
-          tmpStr += '&selPolyXval=' + curLasso.xVal
-          tmpStr += '&selPolyYval=' + curLasso.yVal
-          tmpStr += '&selPolyXarr=' + curLasso.x
-          tmpStr += '&selPolyYarr=' + curLasso.y
-        }
-      }
-      return tmpStr
     },
     showZoomRect () {
       return this.myMouseIsDown && this.navbarState === 'zoom-in'
@@ -264,27 +204,6 @@ export default {
       this.yDomain = this.cache.get(this.mySim.i).yDomain
       this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
       this.didIUpdate *= -1
-    },
-    renderImgURLOptsPart: function () {
-      if (this.myViewState.dataOptions.cmap !== this.cmap) {
-        this.cmap = this.myViewState.dataOptions.cmap
-      }
-      var tmpcnormStr = '&cnorm=' + this.myViewState.dataOptions['cnorm'] +
-        '&pow_zero=' + this.myViewState.dataOptions['pow_zero'] +
-        '&pow_gamma=' + this.myViewState.dataOptions['pow_gamma']
-      if (tmpcnormStr !== this.cnormStr) {
-        this.cnormStr = tmpcnormStr
-      }
-      var i
-      this.imgURLOptsPart = '&'
-      for (i = 0; i < this.dataOptions.length; i++) {
-        this.imgURLOptsPart += this.dataOptions[i] + '=' + this.myViewState.dataOptions[this.dataOptions[i]] + '&'
-      }
-      this.imgURLOptsPart += 'xmin=' + this.myViewState.curView[0] + '&'
-      this.imgURLOptsPart += 'xmax=' + this.myViewState.curView[1] + '&'
-      this.imgURLOptsPart += 'ymin=' + this.myViewState.curView[2] + '&'
-      this.imgURLOptsPart += 'ymax=' + this.myViewState.curView[3] // + '&'
-      return this.imgURLOptsPart
     },
     mouseIsDown (event) {
       if (this.navbarState === 'zoom-in' || this.navbarState === 'pan') {
@@ -384,46 +303,6 @@ export default {
         }
       }
       this.myMouseIsDown = false
-    },
-    getImg: // _.debounce(
-      function () {
-        var vm = this
-        axios.get(vm.imgURL)
-          .then(function (response) {
-            vm.cache.set(response.data.i, {
-              mainImgObj: {
-                imgX: response.data.imgX,
-                imgY: response.data.imgY,
-                left: vm.margin.left,
-                top: vm.margin.top,
-                imgData: response.data.imgString},
-              xDomain: [response.data.xmin, response.data.xmax],
-              yDomain: [response.data.ymin, response.data.ymax],
-              cbarDomain: [response.data.vmin, response.data.vmax]
-            })
-            // vm.getColorBar()
-            vm.cache.get(response.data.i).url = response.data.url
-            vm.updatePlot()
-          })
-          .catch(function (error) {
-            // vm.imgString = ''
-            console.log(error)
-          })
-      }, // ,
-    //  20
-    // ),
-    getColorBar () {
-      var vm = this
-      axios.get(vm.cbarURL)
-        .then(function (response) {
-          if (vm.cbarURL === response.data.url) {
-            vm.cbarPNG = response.data.cbarString
-          }
-        })
-        .catch(function (error) {
-          vm.cbarPNG = ''
-          console.log(error)
-        })
     }
   },
   mounted: function () {

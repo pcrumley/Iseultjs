@@ -85,7 +85,7 @@ export default {
     position: fixed;
     left: 0;
     top: 0;
-    width: 500px;
+    width: 440px;
     height: calc(100vh - 70px);
     overflow-y:auto;
     max-width: 90vw;
