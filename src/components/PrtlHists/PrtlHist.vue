@@ -35,6 +35,7 @@
     <rect :x="margin.left" :y ="margin.top" :width = "imgX" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
     <rect :x="imgX + margin.left + margin.hspace - cbarWidth" :y ="margin.top" :width = "cbarWidth" :height="imgY" fill-opacity ="0" style="stroke-width:1px;stroke:rgb(0,0,0);"/>
   </svg>
+  <g> {{imgURL}}</g>
   <axis-label :orient="'labelLeft'" :text="yLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
   <axis-label :orient="'labelBottom'" :text="xLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
   <axis-label :orient="'labelRight'" :text="histLabel" :figWidth="width" :figHeight="height" :figMargin="margin" :useTex="true"/>
@@ -122,10 +123,10 @@ export default {
     },
     imgX () {
       // return this.width - this.right-this.left
-      return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace
+      return Math.max(this.width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace, 1)
     },
     imgY () {
-      return this.height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
+      return Math.max(this.height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom, 1)
     },
     cbarLeft () {
       return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
@@ -213,7 +214,7 @@ export default {
       }
     },
     cbarURL: function () {
-      this.getColorBar()
+      // this.getColorBar()
     },
     chartsUpdated: function (newChartArr) {
       if (newChartArr.includes(this.chartID)) {
@@ -232,6 +233,8 @@ export default {
       }
     },
     imgURL (newURL) {
+      this.getImg()
+      /*
       if (this.imgURLOptsPart !== '') {
         if (this.cache.has(this.mySim.i)) {
           if (this.cache.get(this.mySim.i).url === newURL) {
@@ -243,6 +246,7 @@ export default {
           this.getImg()
         }
       }
+      */
     }
   },
   methods: {
@@ -388,6 +392,7 @@ export default {
     getImg: // _.debounce(
       function () {
         var vm = this
+        console.log(vm.imgURL)
         axios.get(vm.imgURL)
           .then(function (response) {
             vm.cache.set(response.data.i, {

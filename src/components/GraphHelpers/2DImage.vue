@@ -2,8 +2,11 @@
   <div class="absolute" :style="{ width:width+'px', height:height+'px' }" @mousedown="mouseIsDown" @mousemove="mouseIsMoving" @mouseup="mouseIsUp" @mouseleave="mouseLeft">
     <!-- The div will hold 1 figure with 3 axis objects, one html canvas &
       three labels -->
-  <iseult-image-canvas :imgObj="mainImgObj"></iseult-image-canvas>
-  <iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>
+  <canvas :width="this.px"
+          :height="this.py"
+          :style="{ left:this.margin.left + 'px', top: this.margin.top +'px'}">
+  </canvas>
+  <!--<iseult-image-canvas :imgObj="cbarObj" ></iseult-image-canvas>-->
   <svg :id="svgID" :style="{ width:width+'px', height:height+'px'}" ><!-- @mouseup="myMouseIsDown=false">-->
     <!-- The svg is where we'll draw our vector elements using d3.js -->
     <!-- The x-axis -->
@@ -57,23 +60,31 @@ export default {
     return {
       width: 800,
       height: 400,
+
       yLabel: '',
       xLabel: '',
+      ImgData: '',
+      ImgX: 200,
+      ImgY: 200,
+      ImgXDataMin: 0,
+      ImgXDataMax: 100,
+      ImgYDataMin: 0,
+      ImgYDataMax: 100,
+      cbarImgObj: {},
+      cbarLabel: '',
       pathString: '',
       rectX1: 0,
       rectX2: 0,
       rectY1: 0,
       rectY2: 0,
       myMouseIsDown: false,
-      mainImgObj: {},
       xDomain: [],
       yDomain: [],
       cbarDomain: [],
       cbarScaleType: 'scaleLog',
-      cbarImgObj: {},
-      histLabel: '',
+      xScaleType: 'scaleLinear',
+      yScaleType: 'scaleLinear',
       cbarWidth: 20,
-      didIUpdate: 1,
       margin: {
         top: 20,
         right: 60,
@@ -93,23 +104,23 @@ export default {
     svgID () {
       return 'svg' + this.chartID
     },
-    imgX () {
+    px () {
       // return this.width - this.right-this.left
-      return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace
+      return Math.max(this.width - this.myViewState.renderOptions.margin.right - this.myViewState.renderOptions.margin.left - this.myViewState.renderOptions.margin.hspace, 1)
     },
-    imgY () {
-      return this.height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom
+    py () {
+      return Math.max(this.height - this.myViewState.renderOptions.margin.top - this.myViewState.renderOptions.margin.bottom, 1)
     },
     cbarLeft () {
       return this.width - this.myViewState.renderOptions.margin.right - this.myViewState.cbarWidth
     },
     xScale () {
-      return d3['scaleLinear']()
+      return d3[this.xScaleType]()
         .range([0, this.imgX])
         .domain(this.xDomain)
     },
     yScale () {
-      return d3['scaleLinear']()
+      return d3[this.xScaleType]()
         .range([this.imgY, 0])
         .domain(this.yDomain)
     },
@@ -139,71 +150,36 @@ export default {
       }
     },
     rectObj () {
-      return {left: Math.min(this.rectX1, this.rectX2),
+      return {
+        left: Math.min(this.rectX1, this.rectX2),
         top: Math.min(this.rectY1, this.rectY2),
         width: Math.abs(this.rectX1 - this.rectX2),
         height: Math.abs(this.rectY1 - this.rectY2)}
     }
   },
   watch: {
-    simUpdated: function (newSimArr) {
-      if (newSimArr.includes(this.myViewState.sims[0])) {
-        this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
-        this.renderImgURLSimPart()
-      }
+    px: function () {
+      this.drawImage()
     },
-    cbarURL: function () {
-      this.getColorBar()
-    },
-    chartsUpdated: function (newChartArr) {
-      if (newChartArr.includes(this.chartID)) {
-        if (this.width !== this.myViewState.renderOptions.tot_width) {
-          this.width = this.myViewState.renderOptions.tot_width
-        }
-        if (this.height !== this.myViewState.renderOptions.tot_height) {
-          this.height = this.myViewState.renderOptions.tot_height
-        }
-        this.renderImgURLOptsPart()
-        const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
-        this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
-        this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
-        this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
-        this.cbarScaleType = (this.myViewState.dataOptions['cnorm'] === 'log') ? 'scaleLog' : 'scaleLinear'
-      }
-    },
-    imgURL (newURL) {
-      if (this.imgURLOptsPart !== '') {
-        if (this.cache.has(this.mySim.i)) {
-          if (this.cache.get(this.mySim.i).url === newURL) {
-            this.updatePlot()
-          } else {
-            this.getImg()
-          }
-        } else {
-          this.getImg()
-        }
-      }
+    py: function () {
+      this.drawImage()
     }
   },
   methods: {
     ...mapActions({
-      updateChartOptions: types.UPDATE_CHART,
       setView: types.SET_CUR_VIEW,
       setLasso: types.SET_LASSO_REGION
     }),
-    renderImgURLSimPart: function () {
-      this.imgURLSimPart = this.mySim.info.serverURL + '/api/2dhist/imgs/?' +
-        'sim_type=' + this.mySim.info.simType +
-        '&outdir=' + this.mySim.info.outdir.replace(/\//g, '%2F') +
-        '&n=' + this.mySim.data.fileArray[this.mySim.i] +
-        '&i=' + this.mySim.i
-    },
-    updatePlot: function () {
-      this.mainImgObj = this.cache.get(this.mySim.i).mainImgObj
-      this.xDomain = this.cache.get(this.mySim.i).xDomain
-      this.yDomain = this.cache.get(this.mySim.i).yDomain
-      this.cbarDomain = this.cache.get(this.mySim.i).cbarDomain
-      this.didIUpdate *= -1
+    drawImage () {
+      var a = (this.xDomain[1] - this.xDomain[0]) / (this.ImgXExtent[1] - this.ImgXExtent[0]) * this.ImgX / this.px
+      var d = (this.yDomain[1] - this.yDomain[0]) / (this.ImgYExtent[1] - this.ImgYExtent[0]) * this.ImgY / self.py
+      var e = -(this.ImgXExtent[0] - this.xDomain[0]) / (this.ImgXExtent[1] - this.ImgXExtent[0]) * self.ImgX
+      var f = (this.ImgYExtent[1] - this.yDomain[1]) / (this.ImgYExtent[1] - this.ImgYExtent[0]) * this.ImgY
+      /* var ctx = canvasElement.getContext('2d')
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvasElement.width, canvasElement.height)
+      ctx.setTransform(a,0,0, d, e, f)
+      */
     },
     mouseIsDown (event) {
       if (this.navbarState === 'zoom-in' || this.navbarState === 'pan') {
@@ -305,25 +281,18 @@ export default {
       this.myMouseIsDown = false
     }
   },
-  mounted: function () {
-    this.mySim = JSON.parse(JSON.stringify(this.simMap.get(this.myViewState.sims[0])))
-
-    const tmpPrtlType = this.myViewState.dataOptions['prtl_type']
-    this.yLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data.prtls[tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.yval)]
-    this.xLabel = this.mySim.data.prtls[tmpPrtlType].axisLabels[this.mySim.data['prtls'][tmpPrtlType].quantities.indexOf(this.myViewState.dataOptions.xval)]
-    this.histLabel = this.mySim.data['prtls'][tmpPrtlType]['histLabel']
-    this.renderImgURLSimPart()
+  /* mounted: function () {
     this.$nextTick(function () {
       var pStyle = document.getElementById('VueGrid' + this.chartID.toString()).getAttribute('style')
       var pHeight = pStyle.slice(pStyle.search(/height/g))
       pHeight = parseInt(pHeight.slice(pHeight.search(/:/g) + 1, pHeight.search(/;/g) - 2))
       var pWidth = pStyle.slice(pStyle.search(/width/g))
       pWidth = parseInt(pWidth.slice(pWidth.search(/:/g) + 1, pWidth.search(/;/g) - 2))
-
       this.$store.commit(types.MUTATE_RENDER_OPTS, {chartID: this.chartID, wVal: pWidth, hVal: pHeight})
       this.$store.commit(types.MARK_UPDATE, {ids: [this.chartID]})
     })
   },
+  */
   components: {
     'iseultImageCanvas': ImageCanvas,
     iseultAxis,

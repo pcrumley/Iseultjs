@@ -11,6 +11,10 @@ const state = {
     chartType: '2D Prtl Histogram',
     ylabel: '\\gamma_i\\beta_{i,x}',
     xlabel: 'x\\ [c/\\omega_{pe}]',
+    cbarlabel: '',
+    lassoType: '',
+    imgX: '',
+    imgY: '',
     curView: ['', '', '', ''],
     dataOptions: {
       prtl_type: 'ions',
@@ -56,6 +60,7 @@ const state = {
     chartType: '2D Prtl Moments',
     ylabel: '\\gamma_i\\beta_{i,x}',
     xlabel: 'x\\ [c/\\omega_{pe}]',
+    cbarlabel: '',
     curView: ['', '', '', ''],
     dataOptions: {
       prtl_type: 'ions',
@@ -211,6 +216,9 @@ const actions = {
   [types.DEL_GRAPH]: ({ commit, state }, payload) => {
     // Payload must include server id
     commit(types.POP_GRAPH, payload)
+  },
+  [types.IMG_SIZE_CHANGED]: ({ commit, state }, payload) => {
+    console.log(payload)
   },
   [types.UPDATE_CHART]: ({ commit, state }, payload) => {
     commit(types.MUTATE_CHART_OPT, payload)
